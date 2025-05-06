@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.retrieval.batch_processor &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.retrieval.batch_processor</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.retrieval.batch_processor</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">batch_processor.py</span>
+<span class="sd">-------------------</span>
+<span class="sd">Version 1.0, updated on 2024-12-04</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.checkpoint_mixin</span> <span class="kn">import</span> <span class="n">CheckpointMixin</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_dataframe_factory</span> <span class="kn">import</span> <span class="n">MyDataFrameFactory</span>
+<span class="kn">from</span> <span class="nn">src.decorators.data_check_decorators</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">requires_property</span><span class="p">,</span>
+    <span class="n">parameters_not_empty</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.decorators.type_check_decorators</span> <span class="kn">import</span> <span class="n">enforce_input_types</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.chunk_processor</span> <span class="kn">import</span> <span class="n">ChunkProcessor</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BatchFinishedException</span><span class="p">,</span>
+    <span class="n">LanguageFinishedException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_analysis_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SentimentAnalysisConfig</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="BatchProcessor">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.batch_processor.BatchProcessor">[docs]</a>
+<span class="k">class</span> <span class="nc">BatchProcessor</span><span class="p">(</span><span class="n">LoggingMixin</span><span class="p">,</span> <span class="n">CheckpointMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    BatchProcessor class.</span>
+
+<span class="sd">    This class manages batch-wise processing of data samples for a specified</span>
+<span class="sd">    language. It maintains checkpoints to resume processing after interruptions</span>
+<span class="sd">    and aggregates results from processed batches.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    batch_size : int</span>
+<span class="sd">        The size of each batch, according to the entiment analysis</span>
+<span class="sd">        configuration.</span>
+
+<span class="sd">    config : SentimentAnalysisConfig</span>
+<span class="sd">        The sentiment analysis configuratation.</span>
+
+<span class="sd">    n_possible_batches : int</span>
+<span class="sd">        The number of possible batches. Computed property.</span>
+
+<span class="sd">    results : MyDataFrame</span>
+<span class="sd">        The batches results.</span>
+
+<span class="sd">    results_file_name : str</span>
+<span class="sd">        The name of the results file.</span>
+
+<span class="sd">    samples : MyDataFrame</span>
+<span class="sd">        The samples to process in batches.</span>
+
+<span class="sd">    target_n_batches: int</span>
+<span class="sd">        The number of batches to process, according to the sentiment analysis</span>
+<span class="sd">        configuration.</span>
+
+<span class="sd">    target_n_samples : int</span>
+<span class="sd">        The number of samples to process. Computed property</span>
+
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    process_batch(batch_nr: int) -&gt; None:</span>
+<span class="sd">        Processes the givwn batch of the data.</span>
+
+<span class="sd">    process_batches():</span>
+<span class="sd">        Processes all batches for the given language.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BatchProcessor.__init__">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.batch_processor.BatchProcessor.__init__">[docs]</a>
+    <span class="nd">@parameters_not_empty</span><span class="p">()</span>
+    <span class="nd">@enforce_input_types</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">samples</span><span class="p">:</span> <span class="n">MyDataFrame</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the BatchProcessor with the specified parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">           Language code.</span>
+
+<span class="sd">        samples : MyDataFrame</span>
+<span class="sd">            The MyDataFrame with the samples to process in batches.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">CheckpointMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">element_type</span><span class="o">=</span><span class="s2">&quot;batch&quot;</span><span class="p">,</span>
+            <span class="n">checkpoint_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">samples</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_batch_checkpoint&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">:</span> <span class="n">MyDataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">:</span> <span class="n">MyDataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target_n_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_possible_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results_file_name</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">language</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span>
+
+        <span class="c1"># Configs used in this class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SentimentAnalysisConfig</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;batch_size&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_n_batches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;n_batches&#39;</span><span class="p">)</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">samples</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the samples to process in batches.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span>
+
+    <span class="nd">@samples</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the samples to process in batches.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="n">samples</span>
+        <span class="c1"># Reset computed properties to enforce reload the next time they are</span>
+        <span class="c1"># needed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_possible_batches</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target_n_samples</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the batches results.</span>
+
+<span class="sd">        Returns a filled MyDataFrame instance after the batches have been</span>
+<span class="sd">        processed. Empty or partially filled until then.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span>
+
+    <span class="nd">@results</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets a MyDataFrame instance to store the batches results in.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">results</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_possible_batches</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the number of possible batches.</span>
+
+<span class="sd">        Gets the number of possible batches given the number of samples and</span>
+<span class="sd">        the size of the batches.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_possible_batches</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_compute_n_possible_batches</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_possible_batches</span>
+
+    <span class="nd">@n_possible_batches</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">n_possible_batches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the number of possible batches.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_possible_batches</span> <span class="o">=</span> <span class="n">n_batches</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">target_n_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the number of samples to process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_n_samples</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_target_n_samples</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_n_samples</span>
+
+    <span class="nd">@target_n_samples</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">target_n_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the number of samples to process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target_n_samples</span> <span class="o">=</span> <span class="n">n_samples</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">results_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the name of the results file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results_file_name</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_results_file_name</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results_file_name</span>
+
+    <span class="nd">@results_file_name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">results_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the name of the results file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results_file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+<div class="viewcode-block" id="BatchProcessor.process_batches">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.batch_processor.BatchProcessor.process_batches">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_batches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes all batches for the given language.</span>
+
+<span class="sd">        Creates a checkpoint at the end of each processed batch so that the</span>
+<span class="sd">        program can resume after an interruption where it left off. Prevents</span>
+<span class="sd">        infinite loops by tracking repeated batch numbers.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        LanguageFinishedException</span>
+<span class="sd">            If all batches for the language are processed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">start_batch_nr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_start_nr</span><span class="p">()</span>
+
+        <span class="c1"># Validate the checkpoint</span>
+        <span class="k">if</span> <span class="n">start_batch_nr</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">start_batch_nr</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_n_batches</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;Invalid checkpoint: start_batch_nr = </span><span class="si">%d</span><span class="s2">. &quot;</span>
+                    <span class="s2">&quot;Must be between 1 and </span><span class="si">%d</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="n">start_batch_nr</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">target_n_batches</span>
+                    <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">batch_nr</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_batch_nr</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_n_batches</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">process_batch</span><span class="p">(</span><span class="n">batch_nr</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="n">BatchFinishedException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">batch_nr</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_n_batches</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="s2">&quot;All batches for language </span><span class="si">%s</span><span class="s2"> processed!&quot;</span> <span class="o">%</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">language</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_set_checkpoint</span><span class="p">(</span><span class="n">batch_nr</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">LanguageFinishedException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+
+                <span class="c1"># Log finished batch if nat all the batches have been processed</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Going to proceed with batch </span><span class="si">%d</span><span class="s2"> ...&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="n">batch_nr</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="c1"># Log and handle unexpected errors</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Error processing batch  </span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">batch_nr</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+                <span class="k">raise</span>
+
+            <span class="c1"># Since the current batch has been processed successfully,</span>
+            <span class="c1"># the next batch number to start with is written into the</span>
+            <span class="c1"># checkpoint file.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_checkpoint</span><span class="p">(</span><span class="n">batch_nr</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BatchProcessor.process_batch">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.batch_processor.BatchProcessor.process_batch">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_nr</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes the given batch of data.</span>
+
+<span class="sd">        Extracts the part from the data that corresponds to the batch&#39;s number</span>
+<span class="sd">        and size and passes the data on to the chunks processor to add and </span>
+<span class="sd">        execute the queries.</span>
+
+<span class="sd">        Appends the results returned from the chunks processor to the results </span>
+<span class="sd">        file and reports any failed answers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        batch_nr : int</span>
+<span class="sd">            The number of the batch.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span>
+
+        <span class="n">start_row</span> <span class="o">=</span> <span class="p">(</span><span class="n">batch_nr</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">batch_size</span>
+        <span class="n">end_row</span> <span class="o">=</span> <span class="n">start_row</span> <span class="o">+</span> <span class="n">batch_size</span>
+
+        <span class="c1"># Extract batch from DataFrame</span>
+        <span class="n">batch_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">start_row</span><span class="p">:</span><span class="n">end_row</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">batch_samples</span> <span class="o">=</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">batch_df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_batch_</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">batch_nr</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Processing samples </span><span class="si">{</span><span class="n">start_row</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">end_row</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">chunk_processor</span> <span class="o">=</span> <span class="n">ChunkProcessor</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
+                <span class="n">batch_samples</span>
+            <span class="p">)</span>
+            <span class="n">batch_results</span> <span class="o">=</span> <span class="n">chunk_processor</span><span class="o">.</span><span class="n">process_chunks</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="n">BatchFinishedException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BatchFinishedException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_to_results</span><span class="p">(</span><span class="n">batch_results</span><span class="p">,</span> <span class="n">batch_nr</span><span class="p">)</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="BatchProcessor._add_to_results">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.batch_processor.BatchProcessor._add_to_results">[docs]</a>
+    <span class="k">def</span> <span class="nf">_add_to_results</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">batch_results</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">,</span> <span class="n">batch_nr</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds the batch results to the existing results and saves the results.</span>
+
+<span class="sd">        Adds the batch results to the existing results and saves the results</span>
+<span class="sd">        file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        batch_results : MyDataFrame</span>
+<span class="sd">            The batch results returned from the chunk processor.</span>
+
+<span class="sd">        batch_nr : int</span>
+<span class="sd">            The current batch number.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">batch_nr</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">batch_results</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results_file_name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">do_with_row</span><span class="p">(</span>
+                <span class="s2">&quot;_append_rows&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="n">batch_results</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="BatchProcessor._set_target_n_samples">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.batch_processor.BatchProcessor._set_target_n_samples">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_target_n_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the targeted number of samples.</span>
+
+<span class="sd">        Computes the targeted number of samples from the targeted number of</span>
+<span class="sd">        batches and the batch size and sets the corresponding property.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_n_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_n_batches</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span></div>
+
+
+<div class="viewcode-block" id="BatchProcessor._compute_n_possible_batches">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.batch_processor.BatchProcessor._compute_n_possible_batches">[docs]</a>
+    <span class="nd">@requires_property</span><span class="p">(</span><span class="s1">&#39;samples&#39;</span><span class="p">,</span> <span class="s1">&#39;batch_size&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_compute_n_possible_batches</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the possible number of batches and stores it as a property.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_possible_batches</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="o">.</span><span class="n">df</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BatchProcessor._set_results_file_name">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.batch_processor.BatchProcessor._set_results_file_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_results_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the name of the file for the results of the processed batches.</span>
+
+<span class="sd">        In this file, the sentiment predictions of all targeted batches for </span>
+<span class="sd">        the current language are collected.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">results_file_name</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_n_samples</span><span class="p">)</span><span class="si">}</span><span class="s2">_results&quot;</span>
+        <span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,8 @@
+<map id="inheritanceb5e34a1e1d" name="inheritanceb5e34a1e1d">
+<area shape="rect" id="node1" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.BatchFinishedException" target="_top" title="Exception to handle the switch to the next batch." alt="" coords="18,252,191,277"/>
+<area shape="rect" id="node2" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CancelledByUserException" target="_top" title="Exception raised when the user cancels an operation." alt="" coords="9,203,201,228"/>
+<area shape="rect" id="node3" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.ChunkFinishedException" target="_top" title="Exception to handle the switch to the next chunk." alt="" coords="17,153,193,179"/>
+<area shape="rect" id="node4" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException" target="_top" title="ValueError exception that cannot be caught gracefully." alt="" coords="41,104,168,129"/>
+<area shape="rect" id="node5" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.LanguageFinishedException" target="_top" title="Exception to handle the switch to the next language." alt="" coords="5,55,204,80"/>
+<area shape="rect" id="node6" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.PromptInvalidException" target="_top" title="Exception to handle invalid prompts." alt="" coords="19,5,190,31"/>
+</map>

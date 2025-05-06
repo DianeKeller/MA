@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.settings &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.settings</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.settings</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">settings.py</span>
+<span class="sd">-----------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">This module defines the settings used throughout the project, e.g.</span>
+<span class="sd">    - Data file types and their</span>
+<span class="sd">        - Storage locations (&#39;PATH&#39;)</span>
+<span class="sd">        - File extensions (&#39;EXTENSION&#39;)</span>
+<span class="sd">        - Test file names (&#39;TEST FILE&#39;)</span>
+
+<span class="sd">Usage</span>
+<span class="sd">-----</span>
+<span class="sd">Get a project setting anywhere in the project using the function</span>
+<span class="sd">    &gt;&gt;&gt; get_setting(setting_category, setting_name)</span>
+
+<span class="sd">For example, to get the path for CSV files, you can use:</span>
+<span class="sd">    &gt;&gt;&gt; get_setting(SettingCategories.CSV, &#39;PATH&#39;)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypedDict</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="c1"># Custom Enum to define file extension types</span>
+<span class="kn">from</span> <span class="nn">src.serialization.file_extension</span> <span class="kn">import</span> <span class="n">FileExtension</span>
+
+
+<div class="viewcode-block" id="SettingCategories">
+<a class="viewcode-back" href="../../SentimentAnalysis.html#SentimentAnalysis.settings.SettingCategories">[docs]</a>
+<span class="k">class</span> <span class="nc">SettingCategories</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enumerates categories to organize the different settings for this project.</span>
+
+<span class="sd">    The Enum type is used for easy access and modification.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    CSV : Enum</span>
+<span class="sd">        Small dataframes (DataFrame).</span>
+<span class="sd">    XLS : Enum</span>
+<span class="sd">        Small dataframes (DataFrame) (only for reading data).</span>
+
+<span class="sd">    JSON : Enum</span>
+<span class="sd">        Data from Dict.</span>
+<span class="sd">    JSONL : Enum</span>
+<span class="sd">        Data from Dict.</span>
+<span class="sd">    PKL : Enum</span>
+<span class="sd">        Big dataframes (DataFrame).</span>
+<span class="sd">    TXT : Enum</span>
+<span class="sd">        Content of string variables.</span>
+<span class="sd">    NUM : int</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Data file types for the storage of data coming from different data types.</span>
+    <span class="n">CSV</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>  <span class="c1"># Small dataframes (DataFrame).</span>
+    <span class="n">XLS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>  <span class="c1"># Small dataframes (DataFrame).</span>
+    <span class="n">XLSX</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>  <span class="c1"># Small dataframes (DataFrame).</span>
+    <span class="n">JSON</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>  <span class="c1"># Data from Dict.</span>
+    <span class="n">JSONL</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>  <span class="c1"># Data from Dict.</span>
+    <span class="n">PKL</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>  <span class="c1"># Big dataframes (DataFrame).</span>
+    <span class="n">TXT</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>  <span class="c1"># Content of string variables.</span>
+
+    <span class="c1"># Logging parameters</span>
+    <span class="n">LOG</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1"># Numeric constants (int)</span>
+    <span class="n">NUM</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1"># String constants (str)</span>
+    <span class="n">STR</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1"># (Pandas) Data types</span>
+    <span class="n">DTYPE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="SettingValue">
+<a class="viewcode-back" href="../../SentimentAnalysis.html#SentimentAnalysis.settings.SettingValue">[docs]</a>
+<span class="k">class</span> <span class="nc">SettingValue</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Explicitly set the types of the setting values to ensure type safety.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">PATH</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">SEPARATOR</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">EXTENSION</span><span class="p">:</span> <span class="n">FileExtension</span>
+    <span class="n">STRATEGY</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">SIZE</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">NR_BACKUPS</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">LEVEL</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">FIRST_ID</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">MAX_ITEMS</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">MAX_STRING_LENGTH</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">INFINITY</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">DEFAULT_LENGTH</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">BPE_MERGES</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">BIG_DATA_THRESHOLD</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">INT_NONE</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">FLOAT</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">INT</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">DEFAULT_LANGUAGE</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<span class="n">SettingsDict</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="n">SettingCategories</span><span class="p">,</span> <span class="n">SettingValue</span><span class="p">]</span>
+
+<span class="c1"># Root directory of the project, derived from the absolute path of this</span>
+<span class="c1"># settings file.</span>
+<span class="n">ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+<span class="n">DATA_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ROOT</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+<span class="n">LOG_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ROOT</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">)</span>
+
+<span class="c1"># Set DEBUG_MODE to &#39;False&#39; in production!</span>
+<span class="n">DEBUG_MODE</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="c1"># Set the log level</span>
+<span class="c1"># Decide which messages to show in the console</span>
+<span class="n">LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span> <span class="k">if</span> <span class="n">DEBUG_MODE</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+
+<span class="c1"># Add the string identifier of a message you want to switch off to the list:</span>
+<span class="n">DISALLOWED_MESSAGES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;no_file_name&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;set_index_manually&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;log_info_before_saving&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;log_info_after_saving&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Prompt successfully validated&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Validating next prompt&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Validating prompt&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Using cached data&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;PromptsProvider using strategy nr&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># Define the settings for each category</span>
+<span class="n">SETTINGS</span><span class="p">:</span> <span class="n">SettingsDict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">CSV</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;PATH&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_ROOT</span><span class="p">,</span> <span class="s1">&#39;csv&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;SEPARATOR&#39;</span><span class="p">:</span> <span class="s1">&#39;;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;EXTENSION&#39;</span><span class="p">:</span> <span class="n">FileExtension</span><span class="o">.</span><span class="n">CSV</span><span class="p">,</span>
+        <span class="s1">&#39;STRATEGY&#39;</span><span class="p">:</span> <span class="s1">&#39;CsvStrategy&#39;</span>
+    <span class="p">},</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">XLS</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;PATH&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_ROOT</span><span class="p">,</span> <span class="s1">&#39;xls&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;EXTENSION&#39;</span><span class="p">:</span> <span class="n">FileExtension</span><span class="o">.</span><span class="n">XLS</span><span class="p">,</span>
+        <span class="s1">&#39;STRATEGY&#39;</span><span class="p">:</span> <span class="s1">&#39;XlsStrategy&#39;</span>
+    <span class="p">},</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">XLSX</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;PATH&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_ROOT</span><span class="p">,</span> <span class="s1">&#39;xlsx&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;EXTENSION&#39;</span><span class="p">:</span> <span class="n">FileExtension</span><span class="o">.</span><span class="n">XLSX</span><span class="p">,</span>
+        <span class="s1">&#39;STRATEGY&#39;</span><span class="p">:</span> <span class="s1">&#39;XlsxStrategy&#39;</span>
+    <span class="p">},</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">TXT</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;PATH&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_ROOT</span><span class="p">,</span> <span class="s1">&#39;txt&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;EXTENSION&#39;</span><span class="p">:</span> <span class="n">FileExtension</span><span class="o">.</span><span class="n">TXT</span><span class="p">,</span>
+        <span class="s1">&#39;STRATEGY&#39;</span><span class="p">:</span> <span class="s1">&#39;TxtStrategy&#39;</span>
+    <span class="p">},</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">JSON</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;PATH&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_ROOT</span><span class="p">,</span> <span class="s1">&#39;json&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;EXTENSION&#39;</span><span class="p">:</span> <span class="n">FileExtension</span><span class="o">.</span><span class="n">JSON</span><span class="p">,</span>
+        <span class="s1">&#39;STRATEGY&#39;</span><span class="p">:</span> <span class="s1">&#39;JsonStrategy&#39;</span>
+    <span class="p">},</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">JSONL</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;PATH&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_ROOT</span><span class="p">,</span> <span class="s1">&#39;jsonl&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;EXTENSION&#39;</span><span class="p">:</span> <span class="n">FileExtension</span><span class="o">.</span><span class="n">JSONL</span><span class="p">,</span>
+        <span class="s1">&#39;STRATEGY&#39;</span><span class="p">:</span> <span class="s1">&#39;JsonlStrategy&#39;</span>
+    <span class="p">},</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">PKL</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;PATH&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_ROOT</span><span class="p">,</span> <span class="s1">&#39;pkl&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;EXTENSION&#39;</span><span class="p">:</span> <span class="n">FileExtension</span><span class="o">.</span><span class="n">PKL</span><span class="p">,</span>
+        <span class="s1">&#39;STRATEGY&#39;</span><span class="p">:</span> <span class="s1">&#39;PklStrategy&#39;</span>
+    <span class="p">},</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">LOG</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;SIZE&#39;</span><span class="p">:</span> <span class="mi">1048576</span><span class="p">,</span>
+        <span class="s1">&#39;NR_BACKUPS&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="s1">&#39;LEVEL&#39;</span><span class="p">:</span> <span class="n">LOG_LEVEL</span><span class="p">,</span>
+        <span class="s1">&#39;EXTENSION&#39;</span><span class="p">:</span> <span class="n">FileExtension</span><span class="o">.</span><span class="n">LOG</span>
+    <span class="p">},</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">NUM</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;FIRST_ID&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s1">&#39;MAX_ITEMS&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s1">&#39;MAX_STRING_LENGTH&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="s1">&#39;INFINITY&#39;</span><span class="p">:</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>
+        <span class="s1">&#39;DEFAULT_LENGTH&#39;</span><span class="p">:</span> <span class="mi">250</span><span class="p">,</span>
+        <span class="s1">&#39;BPE_MERGES&#39;</span><span class="p">:</span> <span class="mi">50000</span><span class="p">,</span>
+        <span class="s1">&#39;BIG_DATA_THRESHOLD&#39;</span><span class="p">:</span> <span class="mi">300000</span><span class="p">,</span>
+        <span class="s1">&#39;INT_NONE&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">9999999999</span>
+    <span class="p">},</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">STR</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;DEFAULT_LANGUAGE&#39;</span><span class="p">:</span> <span class="s1">&#39;en&#39;</span>
+    <span class="p">},</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">DTYPE</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;INT&#39;</span><span class="p">:</span> <span class="s1">&#39;Int64&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;FLOAT&#39;</span><span class="p">:</span> <span class="s1">&#39;Float64&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="get_setting">
+<a class="viewcode-back" href="../../SentimentAnalysis.html#SentimentAnalysis.settings.get_setting">[docs]</a>
+<span class="k">def</span> <span class="nf">get_setting</span><span class="p">(</span><span class="n">setting_category</span><span class="p">:</span> <span class="n">SettingCategories</span><span class="p">,</span> <span class="n">setting_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">FileExtension</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieves the value of a specific setting within a given category.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    setting_category : SettingCategories</span>
+<span class="sd">        The category of the setting to retrieve.</span>
+
+<span class="sd">    setting_name : str</span>
+<span class="sd">        The name of the setting within the category to retrieve.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str | int | FileExtension</span>
+<span class="sd">        The value of the requested setting, which can be of type string or</span>
+<span class="sd">        FileExtension).</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    KeyError</span>
+<span class="sd">        If setting_category or setting_name does not exist.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    To get the path for CSV files, you can use:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt;    get_setting(SettingCategories.CSV, &#39;PATH&#39;)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Check the input variables.</span>
+
+    <span class="c1"># Catches inputs with wrong data types such as strings, for example:</span>
+    <span class="c1"># get_setting(&#39;BAT&#39;, &#39;EXTENSION&#39;). Trying to call the function with a</span>
+    <span class="c1"># non-existing attribute of SettingCategories will throw an</span>
+    <span class="c1"># AttributeError even before the function is entered, for example:</span>
+    <span class="c1"># get_setting(SettingCategories.BAT, &#39;EXTENSION&#39;).</span>
+
+    <span class="k">if</span> <span class="n">setting_category</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">SETTINGS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;There is no category </span><span class="si">{</span><span class="n">setting_category</span><span class="si">}</span><span class="s2"> in the &quot;</span>
+                       <span class="sa">f</span><span class="s2">&quot;settings.&quot;</span><span class="p">)</span>
+
+    <span class="n">category_settings</span> <span class="o">=</span> <span class="n">SETTINGS</span><span class="p">[</span><span class="n">setting_category</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">setting_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">category_settings</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;There is no setting </span><span class="si">{</span><span class="n">setting_name</span><span class="si">}</span><span class="s2"> in the setting &quot;</span>
+                       <span class="sa">f</span><span class="s2">&quot;category </span><span class="si">{</span><span class="n">setting_category</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Mypy complains here about the &quot;setting_name&quot; variable not being a string</span>
+    <span class="c1"># literal but this cannot be helped in this dynamic approach, and it does</span>
+    <span class="c1"># not prevent the code from working as wished.</span>
+    <span class="k">return</span> <span class="n">category_settings</span><span class="p">[</span><span class="n">setting_name</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_settings_category_from_string">
+<a class="viewcode-back" href="../../SentimentAnalysis.html#SentimentAnalysis.settings.get_settings_category_from_string">[docs]</a>
+<span class="k">def</span> <span class="nf">get_settings_category_from_string</span><span class="p">(</span><span class="n">category_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">SettingCategories</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert the input string to a SettingCategories enum member</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    category_name : str</span>
+<span class="sd">        The category name to convert into a SettingCategories enum member.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    SettingCategories</span>
+<span class="sd">        The requested SettingCategories enum member.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">category</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">cat</span> <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">SettingCategories</span> <span class="k">if</span>
+                        <span class="n">cat</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">category_name</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">StopIteration</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;No matching category for name &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">category_name</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+
+    <span class="k">return</span> <span class="n">category</span></div>
+
+
+<span class="c1"># If you want to define settings which are based on other settings defined</span>
+<span class="c1"># in the SETTINGS dictionary, place them here:</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

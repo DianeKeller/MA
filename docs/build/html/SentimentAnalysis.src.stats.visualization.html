@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.stats.visualization package &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9bcbadda"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SentimentAnalysis.src.utils package" href="SentimentAnalysis.src.utils.html" />
+    <link rel="prev" title="SentimentAnalysis.src.stats package" href="SentimentAnalysis.src.stats.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">SentimentAnalysis</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="SentimentAnalysis.html">SentimentAnalysis package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="SentimentAnalysis.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="SentimentAnalysis.src.html">SentimentAnalysis.src package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.action">SentimentAnalysis.action module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.constants">SentimentAnalysis.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#sentimentanalysis-logger-module">SentimentAnalysis.logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.main">SentimentAnalysis.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.settings">SentimentAnalysis.settings module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.setup">SentimentAnalysis.setup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.type_aliases">SentimentAnalysis.type_aliases module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.view_log">SentimentAnalysis.view_log module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">SentimentAnalysis</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.html">SentimentAnalysis package</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.src.html">SentimentAnalysis.src package</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.src.stats.html">SentimentAnalysis.src.stats package</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.stats.visualization package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/SentimentAnalysis.src.stats.visualization.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sentimentanalysis-src-stats-visualization-package">
+<h1>SentimentAnalysis.src.stats.visualization package<a class="headerlink" href="#sentimentanalysis-src-stats-visualization-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-SentimentAnalysis.src.stats.visualization.command_line_strategy">
+<span id="sentimentanalysis-src-stats-visualization-command-line-strategy-module"></span><h2>SentimentAnalysis.src.stats.visualization.command_line_strategy module<a class="headerlink" href="#module-SentimentAnalysis.src.stats.visualization.command_line_strategy" title="Link to this heading"></a></h2>
+<p>command_line_strategy.py</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.command_line_strategy.CommandLineStrategy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.stats.visualization.command_line_strategy.</span></span><span class="sig-name descname"><span class="pre">CommandLineStrategy</span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/command_line_strategy.html#CommandLineStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.command_line_strategy.CommandLineStrategy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PlottingStrategy</span></code></p>
+<p>This class is a concrete implementation of the PlottingStrategy
+interface for plotting graphs. This strategy is used for plotting in
+non-interactive environments, such as python IDEs or command line
+environments, where plots are not displayed automatically.</p>
+<div class="graphviz"><img src="_images/inheritance-1178abf7bc6b99d277d868cd12a8afc9bb1cf50e.png" alt="Inheritance diagram of SentimentAnalysis.src.stats.visualization.command_line_strategy.CommandLineStrategy" usemap="#inheritancebac3c80467" class="inheritance graphviz" /></div>
+<map id="inheritancebac3c80467" name="inheritancebac3c80467">
+<area shape="rect" id="node2" href="#SentimentAnalysis.src.stats.visualization.command_line_strategy.CommandLineStrategy" target="_top" title="This class is a concrete implementation of the PlottingStrategy" alt="" coords="299,5,469,31"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.command_line_strategy.CommandLineStrategy.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/command_line_strategy.html#CommandLineStrategy.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.command_line_strategy.CommandLineStrategy.plot" title="Link to this definition"></a></dt>
+<dd><p>Plots data using the plotting strategy currently in use.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.stats.visualization.diagram">
+<span id="sentimentanalysis-src-stats-visualization-diagram-module"></span><h2>SentimentAnalysis.src.stats.visualization.diagram module<a class="headerlink" href="#module-SentimentAnalysis.src.stats.visualization.diagram" title="Link to this heading"></a></h2>
+<section id="diagram-py">
+<h3>diagram.py<a class="headerlink" href="#diagram-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-28</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.stats.visualization.diagram.</span></span><span class="sig-name descname"><span class="pre">Diagram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plotter:</span> <span class="pre">~src.stats.visualization.plotter.Plotter</span> <span class="pre">=</span> <span class="pre">&lt;src.stats.visualization.plotter.Plotter</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class provides diagram drawing methods for the visualization of
+statistics.</p>
+<p class="rubric">Notes</p>
+<p>This class uses a DO_BEEP constant which is set at the beginning of
+the class. It is used to decide whether to play a sound or not when the
+drawing of a diagram is finished. As the statistical analysis and the
+drawing of diagrams is time-consuming, the user may wish to be
+acoustically alerted when the analysis is done. Most probably, you may
+want to set DO_BEEP to
+- False when running the programm via Jupyter Notebook
+- True when using a Python IDE or a command line.</p>
+<div class="graphviz"><img src="_images/inheritance-88ef475b06cf80c16e60071ece3543e1ec1c0f9f.png" alt="Inheritance diagram of SentimentAnalysis.src.stats.visualization.diagram.Diagram" usemap="#inheritance43913c72ae" class="inheritance graphviz" /></div>
+<map id="inheritance43913c72ae" name="inheritance43913c72ae">
+<area shape="rect" id="node1" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram" target="_top" title="This class provides diagram drawing methods for the visualization of" alt="" coords="5,5,83,31"/>
+</map><dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.COLOR_1">
+<span class="sig-name descname"><span class="pre">COLOR_1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'blue'</span></em><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.COLOR_1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.COLOR_2">
+<span class="sig-name descname"><span class="pre">COLOR_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'orange'</span></em><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.COLOR_2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.DO_BEEP">
+<span class="sig-name descname"><span class="pre">DO_BEEP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.DO_BEEP" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.add_thresholds">
+<span class="sig-name descname"><span class="pre">add_thresholds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresholds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.add_thresholds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.add_thresholds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.all_multiple_frequencies_by_prompt_diagrams">
+<span class="sig-name descname"><span class="pre">all_multiple_frequencies_by_prompt_diagrams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freqs_by_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.all_multiple_frequencies_by_prompt_diagrams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.all_multiple_frequencies_by_prompt_diagrams" title="Link to this definition"></a></dt>
+<dd><p>Combines all multiple frequencies by prompt diagrams.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>freqs_by_prompt</strong> (<em>List</em><em>[</em><em>DataFrame</em><em>]</em>) – The list of frequency DataFrames to include as subplots.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – The title of the entire diagram.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.all_pairwise_frequency_comparison_diagrams">
+<span class="sig-name descname"><span class="pre">all_pairwise_frequency_comparison_diagrams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.all_pairwise_frequency_comparison_diagrams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.all_pairwise_frequency_comparison_diagrams" title="Link to this definition"></a></dt>
+<dd><p>Combines all pairwise frequency comparison diagrams.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong></p></li>
+<li><p><strong>true_col</strong></p></li>
+<li><p><strong>n_rows</strong></p></li>
+<li><p><strong>title</strong></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.bar_plot">
+<span class="sig-name descname"><span class="pre">bar_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.bar_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.bar_plot" title="Link to this definition"></a></dt>
+<dd><p>Visualizes the array content in a bar plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> – The array to be visualized.</p></li>
+<li><p><strong>y_label</strong> (<em>str</em>) – The label for the y-axis.</p></li>
+<li><p><strong>legend</strong> (<em>str</em>) – The label for the legend.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.box_plot">
+<span class="sig-name descname"><span class="pre">box_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert_y_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.box_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.box_plot" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.calculate_zipf_values">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_zipf_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.calculate_zipf_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.calculate_zipf_values" title="Link to this definition"></a></dt>
+<dd><p>Calculate target values according to Zipf’s law.</p>
+<p>This function calculates target values according to Zipf’s law. It
+takes a DataFrame as input, calculates the Zipf values based on the
+frequencies in the DataFrame, and returns a new DataFrame containing
+the calculated Zipf values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>DataFrame</em>) – The DataFrame containing the frequencies.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>zipf_values_df</strong> – The DataFrame containing the target values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>According to Zipf’s law, the frequency with wich a word is used is
+inversely proportional to its rank. The most frequent word therefore
+has a frequency of x/1, the second most frequent word a frequency of
+x/2, the third most frequent word a frequency of x/3 and so on.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.diagram_beep">
+<span class="sig-name descname"><span class="pre">diagram_beep</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.diagram_beep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.diagram_beep" title="Link to this definition"></a></dt>
+<dd><p>Decide whether to play a sound and act accordingly.</p>
+<p>Play a sound depending on the DO_BEEP setting at the beginning of the
+file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.heatmap">
+<span class="sig-name descname"><span class="pre">heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">correlation_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.heatmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.heatmap" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.heatmap_from_df">
+<span class="sig-name descname"><span class="pre">heatmap_from_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">correlation_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.heatmap_from_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.heatmap_from_df" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.line_plot">
+<span class="sig-name descname"><span class="pre">line_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresholds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert_y_axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.line_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.line_plot" title="Link to this definition"></a></dt>
+<dd><p>Plots a line diagram for the given DataFrame.</p>
+<p>If thresholds are provided, threshold lines are added with labels on
+the secondary y-axis qualifying the range of values above the threshold
+up to the next threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>DataFrame</em>) – A DataFrame containing the data to plot.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – Title of the diagram.</p></li>
+<li><p><strong>y_label</strong> (<em>str</em>) – Label for the y-axis.</p></li>
+<li><p><strong>x_label</strong> (<em>str</em>) – Label for the x-axis.</p></li>
+<li><p><strong>thresholds</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>) – Dictionary where the keys are the labels for the area above the
+given threshold, and the values are the threshold values.</p></li>
+<li><p><strong>invert_y_axis</strong> (<em>bool</em>) – Whether the y-axis is to be inverted. Defaults to False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.multiple_frequencies_by_prompt_diagram">
+<span class="sig-name descname"><span class="pre">multiple_frequencies_by_prompt_diagram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.multiple_frequencies_by_prompt_diagram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.multiple_frequencies_by_prompt_diagram" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.multiple_frequencies_by_prompt_subplot">
+<span class="sig-name descname"><span class="pre">multiple_frequencies_by_prompt_subplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.multiple_frequencies_by_prompt_subplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.multiple_frequencies_by_prompt_subplot" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.pairwise_frequency_comparison_diagram">
+<span class="sig-name descname"><span class="pre">pairwise_frequency_comparison_diagram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.pairwise_frequency_comparison_diagram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.pairwise_frequency_comparison_diagram" title="Link to this definition"></a></dt>
+<dd><p>Generate a frequency comparison diagram for true and predicted values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>DataFrame</em>) – The DataFrame containing the data.</p></li>
+<li><p><strong>true_col</strong> (<em>str</em>) – The column in the DataFrame containing the true frequencies.</p></li>
+<li><p><strong>predicted_col</strong> (<em>str</em>) – The column in the DataFrame containing the predicted frequencies.</p></li>
+<li><p><strong>n_rows</strong> (<em>int</em>) – The number of rows to select from the specified columns.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – The title of the frequency comparison diagram.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.pairwise_frequency_comparison_subplot">
+<span class="sig-name descname"><span class="pre">pairwise_frequency_comparison_subplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.pairwise_frequency_comparison_subplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.pairwise_frequency_comparison_subplot" title="Link to this definition"></a></dt>
+<dd><p>Generate a frequency comparison subplot for true and predicted values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>DataFrame</em>) – The DataFrame containing the data.</p></li>
+<li><p><strong>true_col</strong> (<em>str</em>) – The column in the DataFrame containing the true frequencies.</p></li>
+<li><p><strong>predicted_col</strong> (<em>str</em>) – The column in the DataFrame containing the predicted frequencies.</p></li>
+<li><p><strong>n_rows</strong> (<em>int</em>) – The number of rows to select from the specified columns.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – The title of the frequency comparison subplot.</p></li>
+<li><p><strong>ax</strong> (<em>plt.Axes</em>) – The axes on which to plot the subplot.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.plot_side_by_side">
+<span class="sig-name descname"><span class="pre">plot_side_by_side</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Comparison'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.plot_side_by_side"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.plot_side_by_side" title="Link to this definition"></a></dt>
+<dd><p>Plots two diagrams side-by-side.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plot1</strong> – A function that takes a matplotlib axis and plots the
+first diagram.</p></li>
+<li><p><strong>plot2</strong> – A function that takes a matplotlib axis and plots the
+second diagram.</p></li>
+<li><p><strong>title1</strong> (<em>str</em>) – Title for the first diagram.</p></li>
+<li><p><strong>title2</strong> (<em>str</em>) – Title for the second diagram.</p></li>
+<li><p><strong>attr</strong> (<em>str</em>) – Attribute for comparison, used as a subtitle. Default is
+‘Comparison’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.prepare_frequency_dataframe">
+<span class="sig-name descname"><span class="pre">prepare_frequency_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.prepare_frequency_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.prepare_frequency_dataframe" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.simple_frequency_diagram">
+<span class="sig-name descname"><span class="pre">simple_frequency_diagram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.simple_frequency_diagram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.simple_frequency_diagram" title="Link to this definition"></a></dt>
+<dd><p>Generate a frequency diagram for a specified column in a DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>DataFrame</em>) – The DataFrame containing the data.</p></li>
+<li><p><strong>col_name</strong> (<em>str</em>) – The column in the DataFrame containing the frequencies for the
+frequency diagram.</p></li>
+<li><p><strong>n_rows</strong> (<em>int</em>) – The number of rows to select from the specified column.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – The title of the frequency diagram.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.diagram.Diagram.zipf_frequency_diagram">
+<span class="sig-name descname"><span class="pre">zipf_frequency_diagram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/diagram.html#Diagram.zipf_frequency_diagram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.diagram.Diagram.zipf_frequency_diagram" title="Link to this definition"></a></dt>
+<dd><p>Generates a zipf frequency diagram.</p>
+<p>This function generates a zipf frequency diagram based on the given
+DataFrame and parameters. It selects the specified number of rows from
+the given column in the DataFrame, plots a bar graph, calculates Zipf
+values, plots the Zipf values on the same graph, and adds labels and
+title to the graph. Finally, it prints the graph and applies tight
+layout to the plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>DataFrame</em>) – The DataFrame containing the data.</p></li>
+<li><p><strong>col_name</strong> (<em>str</em>) – The name of the column in the DataFrame containing the frequencies
+for the frequency diagram.</p></li>
+<li><p><strong>n_rows</strong> (<em>int</em>) – The number of rows to select from the specified column.</p></li>
+<li><p><strong>items_type</strong> (<em>str</em>) – The type of items in the column.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – The title of the frequency diagram.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.stats.visualization.jupyter_strategy">
+<span id="sentimentanalysis-src-stats-visualization-jupyter-strategy-module"></span><h2>SentimentAnalysis.src.stats.visualization.jupyter_strategy module<a class="headerlink" href="#module-SentimentAnalysis.src.stats.visualization.jupyter_strategy" title="Link to this heading"></a></h2>
+<p>jupyter_strategy.py</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.jupyter_strategy.JupyterStrategy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.stats.visualization.jupyter_strategy.</span></span><span class="sig-name descname"><span class="pre">JupyterStrategy</span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/jupyter_strategy.html#JupyterStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.jupyter_strategy.JupyterStrategy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PlottingStrategy</span></code></p>
+<div class="graphviz"><img src="_images/inheritance-02001491f5246f799df11196146786ffc8d3a3dc.png" alt="Inheritance diagram of SentimentAnalysis.src.stats.visualization.jupyter_strategy.JupyterStrategy" usemap="#inheritance464562fee1" class="inheritance graphviz" /></div>
+<map id="inheritance464562fee1" name="inheritance464562fee1">
+<area shape="rect" id="node2" href="#SentimentAnalysis.src.stats.visualization.jupyter_strategy.JupyterStrategy" target="_top" title="JupyterStrategy" alt="" coords="299,5,420,31"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.jupyter_strategy.JupyterStrategy.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/jupyter_strategy.html#JupyterStrategy.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.jupyter_strategy.JupyterStrategy.plot" title="Link to this definition"></a></dt>
+<dd><p>Plots data using the plotting strategy currently in use.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.stats.visualization.plotter">
+<span id="sentimentanalysis-src-stats-visualization-plotter-module"></span><h2>SentimentAnalysis.src.stats.visualization.plotter module<a class="headerlink" href="#module-SentimentAnalysis.src.stats.visualization.plotter" title="Link to this heading"></a></h2>
+<section id="plotter-py">
+<h3>plotter.py<a class="headerlink" href="#plotter-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2025-05-01</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.plotter.Plotter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.stats.visualization.plotter.</span></span><span class="sig-name descname"><span class="pre">Plotter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#SentimentAnalysis.src.stats.visualization.plotting_strategy.PlottingStrategy" title="SentimentAnalysis.src.stats.visualization.plotting_strategy.PlottingStrategy"><span class="pre">PlottingStrategy</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/plotter.html#Plotter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.plotter.Plotter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class serves as the context in a strategy pattern, which allows you to
+dynamically choose a plotting strategy at runtime.</p>
+<p>The class works with any of the plotting strategies that implement the
+PlottingStrategy interface. It gives access to the plot method of the
+given plotting strategy.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.plotter.Plotter.strategy">
+<span class="sig-name descname"><span class="pre">strategy</span></span><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.plotter.Plotter.strategy" title="Link to this definition"></a></dt>
+<dd><p>The current plotting strategy in use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#SentimentAnalysis.src.stats.visualization.plotting_strategy.PlottingStrategy" title="SentimentAnalysis.src.stats.visualization.plotting_strategy.PlottingStrategy">PlottingStrategy</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.plotter.Plotter.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/plotter.html#Plotter.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.plotter.Plotter.plot" title="Link to this definition"></a></dt>
+<dd><p>Plots the data using the plotting strategy currently in use.</p>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-9c33925cc0efc2614b088f23bf3a2c3bbb56cf3c.png" alt="Inheritance diagram of SentimentAnalysis.src.stats.visualization.plotter.Plotter" usemap="#inheritancea99d524b9f" class="inheritance graphviz" /></div>
+<map id="inheritancea99d524b9f" name="inheritancea99d524b9f">
+<area shape="rect" id="node1" href="#SentimentAnalysis.src.stats.visualization.plotter.Plotter" target="_top" title="This class serves as the context in a strategy pattern, which allows you to" alt="" coords="5,5,77,31"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/plotter.html#Plotter.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd><p>Plots the data using the plotting strategy currently in use.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id1">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">strategy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#SentimentAnalysis.src.stats.visualization.plotting_strategy.PlottingStrategy" title="SentimentAnalysis.src.stats.visualization.plotting_strategy.PlottingStrategy"><span class="pre">PlottingStrategy</span></a></em><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<dd><p>Gets the current plotting strategy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The plotting strategy currently in use.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#SentimentAnalysis.src.stats.visualization.plotting_strategy.PlottingStrategy" title="SentimentAnalysis.src.stats.visualization.plotting_strategy.PlottingStrategy">PlottingStrategy</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.stats.visualization.plotting_strategy">
+<span id="sentimentanalysis-src-stats-visualization-plotting-strategy-module"></span><h2>SentimentAnalysis.src.stats.visualization.plotting_strategy module<a class="headerlink" href="#module-SentimentAnalysis.src.stats.visualization.plotting_strategy" title="Link to this heading"></a></h2>
+<section id="plotting-strategy-py">
+<h3>plotting_strategy.py<a class="headerlink" href="#plotting-strategy-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-09-09</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.plotting_strategy.PlottingStrategy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.stats.visualization.plotting_strategy.</span></span><span class="sig-name descname"><span class="pre">PlottingStrategy</span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/plotting_strategy.html#PlottingStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.plotting_strategy.PlottingStrategy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>This class serves as an interface within the framework of
+a strategy pattern. It enables a dynamic change of plotting
+strategies according to the kind of environment the program is running
+in. The class declares the common plot method used by all supported
+plotting strategies.</p>
+<section id="abstract-methods">
+<h3>Abstract Methods<a class="headerlink" href="#abstract-methods" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>plot() -&gt; None:</dt><dd><p>Plots data using the plotting strategy currently in use.</p>
+</dd>
+</dl>
+<div class="graphviz"><img src="_images/inheritance-1d6ef09e51ec08009f6af7a18340348d2320686e.png" alt="Inheritance diagram of SentimentAnalysis.src.stats.visualization.plotting_strategy.PlottingStrategy" usemap="#inheritanceea92c0e9c0" class="inheritance graphviz" /></div>
+<map id="inheritanceea92c0e9c0" name="inheritanceea92c0e9c0">
+<area shape="rect" id="node2" href="#SentimentAnalysis.src.stats.visualization.plotting_strategy.PlottingStrategy" target="_top" title="This class serves as an interface within the framework of" alt="" coords="125,5,251,31"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.stats.visualization.plotting_strategy.PlottingStrategy.plot">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/stats/visualization/plotting_strategy.html#PlottingStrategy.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.stats.visualization.plotting_strategy.PlottingStrategy.plot" title="Link to this definition"></a></dt>
+<dd><p>Plots data using the plotting strategy currently in use.</p>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.stats.visualization">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-SentimentAnalysis.src.stats.visualization" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="SentimentAnalysis.src.stats.html" class="btn btn-neutral float-left" title="SentimentAnalysis.src.stats package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SentimentAnalysis.src.utils.html" class="btn btn-neutral float-right" title="SentimentAnalysis.src.utils package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

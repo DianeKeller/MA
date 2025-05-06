@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.data_sources.data_source_suite &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.data_sources.data_source_suite</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.data_sources.data_source_suite</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">data_source_suite.py</span>
+<span class="sd">--------------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">no_type_check</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Generic</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.data_sources.data_source_stats_mixin</span> <span class="kn">import</span> <span class="n">DataSourceStatsMixin</span>
+<span class="kn">from</span> <span class="nn">src.data_sources.data_source_strategy</span> <span class="kn">import</span> <span class="n">DataSourceStrategy</span>
+<span class="kn">from</span> <span class="nn">src.decorators.data_check_decorators</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">output_not_none_or_empty</span><span class="p">,</span>
+    <span class="n">output_not_none</span><span class="p">,</span> <span class="n">info_output_empty</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.decorators.execution_time_decorator</span> <span class="kn">import</span> <span class="n">execution_time</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">DataSourceStrategy</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DataSourceSuite">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite">[docs]</a>
+<span class="k">class</span> <span class="nc">DataSourceSuite</span><span class="p">(</span>
+    <span class="n">ABC</span><span class="p">,</span>
+    <span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+    <span class="n">DataSourceStatsMixin</span><span class="p">,</span>
+    <span class="n">LoggingMixin</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    DataSourceSuite class.</span>
+
+<span class="sd">    This abstract base class defines the methods for the import of a data</span>
+<span class="sd">    source collection and the extraction or composition of the different</span>
+<span class="sd">    data sets forming the suite.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    suite_name : str</span>
+<span class="sd">        The name of the data suite. (Read-only)</span>
+
+<span class="sd">    subset_names : List[str]</span>
+<span class="sd">        A list of the names of the loaded subsets. (Read-only)</span>
+
+<span class="sd">    strategy_names : List[str]</span>
+<span class="sd">        A list of the strategy names available in the suite. (Read-only)</span>
+
+<span class="sd">    combined_subsets : T</span>
+<span class="sd">        The combined subset of all data in the suite. This is computed</span>
+<span class="sd">        by combining individual subsets when accessed.</span>
+
+<span class="sd">    STRATEGY_STR : str</span>
+<span class="sd">        A format string used for logging strategy-related messages.</span>
+
+<span class="sd">    SUBSET_STR : str</span>
+<span class="sd">        A format string used for logging subset-related messages.</span>
+
+<span class="sd">    LANG_DE : str</span>
+<span class="sd">        Constant for the German language code.</span>
+
+<span class="sd">    LANG_EN : str</span>
+<span class="sd">        Constant for the English language code.</span>
+
+<span class="sd">    LANG_ES : str</span>
+<span class="sd">        Constant for the Spanish language code.</span>
+
+<span class="sd">    LANG_FR : str</span>
+<span class="sd">        Constant for the French language code.</span>
+
+<span class="sd">    LANG_IT : str</span>
+<span class="sd">        Constant for the Italian language code.</span>
+
+<span class="sd">    LANG_NL : str</span>
+<span class="sd">        Constant for the Dutch language code.</span>
+
+<span class="sd">    LANG_PT : str</span>
+<span class="sd">        Constant for the Portuguese language code.</span>
+
+<span class="sd">    LANG_RO : str</span>
+<span class="sd">        Constant for the Romanian language code.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    get_strategy(strategy_name: str) -&gt; T | None:</span>
+<span class="sd">        Retrieves the specified strategy from the suite.</span>
+
+<span class="sd">    use_strategy(strategy_name: str) -&gt; T:</span>
+<span class="sd">        Ensures the specified strategy exists and returns it.</span>
+
+<span class="sd">    get_subset(subset_name: str) -&gt; T | None:</span>
+<span class="sd">        Retrieves the specified subset from the suite.</span>
+
+<span class="sd">    use_subset(subset_name: str) -&gt; T:</span>
+<span class="sd">        Ensures the specified subset exists and returns it.</span>
+
+<span class="sd">    combine_subsets(subset_names: List[str] | None = None) -&gt; T:</span>
+<span class="sd">        Combines specified subsets into a single subset.</span>
+
+<span class="sd">    to_string() -&gt; str:</span>
+<span class="sd">        Returns a formatted string representation of the data in the suite.</span>
+
+<span class="sd">    Abstract Methods</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    load_subset(strategy_name: str) -&gt; None:</span>
+<span class="sd">        Loads the specified data subset into the suite.</span>
+
+<span class="sd">    _initialize_strategies() -&gt; None:</span>
+<span class="sd">        Initializes all strategies, considering their dependencies.</span>
+
+<span class="sd">    _compose_from_original_files(subset: T, strategy_name: str) -&gt; None:</span>
+<span class="sd">        Composes the specified subset from original files.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Define format strings as class constants</span>
+    <span class="n">STRATEGY_STR</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{self.SUITE_NAME}</span><span class="s2"> strategy &#39;</span><span class="si">{strategy_name}</span><span class="s2">&#39;&quot;</span>
+    <span class="n">SUBSET_STR</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{self.SUITE_NAME}</span><span class="s2"> subset &#39;</span><span class="si">{subset_name}</span><span class="s2">&#39;&quot;</span>
+
+<div class="viewcode-block" id="DataSourceSuite.__init__">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes a new instance of the DataSourceSuite class and provides</span>
+<span class="sd">        private variables to store the different data subsets of the data suite</span>
+<span class="sd">        in memory and make them accessible via properties.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span> <span class="k">else</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_combined_subsets</span><span class="p">:</span> <span class="n">T</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+
+        <span class="c1"># Dictionary for the different strategies to create and store</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_strategies</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
+            <span class="nb">str</span><span class="p">,</span> <span class="n">T</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Dictionary for the loaded data subsets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subsets</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
+            <span class="nb">str</span><span class="p">,</span> <span class="n">T</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Create and store the strategies in the strategies dictionary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_strategies</span><span class="p">()</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">suite_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the name of the data suite.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The name of the data suite.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">subset_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the names of the loaded subsets.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            The list of the subset names.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Ensure you have executed the load_subsets method of the</span>
+<span class="sd">        DataSourceWorkflow class before attempting to access this subset_names</span>
+<span class="sd">        property.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subsets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;Make sure you have executed the load_subsets method of the &quot;</span>
+                <span class="s2">&quot;DataSourceWorkflow class before attempting to access this &quot;</span>
+                <span class="s2">&quot;subset_names property.&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subsets</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">strategy_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of the strategy names.</span>
+
+<span class="sd">        Returns the list of the different strategy names in the suite.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            The list of the strategy names.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_strategies</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">languages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the languages present in the suite.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_languages</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;No languages found in suite. Cannot proceed.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span>
+
+    <span class="nd">@languages</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">languages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">languages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the languages of the suite.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span> <span class="o">=</span> <span class="n">languages</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">combined_subsets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the combined subsets of the data suite.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_combined_subsets</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_combined_subsets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">combine_subsets</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combined_subsets</span>  <span class="c1"># type: ignore</span>
+
+    <span class="nd">@combined_subsets</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">combined_subsets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">combined_subset</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the combined subsets of the data suite.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_combined_subsets</span> <span class="o">=</span> <span class="n">combined_subset</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="DataSourceSuite.get_strategy">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite.get_strategy">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">T</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the specified strategy from the _strategies dictionary.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        strategy_name : str</span>
+<span class="sd">            The name of the strategy to return.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        T | None</span>
+<span class="sd">            The specified strategy.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        ------</span>
+<span class="sd">        - Use this method if the returned strategy may be None.</span>
+
+<span class="sd">        - Use the use_strategy() method instead if you want to ensure that</span>
+<span class="sd">          the strategy actually exists.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strategies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">strategy_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataSourceSuite.use_strategy">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite.use_strategy">[docs]</a>
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@output_not_none</span><span class="p">(</span><span class="n">STRATEGY_STR</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">use_strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy_name</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the specified strategy from the _strategies dictionary.</span>
+
+<span class="sd">        Ensures the strategy exists before returning it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        strategy_name : str</span>
+<span class="sd">            The name of the strategy to return.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        T</span>
+<span class="sd">            The specified strategy.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        ------</span>
+<span class="sd">        - Use this method if you want to ensure that the strategy actually</span>
+<span class="sd">          exists and want the method to raise an error if it does not.</span>
+
+<span class="sd">        - Use the get_strategy() method instead if the returned strategy may</span>
+<span class="sd">          be None and you want to handle this case individually.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span><span class="n">strategy_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataSourceSuite.get_subset">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite.get_subset">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subset_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">T</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the specified subset from the _subsets dictionary.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subset_name : str</span>
+<span class="sd">            The name of the subset to return.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        T | None</span>
+<span class="sd">            The specified subset.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        ------</span>
+<span class="sd">        - Use this method if the returned subset may be None.</span>
+
+<span class="sd">        - Use the use_subset() method instead if you want to ensure that</span>
+<span class="sd">          the subset actually exists.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subsets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subset_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataSourceSuite.use_subset">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite.use_subset">[docs]</a>
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@output_not_none_or_empty</span><span class="p">(</span><span class="n">SUBSET_STR</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">use_subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subset_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the specified subset from the _subsets dictionary.</span>
+
+<span class="sd">        Makes sure the subset exists before returning it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subset_name : str</span>
+<span class="sd">            The name of the subset to return.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        T</span>
+<span class="sd">            The specified subset.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the subset does not exist.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        ------</span>
+<span class="sd">        - Use this method if you want to ensure that the subset actually</span>
+<span class="sd">          exists and you want the method to raise an error if it does not.</span>
+
+<span class="sd">        - Use the get_subset() method instead if the returned subset may</span>
+<span class="sd">          be None and you want to handle this case individually.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Make sure the subset is in the dictionary</span>
+        <span class="k">if</span> <span class="n">subset_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subsets</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> subset </span><span class="si">%s</span><span class="s2"> not found!&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">suite_name</span><span class="p">,</span> <span class="n">subset_name</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subsets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subset_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataSourceSuite.combine_subsets">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite.combine_subsets">[docs]</a>
+    <span class="nd">@no_type_check</span>
+    <span class="k">def</span> <span class="nf">combine_subsets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subset_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combines the specified subsets into a single subset.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subset_names : List[str] | None</span>
+<span class="sd">            The subsets to combine. Defaults to None. If no subset names are</span>
+<span class="sd">            provided, all subsets in the suite are combined.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        T</span>
+<span class="sd">            The combined subset.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">save_combined_subsets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">subset_names</span><span class="p">):</span>
+            <span class="n">subset_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subset_names</span>
+            <span class="n">save_combined_subsets</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">combined_subsets</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">subset_names</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+            <span class="n">subset</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">use_subset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">combined_subsets</span><span class="p">):</span>
+                <span class="n">combined_subsets</span> <span class="o">=</span> <span class="n">subset</span>
+                <span class="n">new_col_names</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">subset</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">col_names</span><span class="p">:</span>
+                    <span class="n">new_col_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">subset</span><span class="o">.</span><span class="n">language</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">combined_subsets</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">new_col_names</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">combined_subsets</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subset</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+                <span class="n">combined_subsets</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">combined_subsets</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_&#39;</span>
+                                         <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subset</span><span class="o">.</span><span class="n">language</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Make sure the combined_subsets property is only set if all subsets</span>
+        <span class="c1"># are included in the combination.</span>
+        <span class="k">if</span> <span class="n">save_combined_subsets</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">combined_subsets</span> <span class="o">=</span> <span class="n">combined_subsets</span>
+
+        <span class="k">return</span> <span class="n">combined_subsets</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Abstract Public Methods</span>
+<div class="viewcode-block" id="DataSourceSuite.load_subset">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite.load_subset">[docs]</a>
+    <span class="nd">@execution_time</span>
+    <span class="k">def</span> <span class="nf">load_subset</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">strategy_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stores the specified data subset in the _subsets dictionary.</span>
+
+<span class="sd">        The data subset is loaded from disk, fetched from the original</span>
+<span class="sd">        online or local source, or extracted from its superset and stored in</span>
+<span class="sd">        the _subsets dictionary.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        strategy_name : str</span>
+<span class="sd">            The name of the data subset.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the specified data subset could not be loaded from disk,</span>
+<span class="sd">            fetched from the online source or extracted from its superset.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - The loaded, fetched or extracted subset data is not returned by</span>
+<span class="sd">          this method but stored in the data structure of the respective</span>
+<span class="sd">          strategy collected in the _subsets dictionary of this class</span>
+
+<span class="sd">        - This method provides a standard way to load subsets. It may be</span>
+<span class="sd">          overridden or extended by subclasses to satisfy specific needs.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enforce_load</span><span class="p">(</span><span class="n">strategy_name</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="n">strategy_name</span><span class="si">}</span><span class="s2"> data.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subsets</span><span class="p">[</span><span class="n">strategy_name</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="DataSourceSuite.to_string">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite.to_string">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides a formatted string representation of the data in the current</span>
+<span class="sd">        suite.</span>
+
+<span class="sd">        Expands the base description by suite specific details like the name</span>
+<span class="sd">        and source of the data collection, the author(s) of the collection</span>
+<span class="sd">        and the citation of the associated scientific paper. If the data</span>
+<span class="sd">        is not yet initialized, the description includes statistical insights</span>
+<span class="sd">        such as the numbers and names of the domains, languages and original</span>
+<span class="sd">        datasets contained in the data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A string representation of the data in the current MMS suite.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+    <span class="c1"># endregion --- Abstract Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="DataSourceSuite._enforce_load">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite._enforce_load">[docs]</a>
+    <span class="nd">@output_not_none</span><span class="p">(</span><span class="n">STRATEGY_STR</span><span class="p">)</span>
+    <span class="nd">@info_output_empty</span><span class="p">(</span>
+        <span class="n">STRATEGY_STR</span> <span class="o">+</span> <span class="s2">&quot; is not yet on disk. Creating subset...&quot;</span><span class="p">,</span>
+        <span class="n">on_empty</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">strategy_name</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compose_from_original_files</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">strategy_name</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_enforce_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Enforces loading the subset defined by the given strategy name.</span>
+
+<span class="sd">        If the subset data cannot be loaded from disk, an info message is</span>
+<span class="sd">        logged and the data is composed from the original files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        strategy_name : str</span>
+<span class="sd">            The name of the Olympia strategy used to manage the subset.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Subset</span>
+<span class="sd">            The subset.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - The loaded or fetched subset data is only returned by this</span>
+<span class="sd">          method to enable the decorator to check its content. The caller</span>
+<span class="sd">          will not use the return value but the subset in the _subsets</span>
+<span class="sd">          collection of this class where it is identified by its strategy</span>
+<span class="sd">          name.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_strategy</span><span class="p">(</span><span class="n">strategy_name</span><span class="p">)</span>
+
+        <span class="c1"># Try to load the subset from disk. If this fails, the method</span>
+        <span class="c1"># specified in the &#39;info_output_empty&#39; decorator will be called.</span>
+        <span class="n">subset</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subsets</span><span class="p">[</span><span class="n">strategy_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset</span>
+
+        <span class="c1"># Return the subset so that the decorator can check its content</span>
+        <span class="k">return</span> <span class="n">subset</span></div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+
+    <span class="c1"># region --- Abstract Protected Methods</span>
+
+<div class="viewcode-block" id="DataSourceSuite._initialize_strategies">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite._initialize_strategies">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_initialize_strategies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize all strategies, respecting their dependencies.</span>
+
+<span class="sd">        Each strategy is configured specifying</span>
+<span class="sd">        - its strategy name,</span>
+<span class="sd">        - its data type,</span>
+<span class="sd">        - its file name,</span>
+<span class="sd">        - its language, if there is only one</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="DataSourceSuite._compose_from_original_files">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite._compose_from_original_files">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_compose_from_original_files</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">subset</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
+            <span class="n">strategy_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Composes the specified subset from the original files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subset : T</span>
+<span class="sd">            The subset to compose.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The created subset is not returned from this method but</span>
+<span class="sd">        - stored in the _subsets dictionary of this class and</span>
+<span class="sd">        - saved to disk according to the serialization strategy used by the</span>
+<span class="sd">          Olympia strategy of the subset (PKL format for DataFrame objects).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Abstract Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

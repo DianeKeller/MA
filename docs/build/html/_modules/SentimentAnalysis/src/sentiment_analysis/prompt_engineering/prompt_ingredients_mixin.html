@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_ingredients_mixin &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_ingredients_mixin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_ingredients_mixin</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">prompt_ingredients_mixin.py</span>
+<span class="sd">---------------------------</span>
+<span class="sd">Version 1.0, updated on 2025-01-03</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">src.utils.list_utils</span> <span class="kn">import</span> <span class="n">permute_and_join</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">PromptIngredientsType</span>
+
+
+<div class="viewcode-block" id="PromptIngredientsMixin">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_ingredients_mixin.PromptIngredientsMixin">[docs]</a>
+<span class="k">class</span> <span class="nc">PromptIngredientsMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    PromptIngredientsMixin class.</span>
+
+<span class="sd">    This class provides and manages prompt ingredients.</span>
+
+<span class="sd">    Prompt ingredients are recurring elements that will be used to constitute</span>
+<span class="sd">    prompt parts which are defined by their position in a query string. Prompt</span>
+<span class="sd">    ingredients can be basic or composed of other ingredients.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    PromptGenerator</span>
+<span class="sd">        Class that generates the bigger prompt parts and assembles them to</span>
+<span class="sd">        build a prompt.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># region --- Properties : Ingredients collections</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_all_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">PromptIngredientsType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves all prompt ingredients.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PromptIngredientsType</span>
+<span class="sd">            A dictionary where the keys represent ingredient categories, and</span>
+<span class="sd">            the values are lists of equivalent values that are interchangeable</span>
+<span class="sd">            within their respective categories.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This is a protected setter since it should only be called inside the</span>
+<span class="sd">        mixin and the concrete prompt engineering strategies. It should not</span>
+<span class="sd">        be called from the context of the prompt engineeriong strategy</span>
+<span class="sd">        pattern (i.e. it should not be used to provide the PromptEngineer</span>
+<span class="sd">        with data to return outside).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__all_ingredients&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_all_ingredients</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__all_ingredients&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@_all_ingredients</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">_all_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ingredients</span><span class="p">:</span> <span class="n">PromptIngredientsType</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets _all_ingredients.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ingredients : PromptIngredientsType</span>
+<span class="sd">            A dictionary where the keys are prompt ingredients categories</span>
+<span class="sd">            and the values are lists of possible values the categories can</span>
+<span class="sd">            have.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__all_ingredients&#39;</span><span class="p">,</span> <span class="n">ingredients</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_basic_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">PromptIngredientsType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the basic ingredients dictionary.</span>
+
+<span class="sd">        The basic ingredients are used to compose bigger prompt ingredients.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PromptIngredientsType</span>
+<span class="sd">            A dictionary where the keys are the types of the basic</span>
+<span class="sd">            ingredients and the values are lists of equivalent variants of</span>
+<span class="sd">            the given basic ingredients types.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__basic_ingredients&#39;</span><span class="p">,</span> <span class="p">{})):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_basic_ingredients</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__basic_ingredients&#39;</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="nd">@_basic_ingredients</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">_basic_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ingredients</span><span class="p">:</span> <span class="n">PromptIngredientsType</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the basic ingredients dictionary.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ingredients : PromptIngredientsType</span>
+<span class="sd">            The basic ingredients dictionary.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__basic_ingredients&#39;</span><span class="p">,</span> <span class="n">ingredients</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_basic_and_composed_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the list of basic and corresponding composed ingredients types.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[Tuple[str, str]]</span>
+<span class="sd">            The list of tuples of basic and composed ingredients types.</span>
+<span class="sd">            The first element of each tuple is a basic ingredient type and</span>
+<span class="sd">            the second a composed ingredient type the basic ingredient</span>
+<span class="sd">            type contributes to compose. A basic ingredient type can</span>
+<span class="sd">            be used in various composed ingredients types and a composed</span>
+<span class="sd">            ingredient type usually is composed of multiple basic</span>
+<span class="sd">            ingredients types.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__basic_and_composed_ingredients&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_basic_and_composed_ingredients</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__basic_and_composed_ingredients&#39;</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="nd">@_basic_and_composed_ingredients</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">_basic_and_composed_ingredients</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">basic_and_composed_ingredients</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">setattr</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="s1">&#39;__basic_and_composed_ingredients&#39;</span><span class="p">,</span>
+            <span class="n">basic_and_composed_ingredients</span>
+        <span class="p">)</span>
+
+    <span class="c1"># endregion --- Properties : Ingredients collections</span>
+
+    <span class="c1"># region --- Properties : Lists to include in _all_ingredients</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sentiment_orders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets all permutations of sentiment orders.</span>
+
+<span class="sd">        The sentiment order to use for the generation of the &#39;scale&#39; parts</span>
+<span class="sd">        of the prompts will be chosen randomly from the list of all</span>
+<span class="sd">        permutated sentiment orders to account for the possibility that the</span>
+<span class="sd">        the LLM&#39;s answers are influenced by the way its possible choices are</span>
+<span class="sd">        expressed.</span>
+
+<span class="sd">        It is also made a distinction between sentiments with and without</span>
+<span class="sd">        quotation marks.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[tuple[str, ...]]</span>
+<span class="sd">            List of sentiment order permutations.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Produces 2 x 3! = 12 sentiment order variants.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Without quotation marks</span>
+        <span class="n">sentiments_1</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;positive&#39;</span><span class="p">,</span> <span class="s1">&#39;negative&#39;</span><span class="p">,</span> <span class="s1">&#39;neutral&#39;</span><span class="p">]</span>
+
+        <span class="c1"># With quotation marks</span>
+        <span class="n">sentiments_2</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&quot;positive&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&quot;negative&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&quot;neutral&quot;&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">permute_and_join</span><span class="p">(</span><span class="n">sentiments_1</span><span class="p">,</span> <span class="n">sentiments_2</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sentiment_orders_as_strings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts the sentiment orders to string format.</span>
+
+<span class="sd">        Generates strings from the orders in the sentiment orders list to</span>
+<span class="sd">        prepare them to be used as ingredients for bigger prompt ingredients.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">           List of sentiment orders in string format.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Doubles the number of sentiment order variants because variants with</span>
+<span class="sd">        and without comma before &#39;or&#39; are included =&gt; Produces 2 x 2 x 3! =</span>
+<span class="sd">        24 string variants.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">orders</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentiment_orders</span><span class="p">:</span>
+            <span class="n">orders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">order</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">, or </span><span class="si">{</span><span class="n">order</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="p">)</span>
+            <span class="n">orders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">order</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">order</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">orders</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sentiment_enumerations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the list of sentiment enumerations.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            List of sentiment enumerations.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">sentiment_enumeration</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">intro</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients</span><span class="p">[</span><span class="s1">&#39;sentiment_introductions&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentiment_orders_as_strings</span><span class="p">:</span>
+                <span class="n">sentiment_enumeration</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">intro</span><span class="si">}{</span><span class="n">order</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sentiment_enumeration</span>
+
+    <span class="c1"># endregion --- Properties : Lists to include in _all_ingredients</span>
+
+    <span class="c1"># region --- Public Methods</span>
+<div class="viewcode-block" id="PromptIngredientsMixin.answers_before_mention">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_ingredients_mixin.PromptIngredientsMixin.answers_before_mention">[docs]</a>
+    <span class="k">def</span> <span class="nf">answers_before_mention</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">thoughts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">towards</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">whats</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates the answer text to place before the mention of the target.</span>
+
+<span class="sd">        Generates the answer introduction text to place before the mention</span>
+<span class="sd">        of the target person based on the provided inputs.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        thoughts : List[str]</span>
+<span class="sd">            List of expressions for the thinking or evaluation process</span>
+<span class="sd">            &quot;undergone&quot; by the LLM to find the appropriate answer it is asked</span>
+<span class="sd">            for. Signs of security/insecurity, subjectivity/objectivity or</span>
+<span class="sd">            similar attitudes about the provided answer.</span>
+
+<span class="sd">        towards : List[str]</span>
+<span class="sd">             List of &quot;towards&quot; synonyms.</span>
+
+<span class="sd">        whats : List[str]</span>
+<span class="sd">            List of variants to designate the sentence in which to identify</span>
+<span class="sd">            the sentiment.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            List of generated answers introduction texts to place before the</span>
+<span class="sd">            mention of the target person.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Your answer: </span><span class="si">{</span><span class="n">thought</span><span class="si">}{</span><span class="n">what</span><span class="si">}{</span><span class="n">toward</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="k">for</span> <span class="n">thought</span> <span class="ow">in</span> <span class="n">thoughts</span>
+            <span class="k">for</span> <span class="n">what</span> <span class="ow">in</span> <span class="n">whats</span>
+            <span class="k">for</span> <span class="n">toward</span> <span class="ow">in</span> <span class="n">towards</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="PromptIngredientsMixin.questions">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_ingredients_mixin.PromptIngredientsMixin.questions">[docs]</a>
+    <span class="k">def</span> <span class="nf">questions</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">towards</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">targets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">givens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates questions based on the provided inputs.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        towards : List[str]</span>
+<span class="sd">            List of &quot;towards&quot; synonyms.</span>
+
+<span class="sd">        targets : List[str]</span>
+<span class="sd">            List of synonyms referencing the person that is the target of</span>
+<span class="sd">            the sentiment the LLM is required to identify.</span>
+
+<span class="sd">        givens : List[str]</span>
+<span class="sd">            List of elements that can be used at the same position as</span>
+<span class="sd">            &quot;(the) given&quot;, e.g. &quot;(the) specified&quot;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            List of generated questions.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="sa">f</span><span class="s1">&#39;what is the sentiment </span><span class="si">{</span><span class="n">toward</span><span class="si">}{</span><span class="n">given</span><span class="si">}{</span><span class="n">target</span><span class="si">}</span><span class="s1">? &#39;</span>
+            <span class="k">for</span> <span class="n">toward</span> <span class="ow">in</span> <span class="n">towards</span>
+            <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">targets</span>
+            <span class="k">for</span> <span class="n">given</span> <span class="ow">in</span> <span class="n">givens</span>
+        <span class="p">]</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="PromptIngredientsMixin._initialize_all_ingredients">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_ingredients_mixin.PromptIngredientsMixin._initialize_all_ingredients">[docs]</a>
+    <span class="k">def</span> <span class="nf">_initialize_all_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the _all_ingredients property to initial values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Some fields are temporarily left unfilled because they build on other</span>
+        <span class="c1"># categories in the dictionary.</span>
+        <span class="c1">#</span>
+        <span class="c1"># Very basic ingredients as &quot;the &quot; in the &#39;givens&#39; category must be</span>
+        <span class="c1"># put at the end of the corresponding list because the decomposition</span>
+        <span class="c1"># of ingredients into basic ingredients will recognize similar words</span>
+        <span class="c1"># in other positions than the &#39;givens&#39; positions as matches.</span>
+        <span class="c1">#</span>
+        <span class="c1"># Ingredients that appear in other ingredients (like &#39;individual&#39;</span>
+        <span class="c1"># does in &#39;target individual&#39;) must be put behind the longer</span>
+        <span class="c1"># ingredient so that the decomposition can first find the longer</span>
+        <span class="c1"># ingredient.</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;answer_starts&#39;</span><span class="p">:</span>
+                <span class="p">[</span>
+                    <span class="s1">&#39; appears to be&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39; can be called&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39; can be labeled as&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39; can be qualified as&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39; can be said to be quite&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39; can be said to be rather&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39; can be said to be relatively&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39; is more or less&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39; is quite&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39; is rather&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39; is relatively&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39; must be called&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39; tends to be&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39; is&#39;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="s1">&#39;basic_scales&#39;</span><span class="p">:</span>
+                <span class="p">[</span>
+                    <span class="s1">&#39;On a scale from negative to neutral to positive, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;On a scale from positive to neutral to negative, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;On a scale from &quot;negative&quot; to &quot;neutral&quot; to &quot;positive&quot;, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;On a scale from &quot;positive&quot; to &quot;neutral&quot; to &quot;negative&quot;, &#39;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="s1">&#39;givens&#39;</span><span class="p">:</span>
+                <span class="p">[</span>
+                    <span class="s1">&#39;the specified &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;the mentioned &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;the given &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;the following &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;this &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;the &#39;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="s1">&#39;politenesses&#39;</span><span class="p">:</span>
+                <span class="p">[</span>
+                    <span class="s1">&#39;Please &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;I would like you to &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Can you &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="s1">&#39;prepositions&#39;</span><span class="p">:</span>
+                <span class="p">[</span>
+                    <span class="s1">&#39;in &#39;</span>
+                <span class="p">],</span>
+            <span class="s1">&#39;scales&#39;</span><span class="p">:</span>
+                <span class="p">[],</span>
+            <span class="s1">&#39;sentence_labels&#39;</span><span class="p">:</span>
+                <span class="p">[</span>
+                    <span class="s1">&#39;Here is the &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="s1">&#39;sentiment_introductions&#39;</span><span class="p">:</span>
+                <span class="p">[</span>
+                    <span class="s1">&#39;The sentiment being either &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;The sentiment being &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;The possible sentiments being either &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;The possible sentiments being &#39;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="s1">&#39;sentiment_orders&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sentiment_orders</span><span class="p">,</span>
+            <span class="s1">&#39;targets&#39;</span><span class="p">:</span>
+                <span class="p">[</span>
+                    <span class="s1">&#39;target individual&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;target person&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;individual&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;person&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;target&#39;</span><span class="p">,</span>
+
+                <span class="p">],</span>
+            <span class="s1">&#39;tasks&#39;</span><span class="p">:</span>
+                <span class="p">[</span>
+                    <span class="s1">&#39;apply a target-dependent sentiment analysis on &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;carefully analyse &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;carefully analyze &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;determine &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;identify &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;specify &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;thoroughly analyse &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;thoroughly analyze &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;analyse &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;analyze &#39;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="s1">&#39;thoughts&#39;</span><span class="p">:</span>
+                <span class="p">[</span>
+                    <span class="s1">&#39;Analyzing this sentence, I conclude that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;As far as I</span><span class="se">\&#39;</span><span class="s1">m concerned, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;As I see it, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;As I understand it, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Clearly, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;For me, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;From my perspective, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Having analyzed this sentence, I believe that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Having analyzed this sentence, I find that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Having analyzed this sentence, I firmly believe that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Having analyzed this sentence, I have come to the &#39;</span>
+                    <span class="s1">&#39;conclusion &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Having analyzed this sentence, I tend to think that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Having analyzed this sentence, I think that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Having analyzed this sentence, I would think that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;I believe that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;I feel that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;I might be wrong, but &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;I tend to think that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;I think &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;I would think that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;If I grasp it correctly, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;If I understand it right, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;If I were to guess, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;If my understanding is correct, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;If we look at it objectively, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;If you ask me, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;In my experience, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;In my humble opinion, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;In my opinion, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;In my view, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;It is my belief that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;It is my opinion that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;It seems that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;My view is that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Objectively speaking, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Obviously, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Personally, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Speaking for myself, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;The way I see it, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;To me, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;To my knowledge, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;To my mind, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;To my way of thinking, &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;that &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="s1">&#39;towards&#39;</span><span class="p">:</span>
+                <span class="p">[</span>
+                    <span class="s1">&#39;about &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;concerning &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;directed at &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;on the subject of &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;regarding &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;related to &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;relating to &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;targeted at &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;toward &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;towards &#39;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="s1">&#39;whats&#39;</span><span class="p">:</span>
+                <span class="p">[</span>
+                    <span class="s1">&#39;the sentiment &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;the stance &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;the opinion &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;the view &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;the viewpoint &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;the feeling &#39;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="s1">&#39;wheres&#39;</span><span class="p">:</span>
+                <span class="p">[</span>
+                    <span class="s1">&#39;assertion &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;opinion &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;sentence &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;statement &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;text &#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;utterance &#39;</span><span class="p">,</span>
+                <span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Values to fill in after self._all_ingredients has been temporarily</span>
+        <span class="c1"># set</span>
+        <span class="n">_all</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients</span>
+
+        <span class="n">_all</span><span class="p">[</span><span class="s1">&#39;scales&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">_all</span><span class="p">[</span><span class="s1">&#39;basic_scales&#39;</span><span class="p">]</span> <span class="o">+</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sentiment_enumerations</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_set_basic_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_basic_ingredients</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;answer_start&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients</span><span class="p">[</span><span class="s1">&#39;answer_starts&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;basic_scale&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients</span><span class="p">[</span><span class="s1">&#39;basic_scales&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;given&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients</span><span class="p">[</span><span class="s1">&#39;givens&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentiment_orders_as_strings</span><span class="p">,</span>
+            <span class="s1">&#39;politeness&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients</span><span class="p">[</span><span class="s1">&#39;politenesses&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients</span><span class="p">[</span><span class="s1">&#39;scales&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;sentence_label&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients</span><span class="p">[</span><span class="s1">&#39;sentence_labels&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;sentiment_intro&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients</span><span class="p">[</span>
+                <span class="s1">&#39;sentiment_introductions&#39;</span>
+            <span class="p">],</span>
+            <span class="s1">&#39;target&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients</span><span class="p">[</span><span class="s1">&#39;targets&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;task&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients</span><span class="p">[</span><span class="s1">&#39;tasks&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;thought&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients</span><span class="p">[</span><span class="s1">&#39;thoughts&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;what&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients</span><span class="p">[</span><span class="s1">&#39;whats&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;where&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients</span><span class="p">[</span><span class="s1">&#39;wheres&#39;</span><span class="p">],</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="PromptIngredientsMixin._set_basic_and_composed_ingredients">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_ingredients_mixin.PromptIngredientsMixin._set_basic_and_composed_ingredients">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_basic_and_composed_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The first element of each tuple is a basic ingredient type and</span>
+<span class="sd">        the second a composed ingredient type the basic ingredient</span>
+<span class="sd">        type contributes to compose. A basic ingredient type can</span>
+<span class="sd">        be used in various composed ingredients types and a composed</span>
+<span class="sd">        ingredient type usually is composed of multiple basic</span>
+<span class="sd">        ingredients types</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_basic_and_composed_ingredients</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s1">&#39;sentiment_intro&#39;</span><span class="p">,</span> <span class="s1">&#39;scale&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="s1">&#39;scale&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;scale&#39;</span><span class="p">,</span> <span class="s1">&#39;scale&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;given&#39;</span><span class="p">,</span> <span class="s1">&#39;question&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="s1">&#39;question&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;what&#39;</span><span class="p">,</span> <span class="s1">&#39;question&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="s1">&#39;before_mention&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;thought&#39;</span><span class="p">,</span> <span class="s1">&#39;answer_before_mention&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;answer_start&#39;</span><span class="p">,</span> <span class="s1">&#39;answer_start&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;given&#39;</span><span class="p">,</span> <span class="s1">&#39;before_sentence&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;politeness&#39;</span><span class="p">,</span> <span class="s1">&#39;before_sentence&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="s1">&#39;before_sentence&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;sentence_label&#39;</span><span class="p">,</span> <span class="s1">&#39;before_sentence&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;task&#39;</span><span class="p">,</span> <span class="s1">&#39;before_sentence&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;what&#39;</span><span class="p">,</span> <span class="s1">&#39;before_sentence&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;where&#39;</span><span class="p">,</span> <span class="s1">&#39;before_sentence&#39;</span><span class="p">),</span>
+        <span class="p">]</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

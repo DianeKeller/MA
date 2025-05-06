@@ -1,0 +1,10 @@
+{
+    "1": {
+        "before_sentence": "carefully analyze the viewpoint in the statement on the subject of the person. \nHere is the statement: ",
+        "before_mention": "\nPerson: ",
+        "scale": "The sentiment being neutral, positive, or negative, ",
+        "question": "what is the viewpoint on the subject of the person?",
+        "answer_before_mention": "\nYour answer: I feel that the viewpoint on the subject of ",
+        "answer_start": " appears to be"
+    }
+}

@@ -1,0 +1,100 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+title QueryColumnProcessor
+
+start
+
+:Initialize QueryColumnProcessor with
+  - language
+  - batch samples
+  - start query column number;
+
+partition "process_query_columns" {
+    :Get Start Query Column Number as lower limit of range;
+    :Compute upper limit of range;
+
+    while (Query column number is within range?) is (Yes)
+        :Reset answers collection;
+
+        partition "process_query_column" {
+            while (More queries to process?) is (Yes)
+
+                partition "process_query" {
+                    :Send payload to QueryColumnProcessor;
+                    :Process query;
+                    :Receive answer;
+                    :Add answer to answers collection;
+                    :Monitor progress + validity;
+                    :Validate half batch result;
+
+                    if (Only one kind of answers?) then (Yes)
+                        :Raise QueryVariantInvalidException;
+                    else (No)
+                        :Validate batch result;
+                        if (Only two kinds of answers?) then (Yes)
+                            :Raise QueryVariantInvalidException;
+                        else (No)
+                            :Continue processing;
+                        endif
+                    endif
+                }
+            endwhile (No)
+
+            partition "_report_failed_answers" {
+                if (Failed answers?) then (Yes)
+                    :Show failed answers;
+                    :Ask: Save and continue?;
+                    if (Save and continue?) then (Yes)
+                        :Set can_save = True;
+                    elseif (Continue without saving?) then (Yes)
+                        :Set can_save = False;
+                    else (No)
+                        :Give user the opportunity to interrupt the program;
+                        :sleep for 24 hours;
+                    endif
+                else (No)
+                    :Set can_save = True;
+                endif
+            }
+
+            partition "_save_col_result" {
+                if (can save?) then (Yes)
+                    :Save column result;
+                    :Set can save = False;
+                else (No)
+                    :Log INFO: query column discarded;
+                endif
+            }
+
+            if (QueryVariantInvalidException raised?) then (Yes)
+                :Log INFO: Column discarded;
+
+            (No) elseif (KeyError raised) then (Yes)
+                :Log INFO: all query variants processed;
+                :Raise ChunkFinishedException;
+            (No) elseif (Other exception) then (Yes)
+                :Log ERROR;
+                stop
+            endif
+        }
+
+        :Set Checkpoint;
+
+        if (ChunkFinishedException raised?) then (Yes)
+            :Log INFO: going to proceed with next chunk;
+            :Re-raise ChunkFinishedException;
+        (No) elseif (Other exception?) then (Yes)
+            :Log ERROR;
+            :Re-raise the exception;
+            stop;
+        else (No)
+            :Proceed to next query column;
+        endif
+
+    endwhile (No)
+
+    stop
+}
+
+@enduml

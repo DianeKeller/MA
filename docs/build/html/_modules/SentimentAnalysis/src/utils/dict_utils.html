@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.utils.dict_utils &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.utils.dict_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.utils.dict_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">dict_utils.py</span>
+<span class="sd">-------------</span>
+<span class="sd">Version 1.0, updated on 2025-01-26</span>
+
+<span class="sd">This module provides functions for the handling of dictionaries, especially</span>
+<span class="sd">for determining the specific dictionary structure, filtering a dictionary&#39;s</span>
+<span class="sd">content, extracting items from it, converting the keys or the entire</span>
+<span class="sd">dictionary to strings, etc.</span>
+
+<span class="sd">Functions</span>
+<span class="sd">---------</span>
+<span class="sd">convert_keys_to_consecutive_str_numbers(data: Dict[Any, Any])</span>
+<span class="sd">        -&gt; Dict[str, Any]:</span>
+<span class="sd">    Converts the keys to consecutive numbers formatted as strings.</span>
+
+<span class="sd">dict_to_string(my_dict: Dict[DictKeyType, Any]) -&gt; str:</span>
+<span class="sd">    Converts a dictionary into a string.</span>
+
+<span class="sd">filter_dict_by_value(my_filter: Any, my_dict: Dict[DictKeyType, Any])</span>
+<span class="sd">        -&gt; Dict[DictKeyType, Any]:</span>
+<span class="sd">    Filters a dictionary by matching its values to a specified filter.</span>
+
+<span class="sd">filter_dict_keys_by_value(my_dict: Dict[DictKeyType, str | int | float],</span>
+<span class="sd">        my_filter: str | int | float) -&gt; List[DictKeyType]:</span>
+<span class="sd">    Extracts the keys of a dictionary whose values match a specified value.</span>
+
+<span class="sd">get_key_by_index(my_dict: Dict[DictKeyType, Any], idx: int) -&gt; DictKeyType:</span>
+<span class="sd">    Retrieves the key at the specified index in the dictionary.</span>
+
+<span class="sd">get_n_items_from_bottom(my_dict: Dict[DictKeyType, Any], n_items: int)</span>
+<span class="sd">        -&gt; Dict[DictKeyType, Any]:</span>
+<span class="sd">    Extracts the given number of items from the end of a dictionary.</span>
+
+<span class="sd">get_n_items_from_top(my_dict: Dict[DictKeyType, Any], n_items: int)</span>
+<span class="sd">        -&gt; Dict[DictKeyType, Any]:</span>
+<span class="sd">    Extracts the given number of items from the start of a dictionary.</span>
+
+<span class="sd">is_dict_of_dicts(data: Dict) -&gt; bool:</span>
+<span class="sd">    Checks if the provided dictionary is a dictionary of dictionaries.</span>
+
+<span class="sd">is_dict_of_list_of_str_int_tuples(data: Dict) -&gt; bool:</span>
+<span class="sd">    Checks if the provided dictionary&#39;s values are lists of (str, int) tuples.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">islice</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">floor</span><span class="p">,</span> <span class="n">ceil</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">from</span> <span class="nn">src.data_structures.item_list</span> <span class="kn">import</span> <span class="n">ItemList</span>
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.list_utils</span> <span class="kn">import</span> <span class="n">list_to_string</span><span class="p">,</span> <span class="n">is_list_of_str_int_tuples</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">DictKeyType</span>
+
+
+<div class="viewcode-block" id="dict_to_string">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.dict_to_string">[docs]</a>
+<span class="k">def</span> <span class="nf">dict_to_string</span><span class="p">(</span><span class="n">my_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> \
+        <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">       Converts a dictionary into a string.</span>
+
+<span class="sd">       This function takes a dictionary as input and converts it into a string</span>
+<span class="sd">       by concatenating each key-value pair into the format &quot;key: value&quot;. Each</span>
+<span class="sd">       pair is separated by a tab and a space and ensures that no single line</span>
+<span class="sd">       exceeds 80 characters in length. If the concatenated string would</span>
+<span class="sd">       exceed 80 characters, it is split into multiple lines.</span>
+
+<span class="sd">       Parameters</span>
+<span class="sd">       ----------</span>
+<span class="sd">       my_dict : Dict[DictKeyType, Any]</span>
+<span class="sd">           The dictionary to be converted into a string. The dictionary can</span>
+<span class="sd">           contain any type of objects as keys and values, as long as they can</span>
+<span class="sd">           be converted into strings.</span>
+
+<span class="sd">       Returns</span>
+<span class="sd">       -------</span>
+<span class="sd">       str</span>
+<span class="sd">           THe string representation of the dictionary where each key-value</span>
+<span class="sd">           pair is separated by a tab and a space and lines do not exceed 80</span>
+<span class="sd">           characters in length. Each line is terminated with a newline</span>
+<span class="sd">           character, except possibly the last one. Will be an empty string if</span>
+<span class="sd">           the dictionary is empty.</span>
+
+<span class="sd">       Examples</span>
+<span class="sd">       --------</span>
+
+<span class="sd">       .. code-block:: python</span>
+
+<span class="sd">           &gt;&gt;&gt; dict_to_string({&#39;apple&#39;: 1, &#39;banana&#39;: 2, &#39;cherry&#39;: 3})</span>
+<span class="sd">           &#39;apple: 1\t banana: 2\t cherry: 3\t \n&#39;</span>
+
+<span class="sd">           &gt;&gt;&gt; dict_to_string({1: &#39;a&#39;, 2: &#39;b&#39;, 3: &#39;c&#39;})</span>
+<span class="sd">           &#39;1: a\t 2: b\t 3: c\t \n&#39;</span>
+
+<span class="sd">       Notes</span>
+<span class="sd">       -----</span>
+<span class="sd">       - The function uses &#39;list_to_string&#39; from &#39;utils.list_utils&#39; to format</span>
+<span class="sd">         the list of key-value pairs into the desired string format. This</span>
+<span class="sd">         ensures consistency in handling line lengths and formatting.</span>
+
+<span class="sd">       - Similar to the list_to_string function, this function is used for</span>
+<span class="sd">         providing examples of string representations of dictionary items. To</span>
+<span class="sd">         structure the textual output, the string representation of the</span>
+<span class="sd">         provided dictionary is indented by a tab and a space (&#39;\t &#39;)</span>
+<span class="sd">         preceding each line.</span>
+
+<span class="sd">       - Special characters in keys or values (such as newlines or tabs) are</span>
+<span class="sd">         not escaped or handled specially, which might affect the formatting</span>
+<span class="sd">         or readability of the output string.</span>
+
+<span class="sd">       &quot;&quot;&quot;</span>
+
+    <span class="c1"># Using list comprehension to convert all dictionary items into strings,</span>
+    <span class="c1"># storing them in &#39;lst&#39;.</span>
+    <span class="n">lst</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="n">my_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+
+    <span class="c1"># Use list_to_string to get a string representation of the generated list.</span>
+    <span class="k">return</span> <span class="n">list_to_string</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="filter_dict_by_keys">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.filter_dict_by_keys">[docs]</a>
+<span class="k">def</span> <span class="nf">filter_dict_by_keys</span><span class="p">(</span>
+        <span class="n">keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">],</span>
+        <span class="n">my_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Filters a dictionary by matching its keys to a list of specified keys.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    keys : List[DictKeyType]</span>
+<span class="sd">        The list of keys to match in the dictionary.</span>
+
+<span class="sd">    my_dict : Dict[DictKeyType, Any]</span>
+<span class="sd">        The dictionary to filter.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dict[DictKeyType, Any]</span>
+<span class="sd">        A new dictionary containing the items that have been found to match</span>
+<span class="sd">        the key criteria.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">my_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="filter_dict_by_value">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.filter_dict_by_value">[docs]</a>
+<span class="nd">@singledispatch</span>
+<span class="k">def</span> <span class="nf">filter_dict_by_value</span><span class="p">(</span>
+        <span class="n">my_filter</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">my_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Filters a dictionary by matching its values to a specified filter.</span>
+
+<span class="sd">    This generic function defines the default behaviour of a single-dispatch</span>
+<span class="sd">    mechanism. It handles cases where the filter value provided is not an </span>
+<span class="sd">    int or float by looking for exact matches in the dictionary&#39;s values.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    my_filter : Any</span>
+<span class="sd">        The filter value used to select items from the dictionary.</span>
+
+<span class="sd">    my_dict : Dict[DictKeyType, Any]</span>
+<span class="sd">        The dictionary to filter.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dict[DictKeyType, Any]</span>
+<span class="sd">        A new dictionary containing the items that have been found to match</span>
+<span class="sd">        the filter criteria.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">my_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="n">my_filter</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="_">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils._">[docs]</a>
+<span class="nd">@filter_dict_by_value</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="nd">@filter_dict_by_value</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span>
+        <span class="n">my_filter</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">my_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts dictionary items with values within a specified numerical range.</span>
+
+<span class="sd">    This function is part of a single-dispatch mechanism named</span>
+<span class="sd">    &quot;filter_dict_by_value&quot;. It handles cases where the filter value provided</span>
+<span class="sd">    is a number (int or float).</span>
+
+<span class="sd">    Based on the provided filter value, this function sets a minimum and a</span>
+<span class="sd">    maximum value for the range of values in which to search for dictionary</span>
+<span class="sd">    items. If the range is too small and no items are found within it,</span>
+<span class="sd">    the range is expanded until at least one match is found.</span>
+
+<span class="sd">    This function is used for selecting dictionary items that represent</span>
+<span class="sd">    statistical outliers or averages, such as items close to the median, mean,</span>
+<span class="sd">    maximum or minimum values of a dataset&#39;s characteristic (e.g., length of</span>
+<span class="sd">    text strings, frequency of words).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    my_filter : float | int</span>
+<span class="sd">        The filter value used to select items from the dictionary.</span>
+
+<span class="sd">    my_dict : Dict[DictKeyType, Any]</span>
+<span class="sd">        The dictionary to filter.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dict[DictKeyType, Any]</span>
+<span class="sd">        A new dictionary containing items where values matched the filter </span>
+<span class="sd">        criteria.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt; from src.utils.dict_utils import filter_dict_by_value</span>
+
+<span class="sd">        &gt;&gt;&gt; ex_my_dict = {&#39;a&#39;: 1, &#39;b&#39;: 2.5, &#39;c&#39;: 3, &#39;d&#39;: 4.5}</span>
+<span class="sd">        &gt;&gt;&gt; filter_dict_by_value(2.5, ex_my_dict)</span>
+<span class="sd">        {&#39;b&#39;: 2.5}</span>
+
+<span class="sd">        &gt;&gt;&gt; filter_dict_by_value(3, ex_my_dict)</span>
+<span class="sd">        {&#39;c&#39;: 3}</span>
+
+<span class="sd">        &gt;&gt;&gt; filter_dict_by_value(2.7, ex_my_dict)</span>
+<span class="sd">        {&#39;b&#39;: 2.5}</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    If the filter is a floating point number, it is improbable that the</span>
+<span class="sd">    dictionary contains items that directly match the exact number.</span>
+<span class="sd">    Therefore, in this case, the function directly computes a range of</span>
+<span class="sd">    values, in which to search for dictionary items.</span>
+
+<span class="sd">    If the filter is an integer, the initial range of values is set so that</span>
+<span class="sd">    in a first attempt, it is searched for a dictionary item that matches the</span>
+<span class="sd">    exact filter value provided.</span>
+
+<span class="sd">    In both cases, if no matches are found within the initial range,</span>
+<span class="sd">    the range is gradually expanded until at least one match is found.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># set the initial range</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">my_filter</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">min_filter</span><span class="p">,</span> <span class="n">max_filter</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">my_filter</span><span class="p">),</span> <span class="n">ceil</span><span class="p">(</span><span class="n">my_filter</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># my_filter is int</span>
+        <span class="n">min_filter</span><span class="p">,</span> <span class="n">max_filter</span> <span class="o">=</span> <span class="n">my_filter</span><span class="p">,</span> <span class="n">my_filter</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">counter</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="mi">1</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">my_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">min_filter</span> <span class="o">&lt;=</span> <span class="n">val</span> <span class="o">&lt;=</span> <span class="n">max_filter</span>
+    <span class="p">)</span>
+
+    <span class="c1"># expand the range while no match is found</span>
+    <span class="k">while</span> <span class="n">counter</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">min_filter</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">max_filter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">counter</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="mi">1</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">my_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">min_filter</span> <span class="o">&lt;=</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="n">max_filter</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">my_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">min_filter</span> <span class="o">&lt;=</span> <span class="n">val</span> <span class="o">&lt;=</span> <span class="n">max_filter</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="filter_dict_keys_by_value">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.filter_dict_keys_by_value">[docs]</a>
+<span class="k">def</span> <span class="nf">filter_dict_keys_by_value</span><span class="p">(</span>
+        <span class="n">my_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">my_filter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts the keys of a dictionary whose values match a specified value.</span>
+
+<span class="sd">    This function iterates through the given dictionary, &#39;my_dict&#39;, and</span>
+<span class="sd">    compiles a list of keys whose corresponding values match the &#39;my_filter&#39;</span>
+<span class="sd">    value.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    my_dict : Dict[DictKeyType, str | int | float]</span>
+<span class="sd">        The dictionary whose keys are to be extracted if their values match</span>
+<span class="sd">        the specified filter. The dictionary&#39;s keys can be of type</span>
+<span class="sd">        &#39;str&#39; or &#39;int&#39;, and the values can be of type &#39;str&#39;, &#39;int&#39;, or &#39;float&#39;.</span>
+
+<span class="sd">    my_filter : str | int | float</span>
+<span class="sd">        The value the dictionary values must match for their keys to be</span>
+<span class="sd">        included in the returned list of keys. Corresponding to the possible</span>
+<span class="sd">        types the dictionary values can have, the filter can be of type </span>
+<span class="sd">        &#39;str&#39;, &#39;int&#39;, or &#39;float&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[DictKeyType]</span>
+<span class="sd">        A list of keys from &#39;my_dict&#39; whose values match &#39;my_filter&#39;. The keys</span>
+<span class="sd">        in the returned list will be of the same type as they are in &#39;my_dict&#39;.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt; ex_my_dict = {&#39;a&#39;: 1, &#39;b&#39;: 2, &#39;c&#39;: 1}</span>
+<span class="sd">        &gt;&gt;&gt; filter_dict_keys_by_value(ex_my_dict, 1)</span>
+<span class="sd">        [&#39;a&#39;, &#39;c&#39;]</span>
+
+<span class="sd">        &gt;&gt;&gt; ex_my_dict = {1: &#39;apple&#39;, 2: &#39;banana&#39;, 3: &#39;apple&#39;}</span>
+<span class="sd">        &gt;&gt;&gt; filter_dict_keys_by_value(ex_my_dict, &#39;apple&#39;)</span>
+<span class="sd">        [1, 3]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - If no keys match the &#39;my_filter&#39; value, an empty list is returned.</span>
+
+<span class="sd">    - The order of the keys in the returned list follows the order they appear</span>
+<span class="sd">      in &#39;my_dict&#39;.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">my_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">my_filter</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_key_by_index">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.get_key_by_index">[docs]</a>
+<span class="k">def</span> <span class="nf">get_key_by_index</span><span class="p">(</span><span class="n">my_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">DictKeyType</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieves the key at the specified index in the dictionary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    my_dict : Dict[DictKeyType, Any]</span>
+<span class="sd">        The dictionary from which the key is to be retrieved.</span>
+
+<span class="sd">    idx : int</span>
+<span class="sd">        The index of the key to retrieve.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DictKeyType</span>
+<span class="sd">        The key at the specified index in the dictionary, or None if the index</span>
+<span class="sd">        is out of bounds.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">my_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="get_n_items_from_top">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.get_n_items_from_top">[docs]</a>
+<span class="k">def</span> <span class="nf">get_n_items_from_top</span><span class="p">(</span>
+        <span class="n">my_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">n_items</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts the given number of items from the start of a dictionary.</span>
+
+<span class="sd">    This function maintains the order of the extracted items as they appear in</span>
+<span class="sd">    the original dictionary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    my_dict : Dict[DictKeyType, Any]</span>
+<span class="sd">        The input dictionary from which to extract items.</span>
+
+<span class="sd">    n_items : int</span>
+<span class="sd">        The number of items to extract from the start of the dictionary.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dict[DictKeyType, Any]</span>
+<span class="sd">        A new dictionary containing the first &#39;n_items&#39; from the input</span>
+<span class="sd">        dictionary, preserving their order.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If &#39;n_items&#39; is not an integer.</span>
+
+<span class="sd">    CriticalException</span>
+<span class="sd">        If &#39;n_items&#39; is negative.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt; ex_my_dict = {&#39;a&#39;: 1, &#39;b&#39;: 2, &#39;c&#39;: 3, &#39;d&#39;: 4}</span>
+<span class="sd">        &gt;&gt;&gt; get_n_items_from_top(ex_my_dict, 2)</span>
+<span class="sd">        {&#39;a&#39;: 1, &#39;b&#39;: 2}</span>
+
+<span class="sd">        &gt;&gt;&gt; ex_my_dict = {&#39;apple&#39;: &#39;green&#39;, &#39;carrot&#39;: &#39;orange&#39;, &#39;pear&#39;: &#39;yellow&#39;}</span>
+<span class="sd">        &gt;&gt;&gt; get_n_items_from_top(ex_my_dict, 1)</span>
+<span class="sd">        {&#39;apple&#39;: &#39;green&#39;}</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - The function returns an empty dictionary</span>
+<span class="sd">      - if &#39;n_items&#39; is 0</span>
+<span class="sd">      - or if the input dictionary is empty.</span>
+
+<span class="sd">    - If &#39;n_items&#39; is greater than the number of items in the input</span>
+<span class="sd">      dictionary, the function returns a copy of the entire dictionary.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">n_items</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+            <span class="n">Logger</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(),</span>
+            <span class="s1">&#39;The number of items in a dictionary cannot be negative.&#39;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Use dictionary comprehension to extract the wanted number of items</span>
+    <span class="c1"># from the start of the dictionary:</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">my_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">my_dict</span><span class="p">)[:</span><span class="n">n_items</span><span class="p">]}</span></div>
+
+
+
+<div class="viewcode-block" id="get_n_items_from_bottom">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.get_n_items_from_bottom">[docs]</a>
+<span class="k">def</span> <span class="nf">get_n_items_from_bottom</span><span class="p">(</span>
+        <span class="n">my_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">n_items</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts the given number of items from the end of a dictionary.</span>
+
+<span class="sd">    This function returns the extracted items in reverse order compared to</span>
+<span class="sd">    their order in the original dictionary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    my_dict : Dict[DictKeyType, Any]</span>
+<span class="sd">        The input dictionary from which to extract items.</span>
+
+<span class="sd">    n_items : int</span>
+<span class="sd">        The number of items to extract from the end of the dictionary.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dict[DictKeyType, Any]</span>
+<span class="sd">        A new dictionary containing the last &#39;n_items&#39; from the input</span>
+<span class="sd">        dictionary, in reverse order.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    CriticalException</span>
+<span class="sd">        If &#39;n_items&#39; is negative or if it is not an integer.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt; ex_my_dict = {&#39;a&#39;: 1, &#39;b&#39;: 2, &#39;c&#39;: 3, &#39;d&#39;: 4}</span>
+<span class="sd">        &gt;&gt;&gt; get_n_items_from_bottom(ex_my_dict, 2)</span>
+<span class="sd">        {&#39;c&#39;: 3, &#39;d&#39;: 4}</span>
+
+<span class="sd">        &gt;&gt;&gt; ex_my_dict = {&#39;apple&#39;: &#39;fruit&#39;, &#39;carrot&#39;: &#39;vegetable&#39;, &#39;pear&#39;: &#39;fruit&#39;}</span>
+<span class="sd">        &gt;&gt;&gt; get_n_items_from_bottom(ex_my_dict, 1)</span>
+<span class="sd">        {&#39;pear&#39;: &#39;fruit&#39;}</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - The function returns an empty dictionary</span>
+<span class="sd">      - if &#39;n_items&#39; is 0</span>
+<span class="sd">      - or if the input dictionary is empty.</span>
+
+<span class="sd">    - If &#39;n_items&#39; is greater than the number of items in the input</span>
+<span class="sd">      dictionary, the function returns a copy of the entire dictionary.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">n_items</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+            <span class="n">Logger</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(),</span>
+            <span class="s1">&#39;The number of items in a dictionary cannot be negative.&#39;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Reverse the dictionary items and take the last n_items</span>
+    <span class="n">last_n_items</span> <span class="o">=</span> <span class="n">islice</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">my_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n_items</span><span class="p">)</span>
+
+    <span class="c1"># Convert the sliced items back into a dictionary</span>
+    <span class="n">new_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">last_n_items</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">new_dict</span></div>
+
+
+
+<div class="viewcode-block" id="value_is_in_dict">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.value_is_in_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">value_is_in_dict</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">my_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks whether a value is in a dictionary as the value of one of its keys.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    value : Any</span>
+<span class="sd">        The value to check.</span>
+
+<span class="sd">    my_dict : Dict</span>
+<span class="sd">        The dictionary to check.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the value is in the dictionary, False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">val</span> <span class="o">==</span> <span class="n">value</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">my_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="dict_is_in_list_of_dicts">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.dict_is_in_list_of_dicts">[docs]</a>
+<span class="k">def</span> <span class="nf">dict_is_in_list_of_dicts</span><span class="p">(</span><span class="n">item</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks whether a dictionary is in a list of dictionaries.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    item : Dict</span>
+<span class="sd">        The dictionary to check.</span>
+
+<span class="sd">    data : List[Dict]</span>
+<span class="sd">        The list of dictionaries to check.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the dictionary is in the list, False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#return item in data</span>
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">d</span> <span class="o">==</span> <span class="n">item</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="is_dict_of_dicts">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.is_dict_of_dicts">[docs]</a>
+<span class="k">def</span> <span class="nf">is_dict_of_dicts</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the provided dictionary is a dictionary of dictionaries.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Dict</span>
+<span class="sd">       The dictionary to check.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">       True if the provided dictionary&#39;s values are all dictionaries, False</span>
+<span class="sd">       otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="is_dict_of_list_of_str_int_tuples">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.is_dict_of_list_of_str_int_tuples">[docs]</a>
+<span class="k">def</span> <span class="nf">is_dict_of_list_of_str_int_tuples</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the provided dictionary&#39;s values are lists of (str, int) tuples.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Dict</span>
+<span class="sd">       The dictionary to check.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">       True if all values in the dictionary are lists of (str, int) tuples,</span>
+<span class="sd">       False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_list_of_str_int_tuples</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="convert_keys_to_consecutive_str_numbers">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.convert_keys_to_consecutive_str_numbers">[docs]</a>
+<span class="k">def</span> <span class="nf">convert_keys_to_consecutive_str_numbers</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> \
+        <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts the keys to consecutive numbers formatted as strings.</span>
+
+<span class="sd">    Replaces the keys of the given Dictionary by consecutive numbers</span>
+<span class="sd">    formatted as strings.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Dict[Any, Any]</span>
+<span class="sd">        The dictionary whose keys are to be converted.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dict[str, Any]</span>
+<span class="sd">        The dictionary with the converted keys.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">values</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span> <span class="n">value</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">values</span><span class="p">)}</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+
+<div class="viewcode-block" id="merge_dicts">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.merge_dicts">[docs]</a>
+<span class="k">def</span> <span class="nf">merge_dicts</span><span class="p">(</span>
+        <span class="n">dict1</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+        <span class="n">dict2</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Merges two dictionaries of type Dict[str, List[Any]].</span>
+
+<span class="sd">    If a key exists in both dictionaries, their lists are merged.</span>
+<span class="sd">    If a key exists in only one dictionary, it is added as is.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">merged_dict</span> <span class="o">=</span> <span class="n">dict1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">merged_dict</span><span class="p">:</span>
+            <span class="n">merged_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">merged_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">merged_dict</span></div>
+
+
+
+<div class="viewcode-block" id="exclude_list_elements_from_dict">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.exclude_list_elements_from_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">exclude_list_elements_from_dict</span><span class="p">(</span>
+        <span class="n">dict1</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">dict2</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;Subtracts&quot; lists from dict1 using dict2 based on matching keys.</span>
+
+<span class="sd">    Excludes elements from lists in dict1 based on matching lists and their</span>
+<span class="sd">    elements in dict2.</span>
+
+<span class="sd">    Prints a warning</span>
+<span class="sd">        - If a key exists in dict2 but not in dict1.</span>
+<span class="sd">        - If an element to be removed is not in the corresponding list in</span>
+<span class="sd">          dict1.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">dict1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">values_to_remove</span> <span class="ow">in</span> <span class="n">dict2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WARNING: Key &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; found in dict2 but not in dict1.&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values_to_remove</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;WARNING: Value &#39;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&#39; not found in list for key &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; in dict1.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="unique">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.unique">[docs]</a>
+<span class="k">def</span> <span class="nf">unique</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> \
+        <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the given dictionary with unique elements only.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Dict</span>
+<span class="sd">        The input dictionary.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dict</span>
+<span class="sd">        The dictionary with unique elements only.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Convert dictionary values to tuples if necessary to ensure hashability</span>
+        <span class="n">value_to_check</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> \
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="n">value</span>
+
+        <span class="k">if</span> <span class="n">value_to_check</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+            <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">value_to_check</span><span class="p">)</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="get_values_for_inner_key">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.get_values_for_inner_key">[docs]</a>
+<span class="k">def</span> <span class="nf">get_values_for_inner_key</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">key</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">ItemList</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the values for an inner key in a dictionary of dictionaries.</span>
+
+<span class="sd">    The values are collected into an ItemList. Double values are kept.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Dict[Any, Dict[Any, Any]]</span>
+<span class="sd">        The dictionary of dictionaries.</span>
+
+<span class="sd">    key : Any</span>
+<span class="sd">        The key of the inner dictionary.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ItemList</span>
+<span class="sd">        The values for the inner key.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">ItemList</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">entry</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">()],</span>
+        <span class="s2">&quot;inner_values&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_unique_values_for_inner_key">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.get_unique_values_for_inner_key">[docs]</a>
+<span class="k">def</span> <span class="nf">get_unique_values_for_inner_key</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">key</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the unique values for an inner key in a dictionary of dictionaries.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Dict[Any, Dict[Any, Any]]</span>
+<span class="sd">        The dictionary of dictionaries.</span>
+
+<span class="sd">    key : Any</span>
+<span class="sd">        The key of the inner dictionary.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[Any]</span>
+<span class="sd">        The unique values for the inner key.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">entry</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">()]))</span></div>
+
+
+
+<div class="viewcode-block" id="are_all_values_equal_for_key">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.are_all_values_equal_for_key">[docs]</a>
+<span class="k">def</span> <span class="nf">are_all_values_equal_for_key</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">key</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">key_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+
+    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">value</span> <span class="o">==</span> <span class="n">key_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">key_values</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_inner_keys_of_dict_of_dict">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.get_inner_keys_of_dict_of_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">get_inner_keys_of_dict_of_dict</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> \
+        <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">inner_dict</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">keys</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">inner_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="find_dict_of_dicts_entries_with_same_values_for_inner_key">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.dict_utils.find_dict_of_dicts_entries_with_same_values_for_inner_key">[docs]</a>
+<span class="k">def</span> <span class="nf">find_dict_of_dicts_entries_with_same_values_for_inner_key</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">key</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">Any</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">outer_key</span> <span class="k">for</span> <span class="n">outer_key</span><span class="p">,</span> <span class="n">inner_dict</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">inner_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="n">value</span><span class="p">]</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

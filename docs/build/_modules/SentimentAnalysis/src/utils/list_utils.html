@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.utils.list_utils &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.utils.list_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.utils.list_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">list_utils.py</span>
+<span class="sd">-------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">This module provides functions for the handling of lists and tuples.</span>
+
+<span class="sd">Functions</span>
+<span class="sd">---------</span>
+<span class="sd">are_all_elements_included(partial_list: list, complete_list: list) -&gt; bool:</span>
+<span class="sd">    Checks if the given partial list is contained in the given complete list.</span>
+<span class="sd">    </span>
+<span class="sd">are_all_of_the_same_type(lst: List[Any] | Tuple[Any]) -&gt; bool:</span>
+<span class="sd">    Checks if the elements of the given list or tuple are all of the same type.</span>
+
+<span class="sd">def filter_list_of_tuples_by_min_second_element(</span>
+<span class="sd">        lst: List[Tuple[Any, Any]],</span>
+<span class="sd">        min_value: Any</span>
+<span class="sd">) -&gt; List[Tuple[Any, Any]]:</span>
+<span class="sd">    Filters a list of tuples based on a minimum value for the second element.</span>
+
+<span class="sd">def filter_list_of_tuples_by_second_element(lst: List[Tuple[Any, Any]],</span>
+<span class="sd">        element: Any) -&gt; List[Tuple[Any, Any]]:</span>
+<span class="sd">    Filters a list of tuples based on the second element of each tuple.</span>
+
+<span class="sd">get_common_elements(first_list: list[T], second_list: list[T]) -&gt; list[T]:</span>
+<span class="sd">    Returns a list of elements that two input lists have in common.</span>
+
+<span class="sd">get_elements_by_substring(lst: List[str], substr: str) -&gt; List[str]:</span>
+<span class="sd">    Retrieves all elements in a list that contain the specified substring.</span>
+
+<span class="sd">get_first_elements_from_list_of_tuples(lst: List[Tuple[Any, Any]])</span>
+<span class="sd">        -&gt; List[Any]:</span>
+<span class="sd">    Extracts the first elements from all tuples in the given list.</span>
+
+<span class="sd">get_first_elements_from_tuple_list_by_second_element(</span>
+<span class="sd">        lst: List[Tuple[Any, Any]], element: Any) -&gt; List[Any]:</span>
+<span class="sd">    Extracts the first elements from all tuples by the second elements.</span>
+
+<span class="sd">get_second_elements_from_list_of_tuples(lst: List[Tuple[Any, Any]])</span>
+<span class="sd">        -&gt; List[Any]:</span>
+<span class="sd">    Extracts the second elements from all tuples in the given list.</span>
+
+<span class="sd">have_intersection(first_list: list, second_list: list) -&gt; bool:</span>
+<span class="sd">    Check if the intersection of two lists is not empty.</span>
+
+<span class="sd">is_flat(lst: Sequence) -&gt; bool:</span>
+<span class="sd">    Check if the given list is flat.</span>
+
+<span class="sd">is_list_of_str_int_tuples(data: List[Tuple[str, int]]) -&gt; bool:</span>
+<span class="sd">    Checks if the provided list contains only (str, int) tuples.</span>
+
+<span class="sd">is_str_int_tuple(data: Tuple[str, int]) -&gt; bool:</span>
+<span class="sd">    Checks if the provided tuple is of the form (str, int).</span>
+
+<span class="sd">is_subset(partial_list: list, complete_list: list) -&gt; bool:</span>
+<span class="sd">    Checks whether all elements in &#39;partial_list&#39; are contained in</span>
+<span class="sd">`complete_list`.</span>
+
+<span class="sd">is_substring_of_list_content(substring: str, lst: List[str]) -&gt; bool:</span>
+<span class="sd">    Checks if a given substring exists in any of the strings within a list.</span>
+
+<span class="sd">list_to_string(lst: Iterable[Any]) -&gt; str:</span>
+<span class="sd">    Converts a list or set of elements into a formatted string.</span>
+
+<span class="sd">remove_elements_from_list(lst: List[Any], elements_to_remove: List[Any])</span>
+<span class="sd">        -&gt; List[Any]:</span>
+<span class="sd">    Removes specified elements from a list.</span>
+
+<span class="sd">remove_tuples_from_list_of_tuples(</span>
+<span class="sd">        tuples: List[Tuple[str, ...]], tuples_to_remove: List[Tuple[str, ...]])</span>
+<span class="sd">        -&gt; List[Tuple[str, ...]]:</span>
+<span class="sd">    Removes specified tuples from a list of tuples.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Counter</span>
+
+<span class="kn">from</span> <span class="nn">src.utils.type_utils</span> <span class="kn">import</span> <span class="n">is_int</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">ExamplesType</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="are_all_elements_included">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.are_all_elements_included">[docs]</a>
+<span class="k">def</span> <span class="nf">are_all_elements_included</span><span class="p">(</span><span class="n">partial_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">complete_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the given partial list is contained in the given complete list.</span>
+<span class="sd">    </span>
+<span class="sd">    Checks whether all elements in &#39;partial_list&#39; are contained in</span>
+<span class="sd">    &#39;complete_list&#39;.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    partial_list : list</span>
+<span class="sd">       List of elements.</span>
+
+<span class="sd">    complete_list : list</span>
+<span class="sd">       Potentially more extensive list of elements.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">       - True if all elements in &#39;partial_list&#39; are found in &#39;complete_list&#39;.</span>
+<span class="sd">       - False if there are elements in &#39;partial_list&#39; that are not found</span>
+<span class="sd">         in &#39;complete_list&#39;.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function is optimized for small lists where the linear search time</span>
+<span class="sd">    for each element does not significantly impact performance. It directly</span>
+<span class="sd">    checks each element&#39;s presence, making it straightforward but potentially</span>
+<span class="sd">    slower for large lists due to linear search complexity.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">el</span> <span class="ow">in</span> <span class="n">complete_list</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">partial_list</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="is_subset">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.is_subset">[docs]</a>
+<span class="k">def</span> <span class="nf">is_subset</span><span class="p">(</span><span class="n">partial_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">complete_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks whether all elements in &#39;partial_list&#39; are contained in</span>
+<span class="sd">    &#39;complete_list`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    partial_list : list</span>
+<span class="sd">       List of elements.</span>
+
+<span class="sd">    complete_list : list</span>
+<span class="sd">       Potentially more extensive list of elements.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">       - &#39;True&#39; if all elements in &#39;partial_list&#39; are found in &#39;complete_list&#39;.</span>
+<span class="sd">       - &#39;False&#39; if there are elements in &#39;partial_list&#39; that are not found</span>
+<span class="sd">         in &#39;complete_list&#39;.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function is optimized for large lists by converting them to sets,</span>
+<span class="sd">    which allows for constant-time membership checks. However, it does not</span>
+<span class="sd">    account for the multiplicity of elements, as sets only consider element</span>
+<span class="sd">    uniqueness. This approach is most effective when the lists are large and</span>
+<span class="sd">    the exact count of duplicate elements is not critical for the subset check.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">partial_list</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">complete_list</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="have_intersection">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.have_intersection">[docs]</a>
+<span class="k">def</span> <span class="nf">have_intersection</span><span class="p">(</span><span class="n">first_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">second_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if the intersection of two lists is not empty.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    first_list: list</span>
+<span class="sd">        The first list to check.</span>
+
+<span class="sd">    second_list: list</span>
+<span class="sd">        The second list to check.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        - True if the intersection of the two lists is not empty.</span>
+<span class="sd">        - False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">first_list</span><span class="p">)</span><span class="o">.</span><span class="n">isdisjoint</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">second_list</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="get_common_elements">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.get_common_elements">[docs]</a>
+<span class="k">def</span> <span class="nf">get_common_elements</span><span class="p">(</span><span class="n">first_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">second_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> \
+        <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a list of elements that two input lists have in common.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    first_list[T]: list</span>
+<span class="sd">        The first list to compare with the second list.</span>
+
+<span class="sd">    second_list[T]: list</span>
+<span class="sd">        The second list to compare with the first list.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list[T]</span>
+<span class="sd">        The list of elements that both input lists have in common.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert second_list to a set to also allow for large lists</span>
+    <span class="n">second_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">second_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">first_list</span> <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">second_set</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="is_flat">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.is_flat">[docs]</a>
+<span class="k">def</span> <span class="nf">is_flat</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if the given list is flat.</span>
+
+<span class="sd">    Verify that the list contains no nested data types.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lst: list</span>
+<span class="sd">        The list to check.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool:</span>
+<span class="sd">        - True if the list is flat.</span>
+<span class="sd">        - False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">set</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="are_all_of_the_same_type">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.are_all_of_the_same_type">[docs]</a>
+<span class="k">def</span> <span class="nf">are_all_of_the_same_type</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the elements of the given list or tuple are all of the same type.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lst: List[Any] | Tuple[Any]</span>
+<span class="sd">        The list or tuple to check.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool:</span>
+<span class="sd">        - True if the elements are all of the same type.</span>
+<span class="sd">        - False otherwise.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function works for lists and tuples.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Compare the types of all elements with the type of the first element.</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">lst</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_first_elements_from_list_of_tuples">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.get_first_elements_from_list_of_tuples">[docs]</a>
+<span class="k">def</span> <span class="nf">get_first_elements_from_list_of_tuples</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> \
+        <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts the first elements from all tuples in the given list.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lst : List[Tuple[Any, Any]]</span>
+<span class="sd">        The list of tuples to get the elements from.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[Any]</span>
+<span class="sd">        The extracted list of first elements.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_second_elements_from_list_of_tuples">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.get_second_elements_from_list_of_tuples">[docs]</a>
+<span class="k">def</span> <span class="nf">get_second_elements_from_list_of_tuples</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> \
+        <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts the second elements from all tuples in the given list.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lst : List[Tuple[Any, Any]]</span>
+<span class="sd">        The list of tuples to get the elements from.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[Any]</span>
+<span class="sd">        The extracted list of second elements.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_first_elements_from_tuple_list_by_second_element">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.get_first_elements_from_tuple_list_by_second_element">[docs]</a>
+<span class="k">def</span> <span class="nf">get_first_elements_from_tuple_list_by_second_element</span><span class="p">(</span>
+        <span class="n">lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">element</span><span class="p">:</span> <span class="n">Any</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts the first elements from all tuples by the second elements.</span>
+
+<span class="sd">    Extracts the first elements from all tuples where the second elements</span>
+<span class="sd">    match the given element.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lst : List[Tuple[Any, Any]]</span>
+<span class="sd">        The list of tuples to get the elements from.</span>
+
+<span class="sd">    element: Any</span>
+<span class="sd">        The element the second elements must match for the first element to</span>
+<span class="sd">        be included in the result list.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[Any]</span>
+<span class="sd">        The extracted list of first elements.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">filtered_tuples</span> <span class="o">=</span> <span class="n">filter_list_of_tuples_by_second_element</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">get_first_elements_from_list_of_tuples</span><span class="p">(</span><span class="n">filtered_tuples</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="filter_list_of_tuples_by_second_element">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.filter_list_of_tuples_by_second_element">[docs]</a>
+<span class="k">def</span> <span class="nf">filter_list_of_tuples_by_second_element</span><span class="p">(</span>
+        <span class="n">lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">element</span><span class="p">:</span> <span class="n">Any</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Filters a list of tuples based on the second element of each tuple.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lst : List[Tuple[Any, Any]]</span>
+<span class="sd">        The list of tuples to filter.</span>
+
+<span class="sd">    element : Any</span>
+<span class="sd">         The value to compare against the second element of each tuple.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[Tuple[Any, Any]]</span>
+<span class="sd">        A list of tuples where the second element matches the specified value.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">tup</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="n">lst</span> <span class="k">if</span> <span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">element</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="filter_list_of_tuples_by_min_second_element">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.filter_list_of_tuples_by_min_second_element">[docs]</a>
+<span class="k">def</span> <span class="nf">filter_list_of_tuples_by_min_second_element</span><span class="p">(</span>
+        <span class="n">lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="n">Counter</span><span class="p">,</span>
+        <span class="n">min_value</span><span class="p">:</span> <span class="n">Any</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Filters a list of tuples based on a minimum value for the second element.</span>
+
+<span class="sd">    Filters a list of tuples based on the condition that the second element of</span>
+<span class="sd">    each tuple is greater than or equal to the specified value.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lst : List[Tuple[Any, Any]] | Counter</span>
+<span class="sd">        The list of tuples to filter. May be of type &quot;Counter&quot;.</span>
+
+<span class="sd">    min_value : Any</span>
+<span class="sd">         The minimum value to compare against the second element of each tuple.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[Tuple[Any, Any]]</span>
+<span class="sd">        A list of tuples where the second element is greater than or equal to</span>
+<span class="sd">        the specified value.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">Counter</span><span class="p">):</span>
+        <span class="n">lst</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">lst</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">tup</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="n">lst</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="n">min_value</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="list_to_string">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.list_to_string">[docs]</a>
+<span class="k">def</span> <span class="nf">list_to_string</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span> <span class="n">ExamplesType</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a list or set of elements into a formatted string.</span>
+
+<span class="sd">    This function takes a list or set of elements, concatenates them into a</span>
+<span class="sd">    string with elements separated by tabs and spaces, and ensures that no</span>
+<span class="sd">    single line exceeds 80 characters in length. If the concatenated string</span>
+<span class="sd">    would exceed 80 characters, it is split into multiple lines, with each</span>
+<span class="sd">    line appended to the final string with a newline character.</span>
+
+<span class="sd">    This function is used for providing examples of string elements</span>
+<span class="sd">    collected in lists or sets, illustrating the results of statistical</span>
+<span class="sd">    analyses of corpora, texts or parts of texts. To structure the</span>
+<span class="sd">    textual output, the string representation of the provided list is indented</span>
+<span class="sd">    by a tab and a space (`&#39;\t &#39;`) preceding each line.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lst : List[Any] | Set[Any]</span>
+<span class="sd">        The list or set of elements to be converted into a string. The</span>
+<span class="sd">        elements are expected to be stringifiable (i.e., they should</span>
+<span class="sd">        implement the &#39;__str__&#39; or &#39;__repr__&#39; methods).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        A string representation of the list or set where elements are</span>
+<span class="sd">        separated by tabs and spaces, and lines do not exceed 80 characters in</span>
+<span class="sd">        length. Each line is terminated with a newline character, except</span>
+<span class="sd">        possibly the last one. Will be an empty string if the list is empty.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt; list_to_string([&#39;apple&#39;, &#39;banana&#39;, &#39;pear&#39;])</span>
+<span class="sd">        &#39;\t apple\t banana\t pear\t \n&#39;</span>
+
+<span class="sd">        &gt;&gt;&gt; list_to_string({&#39;apple&#39;, &#39;banana&#39;, &#39;pear&#39;})</span>
+<span class="sd">        &#39;\t apple\t banana\t pear\t \n&#39;</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The function does not guarantee the order of elements when a set is passed</span>
+<span class="sd">    due to the inherent unordered nature of sets. The final string&#39;s line</span>
+<span class="sd">    breaks are designed to ensure readability and adherence to a maximum line</span>
+<span class="sd">    length.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If any element in the list or set does not implement the &#39;__str__&#39; or</span>
+<span class="sd">        &#39;__repr__&#39; method, resulting in a TypeError when attempting to</span>
+<span class="sd">        concatenate non-string types.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> &#39;</span>
+
+    <span class="c1"># append elements to lines list if the total length exceeds 80 characters</span>
+    <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">:</span>
+        <span class="n">new_element</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">el</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> &#39;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span> <span class="o">+</span> <span class="n">new_element</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">80</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> &#39;</span> <span class="o">+</span> <span class="n">new_element</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">+=</span> <span class="n">new_element</span>
+
+    <span class="c1"># append the last line, if it has more than just initial tab and space</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+    <span class="c1"># join lines into a single string with newline separation and ensure it</span>
+    <span class="c1"># ends with &quot;\n&quot;</span>
+    <span class="n">result_string</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">result_string</span><span class="p">:</span>
+        <span class="n">result_string</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+    <span class="k">return</span> <span class="n">result_string</span></div>
+
+
+
+<div class="viewcode-block" id="is_list_of_str_int_tuples">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.is_list_of_str_int_tuples">[docs]</a>
+<span class="k">def</span> <span class="nf">is_list_of_str_int_tuples</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]])</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the provided list contains only (str, int) tuples.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : List[Tuple[str, int]]</span>
+<span class="sd">       The list to check.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">       True if all items in the list are (str, int) tuples, False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_str_int_tuple</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="is_str_int_tuple">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.is_str_int_tuple">[docs]</a>
+<span class="k">def</span> <span class="nf">is_str_int_tuple</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the provided tuple is of the form (str, int).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Tuple[str, int]</span>
+<span class="sd">        The tuple to check.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the tuple consists of a string and an integer, False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_int</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="is_substring_of_list_content">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.is_substring_of_list_content">[docs]</a>
+<span class="k">def</span> <span class="nf">is_substring_of_list_content</span><span class="p">(</span><span class="n">substring</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if a given substring exists in any of the strings within a list.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    substring : str</span>
+<span class="sd">       The substring to search for within the list of strings.</span>
+
+<span class="sd">    lst : List[str]</span>
+<span class="sd">       The list of strings in which to search for the substring.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">       True if the substring is found in any string in the list, False</span>
+<span class="sd">       otherwise.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt; is_substring_of_list_content(&quot;foo&quot;, [&quot;bar&quot;, &quot;foo&quot;, &quot;baz&quot;])</span>
+<span class="sd">        True</span>
+
+<span class="sd">        &gt;&gt;&gt; is_substring_of_list_content(&quot;xyz&quot;, [&quot;bar&quot;, &quot;foo&quot;, &quot;baz&quot;])</span>
+<span class="sd">        False</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">substring</span> <span class="ow">in</span> <span class="n">string</span> <span class="k">for</span> <span class="n">string</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_elements_by_substring">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.get_elements_by_substring">[docs]</a>
+<span class="k">def</span> <span class="nf">get_elements_by_substring</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">substr</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieves all elements in a list that contain the specified substring.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lst : List[str]</span>
+<span class="sd">        The list of strings to search through.</span>
+
+<span class="sd">    substr : str</span>
+<span class="sd">        The substring to search for within each string in the list.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[str]</span>
+<span class="sd">        A list of strings that contain the specified substring.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt; get_elements_by_substring([&quot;apple&quot;, &quot;banana&quot;, &quot;grape&quot;, &quot;pineapple&quot;],</span>
+<span class="sd">        ...     &quot;apple&quot;)</span>
+<span class="sd">        [&#39;apple&#39;, &#39;pineapple&#39;]</span>
+
+<span class="sd">        &gt;&gt;&gt; get_elements_by_substring([&quot;car&quot;, &quot;bike&quot;, &quot;truck&quot;], &quot;plane&quot;)</span>
+<span class="sd">        []</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">lst</span> <span class="k">if</span> <span class="n">substr</span> <span class="ow">in</span> <span class="n">el</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="remove_elements_from_list">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.remove_elements_from_list">[docs]</a>
+<span class="k">def</span> <span class="nf">remove_elements_from_list</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">elements_to_remove</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> \
+        <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Removes specified elements from a list.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lst : List[Any]</span>
+<span class="sd">       The original list of elements.</span>
+
+<span class="sd">    elements_to_remove : List[Any]</span>
+<span class="sd">       The list of elements to be removed from the original list.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[Any]</span>
+<span class="sd">       A new list with the specified elements removed.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt; remove_elements_from_list([1, 2, 3, 4], [2, 4])</span>
+<span class="sd">        [1, 3]</span>
+
+<span class="sd">        &gt;&gt;&gt; remove_elements_from_list([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;], [&quot;b&quot;])</span>
+<span class="sd">        [&#39;a&#39;, &#39;c&#39;]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">lst</span> <span class="k">if</span> <span class="n">el</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">elements_to_remove</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="remove_tuples_from_list_of_tuples">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.remove_tuples_from_list_of_tuples">[docs]</a>
+<span class="k">def</span> <span class="nf">remove_tuples_from_list_of_tuples</span><span class="p">(</span>
+        <span class="n">tuples</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span>
+        <span class="n">tuples_to_remove</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Removes specified tuples from a list of tuples.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tuples : List[Tuple[str, ...]]</span>
+<span class="sd">        The original list of tuples.</span>
+
+<span class="sd">    tuples_to_remove : List[Tuple[str, ...]]</span>
+<span class="sd">        The list of tuples to remove from the original list of tuples.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[Tuple[str, ...]]</span>
+<span class="sd">        A new list of tuples with the specified tuples removed.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt; remove_tuples_from_list_of_tuples(</span>
+<span class="sd">        ...     [(&quot;a&quot;, &quot;b&quot;), (&quot;c&quot;, &quot;d&quot;)], [(&quot;c&quot;, &quot;d&quot;)]</span>
+<span class="sd">        ... )</span>
+<span class="sd">        [(&#39;a&#39;, &#39;b&#39;)]</span>
+
+<span class="sd">        &gt;&gt;&gt; remove_tuples_from_list_of_tuples(</span>
+<span class="sd">        ...     [(&quot;apple&quot;, &quot;banana&quot;), (&quot;pear&quot;, &quot;peach&quot;)], [(&quot;pear&quot;, &quot;peach&quot;)]</span>
+<span class="sd">        ... )</span>
+<span class="sd">        [(&#39;apple&#39;, &#39;banana&#39;)]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">tuples</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">tuples_to_remove</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="permute_elements">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.permute_elements">[docs]</a>
+<span class="k">def</span> <span class="nf">permute_elements</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> \
+        <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns all permutations of the elements in the list.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lst : List[Any]</span>
+<span class="sd">        A list of elements</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        A list of all permuted versions of the original list.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span><span class="n">lst</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="permute_and_join">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.permute_and_join">[docs]</a>
+<span class="k">def</span> <span class="nf">permute_and_join</span><span class="p">(</span><span class="o">*</span><span class="n">lists</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> \
+        <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Permute each list and join the results for any number of lists</span>
+
+<span class="sd">    Usage</span>
+<span class="sd">    -----</span>
+<span class="sd">    &gt;&gt;&gt; lst_1 = [1, 2, 3]</span>
+<span class="sd">    &gt;&gt;&gt; lst_2 = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]</span>
+
+<span class="sd">    &gt;&gt;&gt; result = permute_and_join(lst_1, lst_2)</span>
+<span class="sd">    [</span>
+<span class="sd">        (1, 2, 3), (1, 3, 2), (2, 1, 3), (2, 3, 1), (3, 1, 2),</span>
+<span class="sd">        (3, 2, 1), (&#39;a&#39;, &#39;b&#39;, &#39;c&#39;), (&#39;a&#39;, &#39;c&#39;, &#39;b&#39;),</span>
+<span class="sd">        (&#39;b&#39;, &#39;a&#39;, &#39;c&#39;), (&#39;b&#39;, &#39;c&#39;, &#39;a&#39;), (&#39;c&#39;, &#39;a&#39;, &#39;b&#39;),</span>
+<span class="sd">        (&#39;c&#39;, &#39;b&#39;, &#39;a&#39;)</span>
+<span class="sd">    ]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">permuted_lists</span> <span class="o">=</span> <span class="p">[</span><span class="n">permute_elements</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span> <span class="k">for</span> <span class="n">lst</span> <span class="ow">in</span> <span class="n">lists</span><span class="p">]</span>
+
+    <span class="c1"># Flatten the lists into one</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">permuted_lists</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="find_list_of_dicts_entries_with_same_values_for_inner_key">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.find_list_of_dicts_entries_with_same_values_for_inner_key">[docs]</a>
+<span class="k">def</span> <span class="nf">find_list_of_dicts_entries_with_same_values_for_inner_key</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">key</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">Any</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the indices of all dictionaries in a list where the value of a given</span>
+<span class="sd">    key matches a specified value.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : List[Dict[Any, Any]]</span>
+<span class="sd">        The list of dictionaries to search through.</span>
+
+<span class="sd">    key : Any</span>
+<span class="sd">        The key to check in each dictionary.</span>
+
+<span class="sd">    value :Any</span>
+<span class="sd">        The value to match for the specified key.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[int]</span>
+<span class="sd">        A list of indices of dictionaries that match the condition.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span>
+            <span class="n">value</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="to_strings">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.to_strings">[docs]</a>
+<span class="k">def</span> <span class="nf">to_strings</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> \
+        <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a list of elements of any type into a list of strings.</span>
+
+<span class="sd">    This function takes any list of elements and converts each element</span>
+<span class="sd">    to its string representation using the `str()` function.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lst : List[Any]</span>
+<span class="sd">        A list of elements of any type to be converted into a list of strings.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[str]</span>
+<span class="sd">        A list containing the string representations of the elements</span>
+<span class="sd">        in the input list.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">el</span><span class="p">)</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="to_dict_with_str_keys">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.list_utils.to_dict_with_str_keys">[docs]</a>
+<span class="k">def</span> <span class="nf">to_dict_with_str_keys</span><span class="p">(</span><span class="n">lst</span><span class="p">:</span> <span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">start_key</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a list of elements into a dictionary with string keys.</span>
+
+<span class="sd">    Converts a list of elements into a dictionary with string keys derived from</span>
+<span class="sd">    the integer indices of the original list.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lst : [List[Any]]</span>
+<span class="sd">        A list of elements to be converted into a dictionary with string keys.</span>
+
+<span class="sd">    start_key : int</span>
+<span class="sd">        The starting integer key to use for the dictionary keys. Defaults to 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dict[str, Any]</span>
+<span class="sd">        A dictionary with string keys derived from the integer indices of the</span>
+<span class="sd">        original list.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">start_key</span> <span class="o">+</span> <span class="n">index</span><span class="p">):</span> <span class="n">item</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lst</span><span class="p">)}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

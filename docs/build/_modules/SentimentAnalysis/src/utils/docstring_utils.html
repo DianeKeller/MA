@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.utils.docstring_utils &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.utils.docstring_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.utils.docstring_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">docstring_utils.py</span>
+<span class="sd">------------------</span>
+<span class="sd">Version 1.0, updated on 2024-12-19</span>
+
+<span class="sd">This module provides utility functions to help automate the generation of</span>
+<span class="sd">docstrings.</span>
+
+<span class="sd">Functions</span>
+<span class="sd">---------</span>
+<span class="sd">add_attributes_to_class_docstring(module_name: str) -&gt; None:</span>
+<span class="sd">    Retrieves information about the attributes in the given module.</span>
+
+<span class="sd">add_methods_to_class_docstring(module_name: str) -&gt; None:</span>
+<span class="sd">    Retrieves information about the methods in the given module.</span>
+
+<span class="sd">find_attributes_and_modules(module: str):</span>
+<span class="sd">    Calls the methods to add information to docstrings and find_unused methods.</span>
+
+<span class="sd">find_unused(module_name: str):</span>
+<span class="sd">    Finds unused methods in the module.</span>
+
+<span class="sd">update_attributes_section(module: Callable, content: str) -&gt; str</span>
+<span class="sd">    Suggests updates for the attributes section of class docstrings within a</span>
+<span class="sd">    module.</span>
+
+<span class="sd">update_methods_section(module: Callable, content: str) -&gt; str</span>
+<span class="sd">    Suggests updates for the &#39;Methods&#39; or &#39;Functions&#39; section of a</span>
+<span class="sd">    class or module</span>
+<span class="sd">    docstring.</span>
+
+<span class="sd">Usage</span>
+<span class="sd">-----</span>
+<span class="sd">Insert the lines between the double hyphen lines in the class docstring</span>
+<span class="sd">of a module you intend to provide with information about attributes and</span>
+<span class="sd">methods. Then run the find_attributes_and_modules method.</span>
+
+<span class="sd">=============================================</span>
+<span class="sd">Attributes</span>
+<span class="sd">----------</span>
+<span class="sd">### Start A ###</span>
+<span class="sd">### End A ###</span>
+
+<span class="sd">Methods</span>
+<span class="sd">-------</span>
+<span class="sd">### Start ###</span>
+<span class="sd">### End ###</span>
+<span class="sd">=============================================</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">ModuleType</span>
+
+<span class="kn">import</span> <span class="nn">settings</span>
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.class_utils</span> <span class="kn">import</span> <span class="n">find_attributes</span>
+<span class="kn">from</span> <span class="nn">src.utils.method_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">find_methods</span><span class="p">,</span>
+    <span class="n">update_module</span><span class="p">,</span>
+    <span class="n">dynamic_import</span><span class="p">,</span>
+    <span class="n">find_unused_methods_in_project</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.string_utils</span> <span class="kn">import</span> <span class="n">StringUtils</span>
+<span class="kn">from</span> <span class="nn">src.utils.print_utils</span> <span class="kn">import</span> <span class="n">print_in_box</span>
+
+
+<span class="c1"># region --- Public Functions</span>
+
+<div class="viewcode-block" id="update_attributes_section">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.docstring_utils.update_attributes_section">[docs]</a>
+<span class="k">def</span> <span class="nf">update_attributes_section</span><span class="p">(</span><span class="n">module</span><span class="p">:</span> <span class="n">ModuleType</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Suggests updates for the attributes section of class docstrings.</span>
+
+<span class="sd">    Suggests updates for the attributes section of class docstrings within</span>
+<span class="sd">    modules.</span>
+
+<span class="sd">    Returns a list of the given module&#39;s attributes with type hints and</span>
+<span class="sd">    short descriptions to be inserted in the &#39;Attributes&#39; section of the</span>
+<span class="sd">    module or class docstring of the module.</span>
+
+<span class="sd">    The attribute details (names, types, and descriptions) are derived from</span>
+<span class="sd">    the attributes and properties of the class contained in the given module.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module : MaduleType</span>
+<span class="sd">        The module containing the classes.</span>
+
+<span class="sd">    content : str</span>
+<span class="sd">        The content of the module file as a string.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The content to insert in the &#39;Attributes&#39; section of the class</span>
+<span class="sd">        docstring.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">update_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+
+    <span class="n">start_marker</span> <span class="o">=</span> <span class="s2">&quot;### Start A ###&quot;</span>
+    <span class="n">end_marker</span> <span class="o">=</span> <span class="s2">&quot;### End A ###&quot;</span>
+
+    <span class="c1"># Iterate through classes defined in the module</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span>
+            <span class="n">module</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">==</span> <span class="n">module</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="p">):</span>
+        <span class="c1"># Find the attribute markers in the content</span>
+        <span class="n">start_index</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">start_marker</span><span class="p">)</span>
+        <span class="n">end_index</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">end_marker</span><span class="p">,</span> <span class="n">start_index</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">start_index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">end_index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># Extract and format the class attributes</span>
+            <span class="n">attributes_info</span> <span class="o">=</span> <span class="n">find_attributes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="n">formatted_attributes</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">attr_name</span><span class="p">,</span> <span class="p">(</span><span class="n">type_hint</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
+                    <span class="n">attributes_info</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="c1"># Clean up type hints and descriptions</span>
+                <span class="n">type_hint</span> <span class="o">=</span> <span class="n">type_hint</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;typing.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s1">&#39;\bReturns the\b|\bGets the\b&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;The&#39;</span><span class="p">,</span>
+                    <span class="n">description</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Handle &#39;Optional&#39; type hints</span>
+                <span class="k">if</span> <span class="n">type_hint</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Optional&#39;</span><span class="p">):</span>
+                    <span class="n">types</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\[(.*?)\]&#39;</span><span class="p">,</span> <span class="n">type_hint</span><span class="p">)</span>
+                    <span class="n">type_hint</span> <span class="o">=</span> <span class="s1">&#39; | &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">types</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; | None&#39;</span>
+
+                <span class="c1"># Format the attribute line</span>
+                <span class="n">formatted_attributes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attr_name</span><span class="si">}</span><span class="s2"> : </span><span class="si">{</span><span class="n">type_hint</span><span class="si">}</span><span class="se">\n</span><span class="s2">    </span><span class="si">{</span><span class="n">description</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Replace the attribute section in the content</span>
+            <span class="n">attributes_section</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">formatted_attributes</span><span class="p">)</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">attributes_section</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">content</span></div>
+
+
+
+<div class="viewcode-block" id="update_methods_section">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.docstring_utils.update_methods_section">[docs]</a>
+<span class="k">def</span> <span class="nf">update_methods_section</span><span class="p">(</span><span class="n">module</span><span class="p">:</span> <span class="n">ModuleType</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Suggests updates for the &#39;Methods&#39; or &#39;Functions&#39; section of a docstring.</span>
+
+<span class="sd">    Suggests updates for the &#39;Methods&#39; or &#39;Functions&#39; section of a class or</span>
+<span class="sd">    module docstring.</span>
+
+<span class="sd">    This function finds all module-level functions and class methods,</span>
+<span class="sd">    then formats and inserts their signatures and descriptions between</span>
+<span class="sd">    the specified markers in the content.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module : ModuleType</span>
+<span class="sd">        The module in which the functions or methods are defined.</span>
+
+<span class="sd">    content : str</span>
+<span class="sd">        The content of the file/module as a string.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The content to insert in the &#39;Methods&#39; or &quot;Functions&quot; section of the</span>
+<span class="sd">        class or module docstring.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">update_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+    <span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+
+    <span class="n">start_marker</span> <span class="o">=</span> <span class="s2">&quot;### Start ###&quot;</span>
+    <span class="n">end_marker</span> <span class="o">=</span> <span class="s2">&quot;### End ###&quot;</span>
+
+    <span class="c1"># Find the method markers in the content</span>
+    <span class="n">start_index</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">start_marker</span><span class="p">)</span>
+    <span class="n">end_index</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">end_marker</span><span class="p">,</span> <span class="n">start_index</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">start_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">end_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+            <span class="n">Logger</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(),</span>
+            <span class="s2">&quot;Start or end marker not found in content.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">formatted_functions</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Process module-level functions</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">func</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">==</span> <span class="n">module</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+            <span class="c1"># Extract the function signature and description</span>
+            <span class="n">signature</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">))</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;No description available.&quot;</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="n">StringUtils</span><span class="o">.</span><span class="n">get_first_sentence</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+            <span class="n">formatted_functions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">signature</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="s2">    </span><span class="si">{</span><span class="n">description</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="c1"># Process methods inside classes in the module</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">==</span> <span class="n">module</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+            <span class="n">methods_info</span> <span class="o">=</span> <span class="n">find_methods</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">method_name</span><span class="p">,</span> <span class="p">(</span><span class="n">signature</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
+                    <span class="n">methods_info</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="n">formatted_functions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">method_name</span><span class="si">}{</span><span class="n">signature</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="s2">    </span><span class="si">{</span><span class="n">description</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+    <span class="c1"># Join the formatted function/method list and replace the content</span>
+    <span class="n">functions_section</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">formatted_functions</span><span class="p">)</span>
+    <span class="n">updated_content</span> <span class="o">=</span> <span class="n">functions_section</span>
+
+    <span class="k">return</span> <span class="n">updated_content</span></div>
+
+
+
+<div class="viewcode-block" id="find_unused">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.docstring_utils.find_unused">[docs]</a>
+<span class="k">def</span> <span class="nf">find_unused</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">module_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;src.</span><span class="si">{</span><span class="n">module_name</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">project_path</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">ROOT</span>
+
+    <span class="n">unused_methods</span> <span class="o">=</span> <span class="n">find_unused_methods_in_project</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">project_path</span><span class="p">)</span>
+
+    <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unused methods in </span><span class="si">{</span><span class="n">module_name</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">unused_methods</span>
+
+    <span class="n">print_in_box</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="add_methods_to_class_docstring">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.docstring_utils.add_methods_to_class_docstring">[docs]</a>
+<span class="k">def</span> <span class="nf">add_methods_to_class_docstring</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieves information about the attributes in the given module.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module_name : str</span>
+<span class="sd">        The name of the module in which to search for attributes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">my_module</span> <span class="o">=</span> <span class="n">dynamic_import</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+
+    <span class="c1"># Load the module&#39;s content from the file (as an example, replace with</span>
+    <span class="c1"># actual file path)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">my_module</span><span class="o">.</span><span class="vm">__file__</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">module_content</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="c1"># Update the content with function signatures and first docstring sentences</span>
+    <span class="n">updated_content</span> <span class="o">=</span> <span class="n">update_methods_section</span><span class="p">(</span>
+        <span class="n">my_module</span><span class="p">,</span>
+        <span class="n">module_content</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Output the updated content (or write it back to a file)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">updated_content</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="add_attributes_to_class_docstring">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.docstring_utils.add_attributes_to_class_docstring">[docs]</a>
+<span class="k">def</span> <span class="nf">add_attributes_to_class_docstring</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieves information about the attributes in the given module.</span>
+
+<span class="sd">    Dynamically retrieves information about the attributes in the given module</span>
+<span class="sd">    that can be used to update the class docstring in the module.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module_name : str</span>
+<span class="sd">        The name of the module to import and inspect.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">my_module</span> <span class="o">=</span> <span class="n">dynamic_import</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+
+    <span class="c1"># Load the module&#39;s content from the file (as an example, replace with</span>
+    <span class="c1"># actual file path)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">my_module</span><span class="o">.</span><span class="vm">__file__</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">module_content</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="c1"># Update the content with function signatures and first docstring sentences</span>
+    <span class="n">updated_content</span> <span class="o">=</span> <span class="n">update_attributes_section</span><span class="p">(</span>
+        <span class="n">my_module</span><span class="p">,</span>
+        <span class="n">module_content</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Output the updated content (or write it back to a file)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">updated_content</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="find_attributes_and_modules">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.docstring_utils.find_attributes_and_modules">[docs]</a>
+<span class="k">def</span> <span class="nf">find_attributes_and_modules</span><span class="p">(</span><span class="n">module</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calls the methods to add information to docstrings and find_unused methods.</span>
+
+<span class="sd">    Calls the methods to add attributes and methods to docstrings and the</span>
+<span class="sd">    find_unused method.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module : str</span>
+<span class="sd">        The name of the module in which to search for attributes and methods.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">add_attributes_to_class_docstring</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+    <span class="n">add_methods_to_class_docstring</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+
+    <span class="n">find_unused</span><span class="p">(</span><span class="n">module</span><span class="p">)</span></div>
+
+
+<span class="c1"># endregion --- Public Functions</span>
+
+<span class="c1"># region --- Protected Functions</span>
+
+<span class="c1"># endregion --- Protected Functions</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

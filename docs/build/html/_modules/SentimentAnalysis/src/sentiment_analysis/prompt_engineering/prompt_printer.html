@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_printer &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_printer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_printer</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">prompt_printer.py</span>
+<span class="sd">----------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Counter</span>
+
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.prompt_engineering.prompts</span> <span class="kn">import</span> <span class="n">Prompts</span>
+<span class="kn">from</span> <span class="nn">src.utils.print_utils</span> <span class="kn">import</span> <span class="n">print_in_box</span>
+<span class="kn">from</span> <span class="nn">src.utils.list_utils</span> <span class="kn">import</span> <span class="n">filter_list_of_tuples_by_min_second_element</span>
+
+
+<div class="viewcode-block" id="PromptPrinter">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_printer.PromptPrinter">[docs]</a>
+<span class="k">class</span> <span class="nc">PromptPrinter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    PromptPrinter class</span>
+
+<span class="sd">    Handles all printing operations for PromptOptimizer.</span>
+
+<span class="sd">    This class centralizes all print statements related to prompts,</span>
+<span class="sd">    correlation analysis, discarded prompts, and frequency results.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    print_category_analysis(</span>
+<span class="sd">        category: str,</span>
+<span class="sd">        valid_values: List[Tuple[str, int]],</span>
+<span class="sd">        invalid_values: List[Tuple[str, int]],</span>
+<span class="sd">        n_unique_values: int,</span>
+<span class="sd">        n_valid_unique_values: int,</span>
+<span class="sd">        n_invalid_unique_values: int,</span>
+<span class="sd">        total_n_elements: int</span>
+<span class="sd">    ) -&gt; None:</span>
+<span class="sd">        Prints the analysis results of a given category.</span>
+
+<span class="sd">    print_category_statistics(</span>
+<span class="sd">        category: str = &#39;&#39;,</span>
+<span class="sd">        total_n_elements: int = 0,</span>
+<span class="sd">        n_unique_values: int = 0,</span>
+<span class="sd">        n_valid_unique_values: int = 0,</span>
+<span class="sd">        n_invalid_unique_values: int = 0,</span>
+<span class="sd">        n_only_valid_values: int = 0,</span>
+<span class="sd">        n_only_invalid_values: int = 0</span>
+<span class="sd">    ) -&gt; None:</span>
+<span class="sd">        Prints the statistics of a given category.</span>
+
+<span class="sd">    print_finegrained_analysis(</span>
+<span class="sd">        category: str,</span>
+<span class="sd">        bad_elements: List[str],</span>
+<span class="sd">        good_elements: List[str]</span>
+<span class="sd">    ) -&gt; None:</span>
+<span class="sd">        Prints results of fine-grained prompt part analysis.</span>
+
+<span class="sd">    print_invalid_prompt_parts(</span>
+<span class="sd">        invalid_prompt_parts: Dict[str, List[str]]</span>
+<span class="sd">    ) -&gt; None:</span>
+<span class="sd">        Prints all invalid prompt parts identified in the analysis.</span>
+
+<span class="sd">    print_prompt_statistics(</span>
+<span class="sd">        n_valid_prompts: int,</span>
+<span class="sd">        n_invalid_prompts: int,</span>
+<span class="sd">        total_n_prompts: int</span>
+<span class="sd">    ) -&gt; None:</span>
+<span class="sd">        Prints the counts of total prompts and valid and invalid prompts.</span>
+
+<span class="sd">    print_unique_category_values(</span>
+<span class="sd">        category: str,</span>
+<span class="sd">        unique_values: List[str],</span>
+<span class="sd">        validity: str = &#39;&#39;</span>
+<span class="sd">    ) -&gt; None:</span>
+<span class="sd">        Prints the unique values of a given category.</span>
+
+<span class="sd">    print_unique_category_values_with_freqs(</span>
+<span class="sd">        category: str,</span>
+<span class="sd">        values: Union[List[Tuple[str, int]], Counter],</span>
+<span class="sd">        validity: str = &#39;&#39;</span>
+<span class="sd">    ) -&gt; None:</span>
+<span class="sd">        Prints the values of a given category.</span>
+
+<span class="sd">    print_variants(</span>
+<span class="sd">        valid: Prompts,</span>
+<span class="sd">        invalid: Prompts</span>
+<span class="sd">    ) -&gt; None:</span>
+<span class="sd">        Prints the valid and invalid prompts.</span>
+
+<span class="sd">    print_variants_dicts(</span>
+<span class="sd">        valid: Dict[str, List[Tuple[str, int]]],</span>
+<span class="sd">        invalid: Dict[str, List[Tuple[str, int]]]</span>
+<span class="sd">    ) -&gt; None:</span>
+<span class="sd">        Prints the given variants dictionaries.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy_nr</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strategy_nr</span> <span class="o">=</span> <span class="n">strategy_nr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strategy</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Strategy </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy_nr</span><span class="si">}</span><span class="s2"> -&quot;</span>
+
+<div class="viewcode-block" id="PromptPrinter.print_variants">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_printer.PromptPrinter.print_variants">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_variants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">valid</span><span class="p">:</span> <span class="n">Prompts</span><span class="p">,</span> <span class="n">invalid</span><span class="p">:</span> <span class="n">Prompts</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the valid and invalid prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        valid : Prompts</span>
+<span class="sd">            Valid prompts.</span>
+
+<span class="sd">        invalid : Prompts</span>
+<span class="sd">            Invalid prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">valid</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+        <span class="n">invalid</span><span class="o">.</span><span class="n">print</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PromptPrinter.print_variants_dicts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_printer.PromptPrinter.print_variants_dicts">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_variants_dicts</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">valid</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span>
+            <span class="n">invalid</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the given variants dictionaries.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        valid : Dict[str, List[Tuple[str, int]]]</span>
+<span class="sd">            Dictionary with prompt parts or prompt ingredients that always</span>
+<span class="sd">            lead to valid prompts. The key is the category the respective</span>
+<span class="sd">            parts belong to, the value is a list of tuples where the first</span>
+<span class="sd">            element is a prompt part or ingredient and the second element</span>
+<span class="sd">            is the frequency with which the first element has been used in</span>
+<span class="sd">            the 150 prompts.</span>
+
+<span class="sd">        invalid : Dict[str, List[Tuple[str, int]]]</span>
+<span class="sd">            Dictionary with prompt parts or prompt ingredients that always</span>
+<span class="sd">            lead to invalid prompts. It is organized in the same way as the</span>
+<span class="sd">            &#39;valid&#39; dictionary.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">print_in_box</span><span class="p">(</span><span class="s1">&#39;Only valid queries&#39;</span><span class="p">,</span> <span class="n">valid</span><span class="p">)</span>
+        <span class="n">print_in_box</span><span class="p">(</span><span class="s1">&#39;Only invalid queries&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptPrinter.print_prompt_statistics">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_printer.PromptPrinter.print_prompt_statistics">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_prompt_statistics</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">n_valid_prompts</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">n_invalid_prompts</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">total_n_prompts</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the counts of total prompts and valid and invalid prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n_valid_prompts : int</span>
+<span class="sd">            The number of valid prompts.</span>
+
+<span class="sd">        n_invalid_prompts : int</span>
+<span class="sd">            The number of invalid prompts.</span>
+
+<span class="sd">        total_n_prompts : int</span>
+<span class="sd">            The total number of prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="si">}</span><span class="s2"> Overall Prompts Results&quot;</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Total prompts:</span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><span class="n">total_n_prompts</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Valid prompts:</span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><span class="n">n_valid_prompts</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Invalid prompts:</span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><span class="n">n_invalid_prompts</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">print_in_box</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptPrinter.print_category_analysis">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_printer.PromptPrinter.print_category_analysis">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_category_analysis</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">valid_values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+            <span class="n">invalid_values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+            <span class="n">n_unique_values</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">n_valid_unique_values</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">n_invalid_unique_values</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">total_n_elements</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the analysis results of a given category.</span>
+
+<span class="sd">        Prints the category statistics and the values that only lead to</span>
+<span class="sd">        valid or invalid prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        category : str</span>
+<span class="sd">            The category.</span>
+
+<span class="sd">        valid_values : List[Tuple[str, int]]</span>
+<span class="sd">            The values that appear in valid prompts. Each tuple contains</span>
+<span class="sd">            the value and its frequency.</span>
+
+<span class="sd">        invalid_values : List[Tuple[str, int]]</span>
+<span class="sd">            The values that appear in invalid prompts. Each tuple contains</span>
+<span class="sd">            the value and its frequency.</span>
+
+<span class="sd">        n_unique_values : int</span>
+<span class="sd">            The number of unique values.</span>
+
+<span class="sd">        n_valid_unique_values : int</span>
+<span class="sd">            The number of unique values that appear in valid prompts.</span>
+
+<span class="sd">        n_invalid_unique_values : int</span>
+<span class="sd">            The number of unique values that appear in invalid prompts.</span>
+
+<span class="sd">        total_n_elements : int</span>
+<span class="sd">            The total number of elements.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n_only_valid_values</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_values</span><span class="p">)</span>
+        <span class="n">n_only_invalid_values</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">invalid_values</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_category_statistics</span><span class="p">(</span>
+            <span class="n">category</span><span class="p">,</span>
+            <span class="n">total_n_elements</span><span class="p">,</span>
+            <span class="n">n_unique_values</span><span class="p">,</span>
+            <span class="n">n_valid_unique_values</span><span class="p">,</span>
+            <span class="n">n_invalid_unique_values</span><span class="p">,</span>
+            <span class="n">n_only_valid_values</span><span class="p">,</span>
+            <span class="n">n_only_invalid_values</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_unique_category_values_with_freqs</span><span class="p">(</span>
+            <span class="n">category</span><span class="p">,</span>
+            <span class="n">valid_values</span><span class="p">,</span>
+            <span class="n">validity</span><span class="o">=</span><span class="s2">&quot;only valid&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_unique_category_values_with_freqs</span><span class="p">(</span>
+            <span class="n">category</span><span class="p">,</span>
+            <span class="n">invalid_values</span><span class="p">,</span>
+            <span class="n">validity</span><span class="o">=</span><span class="s2">&quot;only invalid&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptPrinter.print_category_statistics">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_printer.PromptPrinter.print_category_statistics">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_category_statistics</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">category</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">total_n_elements</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">n_unique_values</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">n_valid_unique_values</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">n_invalid_unique_values</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">n_only_valid_values</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">n_only_invalid_values</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the statistics of a given category.</span>
+
+<span class="sd">        Prints</span>
+<span class="sd">        - the total number of elements available,</span>
+<span class="sd">        - the total number of elements used in the prompts,</span>
+<span class="sd">        - the total number of elements used in valid prompts,</span>
+<span class="sd">        - the total number of elements used in invalid prompts,</span>
+<span class="sd">        - the number of elements that are only used in valid prompts,</span>
+<span class="sd">        - the number of elements that are only used in invalid prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        category : str</span>
+<span class="sd">            The category of the elements.</span>
+
+<span class="sd">        total_n_elements : int</span>
+<span class="sd">            The total number of elements.</span>
+
+<span class="sd">        n_unique_values : int</span>
+<span class="sd">            The number of unique values.</span>
+
+<span class="sd">        n_valid_unique_values : int</span>
+<span class="sd">            The number of unique values that appear in valid prompts.</span>
+
+<span class="sd">        n_invalid_unique_values : int</span>
+<span class="sd">            The number of unique values that appear in invalid prompts.</span>
+
+<span class="sd">        n_only_valid_values : int</span>
+<span class="sd">            The number of unique values that always lead to valid prompts.</span>
+
+<span class="sd">        n_only_invalid_values : int</span>
+<span class="sd">            The number of unique values that always lead to invalid prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="si">}</span><span class="s2"> Category: </span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">body</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Total n° of variants: </span><span class="se">\t</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">total_n_elements</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Variants used: </span><span class="se">\t</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_unique_values</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Variants producing valid prompts: </span><span class="se">\t</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_valid_unique_values</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Variants producing invalid prompts: </span><span class="se">\t</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_invalid_unique_values</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Variants producing only valid prompts: </span><span class="se">\t</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_only_valid_values</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Variants producing only invalid prompts: </span><span class="se">\t</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_only_invalid_values</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">print_in_box</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptPrinter.print_unique_category_values_with_freqs">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_printer.PromptPrinter.print_unique_category_values_with_freqs">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_unique_category_values_with_freqs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">|</span> <span class="n">Counter</span><span class="p">,</span>
+            <span class="n">validity</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">min_freq</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the values of a given category.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        category : str</span>
+<span class="sd">            The category to print values for.</span>
+
+<span class="sd">        values : List[Tuple[str, int]] | Counter</span>
+<span class="sd">            The values of the category and their frequencies.</span>
+
+<span class="sd">        validity : str</span>
+<span class="sd">            The validity of the prompts, e.g. &#39;(only) valid&#39;,</span>
+<span class="sd">            &#39;(only) invalid&#39;, &#39;discarded&#39;, or an empty string, if the</span>
+<span class="sd">            prompts are not filtered by validity.</span>
+
+<span class="sd">        min_freq : int</span>
+<span class="sd">            The minimum frequency of the values to print.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">validity</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">validity</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; - </span><span class="si">{</span><span class="n">validity</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="si">}</span><span class="s2"> Category: </span><span class="si">{</span><span class="n">category</span><span class="si">}{</span><span class="n">validity</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">n_values</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+
+        <span class="c1"># If there are only a few values, do not filter them</span>
+        <span class="k">if</span> <span class="n">n_values</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">min_freq</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">min_freq</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># If there are many values, filter them by a minimum frequency</span>
+        <span class="c1"># If no minimum frequency is provided, set it to 1</span>
+        <span class="k">elif</span> <span class="n">min_freq</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">min_freq</span> <span class="o">=</span> <span class="mi">2</span>
+
+        <span class="n">subtitle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_values</span><span class="si">}</span><span class="s2"> unique elements&quot;</span>
+
+        <span class="n">filtered_values</span> <span class="o">=</span> <span class="n">values</span>
+
+        <span class="k">if</span> <span class="n">min_freq</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n_values</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="k">while</span> <span class="n">n_values</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+                <span class="n">filtered_values</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">filter_list_of_tuples_by_min_second_element</span><span class="p">(</span>
+                        <span class="n">values</span><span class="p">,</span> <span class="n">min_freq</span>
+                    <span class="p">)</span>
+                <span class="p">]</span>
+                <span class="n">min_freq</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">n_values</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered_values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="n">subtitle</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot; (minimum frequency displayed: </span><span class="si">{</span><span class="n">min_freq</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">print_in_box</span><span class="p">(</span>
+            <span class="n">title</span><span class="p">,</span>
+            <span class="n">filtered_values</span><span class="p">,</span>
+            <span class="n">subtitle</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptPrinter.print_unique_category_values">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_printer.PromptPrinter.print_unique_category_values">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_unique_category_values</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">unique_values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">validity</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the unique values of a given category.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        category : str</span>
+<span class="sd">            The category to print unique values for.</span>
+
+<span class="sd">        validity : str</span>
+<span class="sd">            The validity of the prompts. Can be &#39;valid&#39; or &#39;invalid&#39; or an</span>
+<span class="sd">            empty string, if the prompts are not filtered by validity.</span>
+
+<span class="sd">        unique_values : List[str]</span>
+<span class="sd">            The unique values of the category.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="si">}</span><span class="s2"> Unique &#39;</span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2">&#39; elements in </span><span class="si">{</span><span class="n">validity</span><span class="si">}</span><span class="s2"> prompts&quot;</span>
+        <span class="n">subtitle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">unique_values</span><span class="p">)</span><span class="si">}</span><span class="s2"> unique elements:&quot;</span>
+
+        <span class="n">print_in_box</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">unique_values</span><span class="p">,</span> <span class="n">subtitle</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptPrinter.print_invalid_prompt_parts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_printer.PromptPrinter.print_invalid_prompt_parts">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_invalid_prompt_parts</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">invalid_prompt_parts</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints all invalid prompt parts identified in the analysis.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        invalid_prompt_parts : Dict[str, List[str]]</span>
+<span class="sd">            The invalid prompt parts identified in the analysis.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">invalid_prompt_parts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">category</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">subtitle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="si">}</span><span class="s2"> unique invalid prompt parts&quot;</span>
+
+            <span class="n">print_in_box</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">subtitle</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptPrinter.print_invalid_ingredients_in_discarded_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_printer.PromptPrinter.print_invalid_ingredients_in_discarded_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_invalid_ingredients_in_discarded_prompts</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">invalid_ingredients</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints all invalid ingredients in discarded prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        invalid_ingredients : Dict[str, List[str]]</span>
+<span class="sd">            The invalid ingredients in discarded prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy</span><span class="si">}</span><span class="s2"> Invalid ingredients in discarded prompts&quot;</span>
+        <span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">invalid_ingredients</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">subtitle</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="si">}</span><span class="s2"> unique invalid ingredients in </span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">sorted_values</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">print_in_box</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">sorted_values</span><span class="p">,</span> <span class="n">subtitle</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="PromptPrinter.print_finegrained_analysis">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_printer.PromptPrinter.print_finegrained_analysis">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_finegrained_analysis</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">bad_elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">good_elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints results of fine-grained prompt part analysis.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        category : str</span>
+<span class="sd">            The category to print unique values for.</span>
+
+<span class="sd">        bad_elements : List[str]</span>
+<span class="sd">            The unique values that lead to invalid prompts.</span>
+
+<span class="sd">        good_elements : List[str]</span>
+<span class="sd">            The unique values that also lead to valid prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_unique_category_values</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2"> (bad)&quot;</span><span class="p">,</span>
+            <span class="n">bad_elements</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_unique_category_values</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2"> (good)&quot;</span><span class="p">,</span>
+            <span class="n">good_elements</span>
+        <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

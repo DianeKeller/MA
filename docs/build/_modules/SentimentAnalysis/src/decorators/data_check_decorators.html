@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.decorators.data_check_decorators &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.decorators.data_check_decorators</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.decorators.data_check_decorators</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">data_check_decorators.py</span>
+<span class="sd">------------------------</span>
+<span class="sd">Version 1.0, updated on 2024-12-17</span>
+
+<span class="sd">This module contains decorators for validating inputs, outputs, and class</span>
+<span class="sd">properties. It includes mechanisms for logging and handling empty or None</span>
+<span class="sd">values in method calls.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Callable</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span><span class="p">,</span> <span class="n">is_empty</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">LoggingMixin</span><span class="p">()</span><span class="o">.</span><span class="n">log</span>
+
+
+<span class="c1"># region --- Decorators</span>
+
+<div class="viewcode-block" id="input_not_none_or_empty">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.data_check_decorators.input_not_none_or_empty">[docs]</a>
+<span class="k">def</span> <span class="nf">input_not_none_or_empty</span><span class="p">(</span><span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator to check if the first input parameter is empty.</span>
+
+<span class="sd">    This decorator checks if the first input parameter of the decorated method</span>
+<span class="sd">    is empty. If so, it logs a message and raises a ValueError.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    what : str</span>
+<span class="sd">        A format string describing the context of the input being checked,</span>
+<span class="sd">        which can be formatted using &#39;*args&#39; and &#39;**kwargs&#39; from the method.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Callable</span>
+<span class="sd">        A decorator that can be applied to a method to ensure the first</span>
+<span class="sd">        parameter of the decorated method is set and not empty.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the first parameter is empty.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+            <span class="n">input_value</span> <span class="o">=</span> <span class="n">_get_input_value</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+            <span class="c1"># Check if the input is None or empty</span>
+            <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">input_value</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">what</span><span class="si">}</span><span class="s1"> not found or empty!&#39;</span>
+                <span class="n">_log_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="c1"># Call the original function with the original arguments</span>
+            <span class="k">return</span> <span class="n">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span>
+
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+
+<div class="viewcode-block" id="parameters_not_empty">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.data_check_decorators.parameters_not_empty">[docs]</a>
+<span class="k">def</span> <span class="nf">parameters_not_empty</span><span class="p">(</span><span class="o">*</span><span class="n">param_names</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator to ensure specified parameters are not None or empty.</span>
+
+<span class="sd">    This decorator ensures specified parameters passed to the decorated</span>
+<span class="sd">    function are not None or empty. If no parameter names are specified,</span>
+<span class="sd">    all parameters are checked.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param_names : str</span>
+<span class="sd">        Names of the parameters to check. If empty, all parameters (excluding</span>
+<span class="sd">        &#39;self&#39; and &#39;cls&#39;) are checked.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Callable</span>
+<span class="sd">        A decorator that can be applied to a method to ensure specified</span>
+<span class="sd">        parameters are not None or empty.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    CriticalException</span>
+<span class="sd">        If a parameter is None or empty.</span>
+<span class="sd">        </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    &#39;Self&#39; and &#39;cls&#39; parameters of the decorated function are automatically</span>
+<span class="sd">    excluded from the check, as they are always automatically set.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+            <span class="c1"># Get the function&#39;s signature to map args and kwargs to parameter</span>
+            <span class="c1"># names</span>
+            <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+            <span class="n">bound_args</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">bind_partial</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">bound_args</span><span class="o">.</span><span class="n">apply_defaults</span><span class="p">()</span>
+
+            <span class="c1"># Determine parameters to check</span>
+            <span class="n">params_to_check</span> <span class="o">=</span> <span class="n">param_names</span> <span class="k">if</span> <span class="n">param_names</span> \
+                <span class="k">else</span> <span class="n">bound_args</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+            <span class="c1"># Exclude &#39;self&#39; and &#39;cls&#39; from the parameters to check</span>
+            <span class="n">params_to_check</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">param</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params_to_check</span>
+                <span class="k">if</span> <span class="n">param</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;self&#39;</span><span class="p">,</span> <span class="s1">&#39;cls&#39;</span><span class="p">}</span>
+            <span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params_to_check</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">bound_args</span><span class="o">.</span><span class="n">arguments</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">bound_args</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="n">param</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                            <span class="n">logger</span><span class="p">,</span>
+                            <span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Parameter &#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&#39; cannot be &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;None or empty!&quot;</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+
+            <span class="c1"># Call the original function</span>
+            <span class="k">return</span> <span class="n">operation</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span>
+
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+
+<div class="viewcode-block" id="requires_property">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.data_check_decorators.requires_property">[docs]</a>
+<span class="k">def</span> <span class="nf">requires_property</span><span class="p">(</span><span class="o">*</span><span class="n">attrs</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator ensuring that the current object has the specified properties.</span>
+
+<span class="sd">    Ensures the required properties of the calling object are set and</span>
+<span class="sd">    not empty before the decorated method is executed. If the required</span>
+<span class="sd">    properties are None or empty, a ValueError is raised and the decorated</span>
+<span class="sd">    method is not executed.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    attrs : str</span>
+<span class="sd">        Names of one or more attributes/properties that must be set and not</span>
+<span class="sd">        empty.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Callable</span>
+<span class="sd">        A decorator that can be applied to a method to enforce the presence of</span>
+<span class="sd">        the specified properties.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If any of the required properties is empty or not set.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not set. Cannot proceed.&quot;</span> <span class="o">%</span>
+                           <span class="n">attr</span><span class="o">.</span><span class="n">capitalize</span><span class="p">())</span>
+                    <span class="n">_log_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span>
+
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+
+<div class="viewcode-block" id="info_requires_property">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.data_check_decorators.info_requires_property">[docs]</a>
+<span class="k">def</span> <span class="nf">info_requires_property</span><span class="p">(</span><span class="o">*</span><span class="n">attrs</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default_value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator ensuring that the current object has the specified properties.</span>
+
+<span class="sd">    Checks whether the required properties of the calling object are set and</span>
+<span class="sd">    not empty before the decorated method is executed. If a required</span>
+<span class="sd">    property is None or empty, the decorator sets it to a default value and</span>
+<span class="sd">    logs an informational message.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    default_value : Any</span>
+<span class="sd">        The value to set for any property that is found to be None or empty.</span>
+
+<span class="sd">    attrs : str</span>
+<span class="sd">        Names of one or more attributes/properties that are required for the</span>
+<span class="sd">        execution of the decorated method.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Callable</span>
+<span class="sd">        A decorator that can be applied to a method to enforce the presence of</span>
+<span class="sd">        the specified properties, setting default values where necessary.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+                <span class="c1"># Make the type of attr recognizable for type checkers</span>
+                <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span>
+
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not set. Returning default value.&quot;</span> <span class="o">%</span>
+                           <span class="n">attr</span><span class="o">.</span><span class="n">capitalize</span><span class="p">())</span>
+                    <span class="n">_log_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+                    <span class="k">return</span> <span class="n">default_value</span>
+
+            <span class="k">return</span> <span class="n">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span>
+
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+
+<div class="viewcode-block" id="output_not_none_or_empty">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.data_check_decorators.output_not_none_or_empty">[docs]</a>
+<span class="k">def</span> <span class="nf">output_not_none_or_empty</span><span class="p">(</span><span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator that ensures that the output of a method is not None or empty.</span>
+
+<span class="sd">    Decorator that checks if the output of a method is None or empty and</span>
+<span class="sd">    raises an error if so.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    what : str</span>
+<span class="sd">        A format string used to describe the context of the operation in error</span>
+<span class="sd">        messages.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Callable</span>
+<span class="sd">        A decorator function that can be applied to methods to enforce that</span>
+<span class="sd">        their output is neither None nor empty.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the output is empty or not set.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This decorator rejects empty outputs like empty strings or empty</span>
+<span class="sd">    lists as well as &#39;None&#39; outputs. If empty outputs are acceptable, though,</span>
+<span class="sd">    use the &#39;output_not_none&#39; decorator instead.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+            <span class="n">return_value</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">return_value</span><span class="p">):</span>
+                <span class="n">params</span> <span class="o">=</span> <span class="n">_prepare_params</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">what</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                <span class="p">)</span>
+
+                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> not found or empty!&#39;</span> <span class="o">%</span> <span class="n">params</span>
+                <span class="n">_log_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">return_value</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span>
+
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+
+<div class="viewcode-block" id="output_not_none">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.data_check_decorators.output_not_none">[docs]</a>
+<span class="k">def</span> <span class="nf">output_not_none</span><span class="p">(</span><span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator that ensures that the output of a method is not None.</span>
+
+<span class="sd">    Decorator that checks if the output of a method is None and raises an</span>
+<span class="sd">    error if so.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    what : str</span>
+<span class="sd">        A format string used to describe the context of the operation in error</span>
+<span class="sd">        messages.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Callable</span>
+<span class="sd">        A decorator function that can be applied to methods to enforce that</span>
+<span class="sd">        their output is not None.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This decorator does accept empty outputs like empty strings or empty</span>
+<span class="sd">    lists. If you need to exclude those as well as &#39;None&#39; outputs, use the</span>
+<span class="sd">    &#39;output_not_none_or_empty&#39; decorator.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the output is None.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+            <span class="n">return_value</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">return_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">params</span> <span class="o">=</span> <span class="n">_prepare_params</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">what</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                <span class="p">)</span>
+
+                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is None!&#39;</span> <span class="o">%</span> <span class="n">params</span>
+                <span class="n">_log_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">return_value</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span>
+
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+
+<div class="viewcode-block" id="info_input_empty">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.data_check_decorators.info_input_empty">[docs]</a>
+<span class="k">def</span> <span class="nf">info_input_empty</span><span class="p">(</span><span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">on_empty</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator that executes a function if the first input parameter is empty.</span>
+
+<span class="sd">    Checks if the first input parameter of the decorated method is empty. If</span>
+<span class="sd">    so, it logs a message and executes a specified function to potentially</span>
+<span class="sd">    remedy the situation. The decorated method is then called with the new</span>
+<span class="sd">    or existing input.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    what : str</span>
+<span class="sd">        A format string describing the context of the input being checked,</span>
+<span class="sd">        which can be formatted using &#39;*args&#39; and &#39;**kwargs&#39; from the method.</span>
+
+<span class="sd">    on_empty : Callable</span>
+<span class="sd">        A function to execute if the input is empty. It receives the &#39;self&#39;</span>
+<span class="sd">        instance and the empty value as parameters. It typically sets the</span>
+<span class="sd">        required value of the first input parameter so that this is not</span>
+<span class="sd">        empty anymore.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Callable</span>
+<span class="sd">        A decorator that can be applied to methods to enforce the presence of a</span>
+<span class="sd">        non-empty first argument.</span>
+
+<span class="sd">    Usage</span>
+<span class="sd">    -----</span>
+<span class="sd">    class DataProcessor:</span>
+<span class="sd">        def log_info(self, message):</span>
+<span class="sd">           print(message)  # Logging to console or elsewhere</span>
+
+<span class="sd">        @info_input_empty(</span>
+<span class="sd">            &#39;Processing input for user {user_id}&#39;,</span>
+<span class="sd">            on_empty=lambda self, input: self.log_info(&quot;Input was empty!&quot;)</span>
+<span class="sd">        )</span>
+<span class="sd">        def process_data(self, data, user_id):</span>
+<span class="sd">            # Method implementation...</span>
+<span class="sd">            pass</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+            <span class="c1"># Check the input value for emptiness</span>
+            <span class="n">input_value</span> <span class="o">=</span> <span class="n">_get_input_value</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">is_empty</span><span class="p">(</span><span class="n">input_value</span><span class="p">):</span>
+
+                <span class="n">formatted_what</span> <span class="o">=</span> <span class="n">what</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Value is empty! </span><span class="si">{</span><span class="n">formatted_what</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">_log_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+                <span class="n">new_input_value</span> <span class="o">=</span> <span class="n">on_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_value</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">new_input_value</span><span class="p">):</span>
+                    <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_input_value</span><span class="p">,)</span> <span class="o">+</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+            <span class="k">return</span> <span class="n">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span>
+
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+
+<div class="viewcode-block" id="info_output_empty">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.data_check_decorators.info_output_empty">[docs]</a>
+<span class="k">def</span> <span class="nf">info_output_empty</span><span class="p">(</span><span class="n">what</span><span class="p">,</span> <span class="n">on_empty</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator that executes a function if the output is empty.</span>
+
+<span class="sd">    Checks if the output  of the decorated method is empty. If so, it logs a</span>
+<span class="sd">    message and executes a specified function.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    what : str</span>
+<span class="sd">        A format string describing the context of the input being checked,</span>
+<span class="sd">        which can be formatted using &#39;*args&#39; and &#39;**kwargs&#39; from the method.</span>
+
+<span class="sd">    on_empty : callable</span>
+<span class="sd">        A function to execute if the output is empty. It receives the &#39;self&#39;</span>
+<span class="sd">        instance and the output value as parameters.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Callable</span>
+<span class="sd">        A decorator that can be applied to methods to enforce the presence of a</span>
+<span class="sd">        non-empty output.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+            <span class="n">return_value</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_empty</span><span class="p">(</span><span class="n">return_value</span><span class="p">):</span>
+                <span class="n">params</span> <span class="o">=</span> <span class="n">_prepare_params</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">what</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                <span class="p">)</span>
+
+                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Return value is empty! </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">params</span>
+                <span class="n">_log_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+                <span class="c1"># Pass return_value to the on_empty function</span>
+                <span class="n">on_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_value</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">return_value</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span>
+
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+
+<span class="c1"># endregion --- Decorators</span>
+
+
+<span class="c1"># region --- Protected Functions</span>
+<div class="viewcode-block" id="_get_input_value">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.data_check_decorators._get_input_value">[docs]</a>
+<span class="k">def</span> <span class="nf">_get_input_value</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> \
+        <span class="o">-&gt;</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines the input value depending on the operation type.</span>
+
+<span class="sd">    Determines which argument represents the input type depending on the</span>
+<span class="sd">    type of the decorated operation: Instance and class methods provide a</span>
+<span class="sd">    &quot;self&quot; or &quot;cls&quot; parameter, while static or standalone methods do not.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    args : Tuple[Any, ...]</span>
+<span class="sd">        Positional arguments passed to the decorated method.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Any</span>
+<span class="sd">        The input value, if found, None otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># Supposing args[0] is the reference to the caller&#39;s class and args[1]</span>
+        <span class="c1"># contains the input value</span>
+        <span class="k">return</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="_log_msg">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.data_check_decorators._log_msg">[docs]</a>
+<span class="k">def</span> <span class="nf">_log_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> \
+        <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Logs a message using the provided logging mechanism.</span>
+
+<span class="sd">    Depending on the context of the method call, this function determines</span>
+<span class="sd">    whether to use the instance&#39;s logger or a default logger. It supports</span>
+<span class="sd">    various logging levels such as &#39;info&#39;, &#39;warning&#39;, and &#39;error&#39;.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    self : Any</span>
+<span class="sd">        The instance from which the log is triggered.</span>
+
+<span class="sd">    msg : str</span>
+<span class="sd">        The message to be logged.</span>
+
+<span class="sd">    level : str</span>
+<span class="sd">        The severity level of the log message (&#39;info&#39;, &#39;warning&#39;, &#39;error&#39;).</span>
+
+<span class="sd">    *args : Tuple[Any, ...]</span>
+<span class="sd">        Additional arguments that may include an object with its own log</span>
+<span class="sd">        method.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - If the first argument in `args` has a `log` method, it is used.</span>
+<span class="sd">    - If `self` has a `log` method, it is used.</span>
+<span class="sd">    - If neither condition is met, the module-level logger is used.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Log or print the message</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;log&#39;</span><span class="p">):</span>
+        <span class="c1"># If it&#39;s an instance method with logging</span>
+        <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Static method</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_prepare_params">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.data_check_decorators._prepare_params">[docs]</a>
+<span class="k">def</span> <span class="nf">_prepare_params</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function to format parameters for logging and error messages.</span>
+
+<span class="sd">    This function prepares a dictionary (context) containing references to</span>
+<span class="sd">    the &#39;self&#39; instance, positional arguments (args), and keyword arguments</span>
+<span class="sd">    (kwargs). It then uses this dictionary to replace placeholders in the</span>
+<span class="sd">    &#39;what&#39; format string, returning the resulting formatted string.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    self :</span>
+<span class="sd">        The instance of the class that contains the method being decorated.</span>
+
+<span class="sd">    operation : Callable</span>
+<span class="sd">        The method being decorated.</span>
+
+<span class="sd">    what : str</span>
+<span class="sd">        A format string that describes the context of the operation being</span>
+<span class="sd">        performed.</span>
+
+<span class="sd">    args : Tuple[Any, ...]</span>
+<span class="sd">        Positional arguments passed to the decorated method.</span>
+
+<span class="sd">    kwargs : Dict[str, Any]</span>
+<span class="sd">        Keyword arguments passed to the decorated method.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    formatted_params : str</span>
+<span class="sd">        A string where placeholders in &#39;what&#39; have been replaced with the</span>
+<span class="sd">        corresponding values from self, args, and kwargs.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Prepare context with self and other params for string formatting</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;self&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">}</span>
+    <span class="c1"># Add keyword arguments</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Retrieve the parameter names from the function signature</span>
+    <span class="n">param_names</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_varnames</span><span class="p">[</span>
+                  <span class="p">:</span><span class="n">operation</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_argcount</span>
+                  <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">context</span><span class="p">[</span><span class="n">param_names</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">arg</span>
+
+    <span class="c1"># Use context for formatting</span>
+    <span class="n">formatted_params</span> <span class="o">=</span> <span class="n">what</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">context</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">formatted_params</span></div>
+
+
+<span class="c1"># endregion --- Protected Functions</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

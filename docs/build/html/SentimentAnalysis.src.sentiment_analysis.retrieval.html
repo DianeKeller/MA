@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.retrieval package &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9bcbadda"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SentimentAnalysis.src.sentiment_analysis.samples package" href="SentimentAnalysis.src.sentiment_analysis.samples.html" />
+    <link rel="prev" title="SentimentAnalysis.src.sentiment_analysis.prompt_engineering package" href="SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">SentimentAnalysis</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="SentimentAnalysis.html">SentimentAnalysis package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="SentimentAnalysis.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="SentimentAnalysis.src.html">SentimentAnalysis.src package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#sentimentanalysis-action-module">SentimentAnalysis.action module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#sentimentanalysis-constants-module">SentimentAnalysis.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#sentimentanalysis-logger-module">SentimentAnalysis.logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.main">SentimentAnalysis.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.settings">SentimentAnalysis.settings module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.setup">SentimentAnalysis.setup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.type_aliases">SentimentAnalysis.type_aliases module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.view_log">SentimentAnalysis.view_log module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">SentimentAnalysis</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.html">SentimentAnalysis package</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.src.html">SentimentAnalysis.src package</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.src.sentiment_analysis.html">SentimentAnalysis.src.sentiment_analysis package</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.retrieval package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/SentimentAnalysis.src.sentiment_analysis.retrieval.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sentimentanalysis-src-sentiment-analysis-retrieval-package">
+<h1>SentimentAnalysis.src.sentiment_analysis.retrieval package<a class="headerlink" href="#sentimentanalysis-src-sentiment-analysis-retrieval-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="sentimentanalysis-src-sentiment-analysis-retrieval-batch-processor-module">
+<h2>SentimentAnalysis.src.sentiment_analysis.retrieval.batch_processor module<a class="headerlink" href="#sentimentanalysis-src-sentiment-analysis-retrieval-batch-processor-module" title="Link to this heading"></a></h2>
+<section id="batch-processor-py">
+<h3>batch_processor.py<a class="headerlink" href="#batch-processor-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-04</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.retrieval.batch_processor.</span></span><span class="sig-name descname"><span class="pre">BatchProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/batch_processor.html#BatchProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LoggingMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">CheckpointMixin</span></code></p>
+<p>BatchProcessor class.</p>
+<p>This class manages batch-wise processing of data samples for a specified
+language. It maintains checkpoints to resume processing after interruptions
+and aggregates results from processed batches.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">batch_size</span></span></dt>
+<dd><p>The size of each batch, according to the entiment analysis
+configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">config</span></span></dt>
+<dd><p>The sentiment analysis configuratation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SentimentAnalysisConfig</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">n_possible_batches</span></span></dt>
+<dd><p>The number of possible batches. Computed property.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">results</span></span></dt>
+<dd><p>The batches results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">results_file_name</span></span></dt>
+<dd><p>The name of the results file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">samples</span></span></dt>
+<dd><p>The samples to process in batches.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">target_n_batches</span></span></dt>
+<dd><p>The number of batches to process, according to the sentiment analysis
+configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">target_n_samples</span></span></dt>
+<dd><p>The number of samples to process. Computed property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_nr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/batch_processor.html#BatchProcessor.process_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Processes the givwn batch of the data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_batches():</span></span></dt>
+<dd><p>Processes all batches for the given language.</p>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-148c427b6b480fea541bc907a75ef0778e4b6dc6.png" alt="Inheritance diagram of SentimentAnalysis.src.sentiment_analysis.retrieval.batch_processor.BatchProcessor" class="inheritance graphviz" /></div>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/batch_processor.html#BatchProcessor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Initializes the BatchProcessor with the specified parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>language</strong> (<em>str</em>) – Language code.</p></li>
+<li><p><strong>samples</strong> (<a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><em>MyDataFrame</em></a>) – The MyDataFrame with the samples to process in batches.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_add_to_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_nr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/batch_processor.html#BatchProcessor._add_to_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Adds the batch results to the existing results and saves the results.</p>
+<p>Adds the batch results to the existing results and saves the results
+file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_results</strong> (<a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><em>MyDataFrame</em></a>) – The batch results returned from the chunk processor.</p></li>
+<li><p><strong>batch_nr</strong> (<em>int</em>) – The current batch number.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_compute_n_possible_batches</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/batch_processor.html#BatchProcessor._compute_n_possible_batches"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Computes the possible number of batches and stores it as a property.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_set_results_file_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/batch_processor.html#BatchProcessor._set_results_file_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Sets the name of the file for the results of the processed batches.</p>
+<p>In this file, the sentiment predictions of all targeted batches for
+the current language are collected.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_set_target_n_samples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/batch_processor.html#BatchProcessor._set_target_n_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Computes the targeted number of samples.</p>
+<p>Computes the targeted number of samples from the targeted number of
+batches and the batch size and sets the corresponding property.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_possible_batches</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em></dt>
+<dd><p>Gets the number of possible batches.</p>
+<p>Gets the number of possible batches given the number of samples and
+the size of the batches.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_nr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/batch_processor.html#BatchProcessor.process_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Processes the given batch of data.</p>
+<p>Extracts the part from the data that corresponds to the batch’s number
+and size and passes the data on to the chunks processor to add and
+execute the queries.</p>
+<p>Appends the results returned from the chunks processor to the results
+file and reports any failed answers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>batch_nr</strong> (<em>int</em>) – The number of the batch.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_batches</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/batch_processor.html#BatchProcessor.process_batches"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Processes all batches for the given language.</p>
+<p>Creates a checkpoint at the end of each processed batch so that the
+program can resume after an interruption where it left off. Prevents
+infinite loops by tracking repeated batch numbers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.LanguageFinishedException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.LanguageFinishedException"><strong>LanguageFinishedException</strong></a> – If all batches for the language are processed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">results</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></em></dt>
+<dd><p>Gets the batches results.</p>
+<p>Returns a filled MyDataFrame instance after the batches have been
+processed. Empty or partially filled until then.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">results_file_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em></dt>
+<dd><p>Gets the name of the results file.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></em></dt>
+<dd><p>Gets the samples to process in batches.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">target_n_samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em></dt>
+<dd><p>Gets the number of samples to process.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="sentimentanalysis-src-sentiment-analysis-retrieval-chunk-processor-module">
+<h2>SentimentAnalysis.src.sentiment_analysis.retrieval.chunk_processor module<a class="headerlink" href="#sentimentanalysis-src-sentiment-analysis-retrieval-chunk-processor-module" title="Link to this heading"></a></h2>
+<section id="chunk-processor-py">
+<h3>chunk_processor.py<a class="headerlink" href="#chunk-processor-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-25</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.retrieval.chunk_processor.</span></span><span class="sig-name descname"><span class="pre">ChunkProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/chunk_processor.html#ChunkProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LoggingMixin</span></code></p>
+<p>ChunkProcessor class.</p>
+<p>This class provides the attributes and methods for the processing of
+chunks of the prompts collection.</p>
+<p>The multiple prompts generated are divided in smaller collections
+of variants so that ideally, one chunk can be processed and sent to the
+LLM’s API before the Hugging Face rate limit hits.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">language</span></span></dt>
+<dd><p>The language of the samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">samples</span></span></dt>
+<dd><p>The batch samples to process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">all_prompts</span></span></dt>
+<dd><p>All prompts generated by the PromptEngineer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PromptsDictType</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">chunk</span></span></dt>
+<dd><p>The current chunk being processed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PromptsDictType | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">chunk_nr</span></span></dt>
+<dd><p>The current chunk number.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">chunk_samples</span></span></dt>
+<dd><p>The chunk_samples to process in batches.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">chunk_size</span></span></dt>
+<dd><p>The size of each chunk, according to the sentiment analysis
+configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">iterator_counter</span></span></dt>
+<dd><p>Tracks the number of queries processed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">queries_chunker</span></span></dt>
+<dd><p>The queries chunker.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.dictionary_chunker.DictionaryChunker" title="SentimentAnalysis.src.data_structures.dictionary_chunker.DictionaryChunker">DictionaryChunker</a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">skip_chunker</span></span></dt>
+<dd><p>A flag indicating whether to skip the chunk generation in
+the current iteration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_chunk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PromptsDictType</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/chunk_processor.html#ChunkProcessor.process_chunk"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Processes the given chunk.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_chunks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">MyDataFrame:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/chunk_processor.html#ChunkProcessor.process_chunks"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Gets the chunks and processes them iteratively.</p>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-2b2781538fabcfcd2af1901ce99be1886cebf7cc.png" alt="Inheritance diagram of SentimentAnalysis.src.sentiment_analysis.retrieval.chunk_processor.ChunkProcessor" class="inheritance graphviz" /></div>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/chunk_processor.html#ChunkProcessor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Constructor.</p>
+<p>Initializes the ChunkProcessor instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>language</strong> (<em>str</em>) – The language of the samples.</p></li>
+<li><p><strong>batch_samples</strong> (<a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><em>MyDataFrame</em></a>) – The batch samples to process.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_add_query_cols</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/chunk_processor.html#ChunkProcessor._add_query_cols"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Creates the chunk samples.</p>
+<p>Fills the provided empty MyDataFrame with the samples with which this
+class was initialized and the query columns composed from the prompt
+parts in the provided chunk.</p>
+<p>Calls the PromptEngineer initialized when the ChunkProcessor itself
+was initialized to perform this prompt engineering strategy-specific
+task.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>my_df</strong> (<a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><em>MyDataFrame</em></a>) – The provided empty MyDataFrame, which has already been assigned
+the correct name attribute for its serialization.</p></li>
+<li><p><strong>chunk</strong> (<em>PromptsDictType</em>) – The current chunk that was returned by the queries chunker,
+containing the prompt parts from which to build the queries for
+the samples in the current batch.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The provided MyDataFrame object with the batch samples and
+different query columns added.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_generate_chunk</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/chunk_processor.html#ChunkProcessor._generate_chunk"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Generates the next chunk of prompts and stores it as a property.</p>
+<p>Sets the chunk and the iterator_counter properties.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_get_chunk_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/chunk_processor.html#ChunkProcessor._get_chunk_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Loads an existing chunk_samples MyDataFrame object or creates it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>chunk</strong> (<em>PromptsDictType</em>) – The current chunk.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_set_chunk_nr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/chunk_processor.html#ChunkProcessor._set_chunk_nr"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Sets the chunk number for the chunk checkpoint name.</p>
+<p>The iterator counter of the chunker corresponds to the number of the
+queries it has taken from the queries dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_set_queries_chunker</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/chunk_processor.html#ChunkProcessor._set_queries_chunker"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Splits the prompts in chunks of 15 variants.</p>
+<p class="rubric">Notes</p>
+<p>15 queries for 100 samples is the number of queries wich will pass
+before the Hugging Face rate limit hits.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">chunk_nr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em></dt>
+<dd><p>Gets the chunk number.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">chunk_samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></em></dt>
+<dd><p>Gets the chunk_samples to process in batches.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_chunk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/chunk_processor.html#ChunkProcessor.process_chunk"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Processes the given chunk.</p>
+<p>Uses the chunk to add query columns to the batch samples by calling
+the _get_chunk_samples method. The resulting chunk samples are then
+passed to a QueryColumnProcessor instance which will process the
+query columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>chunk</strong> (<em>PromptsDictType</em>) – The current chunk of prompt parts sets needed to generate the
+query columns.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If this method passes a newly created chunk to the
+QueryColumnProcessor, this will raise a ChunkFinishedException,
+because the current results DataFrame’s columns do not match the
+query numbers of the new chunk. Therefore, when catching this
+exception and returning to the process_chunks method, the generation
+of yet another chunk must be prevented. This is done with the
+skip_chunker boolean variable.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_chunks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/chunk_processor.html#ChunkProcessor.process_chunks"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Gets the chunks and processes them.</p>
+<p>In a loop, asks the queries_chunker to return a chunk and
+calls the process_chunk method to process the chunk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The chunk samples with all the query and answer columns added.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The queries chunker iteratively produces chunks and manages the
+corresponding checkpoint.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">queries_chunker</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.dictionary_chunker.DictionaryChunker" title="SentimentAnalysis.src.data_structures.dictionary_chunker.DictionaryChunker"><span class="pre">DictionaryChunker</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em></dt>
+<dd><p>Gets the queries chunker.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></em></dt>
+<dd><p>Gets the samples to process in batches.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions">
+<span id="sentimentanalysis-src-sentiment-analysis-retrieval-custom-exceptions-module"></span><h2>SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions module<a class="headerlink" href="#module-SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions" title="Link to this heading"></a></h2>
+<section id="custom-exceptions-py">
+<h3>custom_exceptions.py<a class="headerlink" href="#custom-exceptions-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-13</p>
+<p>This module provides custom exceptions that may be raised in the sentiment
+retrieval process to control the process workflow.</p>
+</section>
+<dl class="py exception">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.BatchFinishedException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.</span></span><span class="sig-name descname"><span class="pre">BatchFinishedException</span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/custom_exceptions.html#BatchFinishedException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.BatchFinishedException" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception to handle the switch to the next batch.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CancelledByUserException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.</span></span><span class="sig-name descname"><span class="pre">CancelledByUserException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Operation</span> <span class="pre">cancelled</span> <span class="pre">by</span> <span class="pre">the</span> <span class="pre">user.'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/custom_exceptions.html#CancelledByUserException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CancelledByUserException" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception raised when the user cancels an operation.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.ChunkFinishedException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.</span></span><span class="sig-name descname"><span class="pre">ChunkFinishedException</span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/custom_exceptions.html#ChunkFinishedException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.ChunkFinishedException" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception to handle the switch to the next chunk.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.</span></span><span class="sig-name descname"><span class="pre">CriticalException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ValueError.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/custom_exceptions.html#CriticalException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+<p>ValueError exception that cannot be caught gracefully.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ValueError.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/custom_exceptions.html#CriticalException.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>Logger</em>) – A logger instance. If provided and log_message is True,
+logs the message. Defaults to None.</p></li>
+<li><p><strong>msg</strong> (<em>str</em>) – The exception message.</p></li>
+<li><p><strong>do_log</strong> (<em>bool</em>) – If True, logs the message using the logger. Default is True.</p></li>
+<li><p><strong>recursive</strong> (<em>bool</em>) – Whether this is a recursive instantiation to prevent re-calling
+handle_error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.LanguageFinishedException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.</span></span><span class="sig-name descname"><span class="pre">LanguageFinishedException</span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/custom_exceptions.html#LanguageFinishedException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.LanguageFinishedException" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception to handle the switch to the next language.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.PromptInvalidException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.</span></span><span class="sig-name descname"><span class="pre">PromptInvalidException</span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/custom_exceptions.html#PromptInvalidException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.PromptInvalidException" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception to handle invalid prompts.</p>
+<p class="rubric">Notes</p>
+<p>This custom exception is used in the QueryColumnProcessor and in the
+ServerlessBloomPromptValidationMixin class.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.handle_error">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.</span></span><span class="sig-name descname"><span class="pre">handle_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Exception</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">BaseException</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err_traceback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TracebackType</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/custom_exceptions.html#handle_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.handle_error" title="Link to this definition"></a></dt>
+<dd><p>Handle the error and raise the same type of error with the given
+message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>object</em>) – The logger object used for logging.</p></li>
+<li><p><strong>err</strong> (<em>Exception</em>) – The original error that occurred.</p></li>
+<li><p><strong>msg</strong> (<em>str</em>) – The error message to be logged and raised.</p></li>
+<li><p><strong>err_type</strong> (<em>Type</em><em>[</em><em>BaseException</em><em>]</em>) – The type of error that occurred. The default is None.</p></li>
+<li><p><strong>err_traceback</strong> (<em>TracebackType</em>) – The traceback of the error. The default is None.</p></li>
+<li><p><strong>recursive</strong> (<em>bool</em>) – Whether recursion has occurred. If True, the function will
+raise an error to prevent infinite recursion.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="sentimentanalysis-src-sentiment-analysis-retrieval-language-processor-module">
+<h2>SentimentAnalysis.src.sentiment_analysis.retrieval.language_processor module<a class="headerlink" href="#sentimentanalysis-src-sentiment-analysis-retrieval-language-processor-module" title="Link to this heading"></a></h2>
+<section id="language-processor-py">
+<h3>language_processor.py<a class="headerlink" href="#language-processor-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-17</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.retrieval.language_processor.</span></span><span class="sig-name descname"><span class="pre">LanguageProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/language_processor.html#LanguageProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LoggingMixin</span></code></p>
+<p>LanguageProcessor class.</p>
+<p>This class processes a given dataset of samples for a given language in
+batches.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">language</span></span></dt>
+<dd><p>The language of the samples to be processed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">samples</span></span></dt>
+<dd><p>A MyDataFrame object containing a pandas DataFrame with the samples
+to be processed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_language</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/language_processor.html#LanguageProcessor.process_language"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Processes the samples for the language in batches.</p>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-1ef23f7edfe069fa72998d18dcf1254e841e46c5.png" alt="Inheritance diagram of SentimentAnalysis.src.sentiment_analysis.retrieval.language_processor.LanguageProcessor" class="inheritance graphviz" /></div>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/language_processor.html#LanguageProcessor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Constructor.</p>
+<p>Initializes a LanguageProcessor instance with the given parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>language</strong> (<em>str</em>) – The language of the samples to be processed.</p></li>
+<li><p><strong>samples</strong> (<a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><em>MyDataFrame</em></a>) – A MyDataFrame object containing a pandas DataFrame with the
+samples to be processed</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException"><strong>CriticalException</strong></a> – If the ‘language’ is empty or not a string, or if ‘samples’ is
+    empty.</p></li>
+<li><p><strong>TypeError</strong> – If ‘samples’ is not an instance of ‘MyDataFrame’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_language</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/language_processor.html#LanguageProcessor.process_language"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Processes the samples for the language in batches.</p>
+<p>This method uses the BatchProcessor class to process the
+samples in batches. If all samples have already been processed
+for the language, it logs an informational message and moves on
+to the next language.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.LanguageFinishedException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.LanguageFinishedException"><strong>LanguageFinishedException</strong></a> – If processing for the current language is already complete.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The LanguageFinishedException is not re-raised but caught
+gracefully, logging an info message.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="sentimentanalysis-src-sentiment-analysis-retrieval-query-column-processor-module">
+<h2>SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor module<a class="headerlink" href="#sentimentanalysis-src-sentiment-analysis-retrieval-query-column-processor-module" title="Link to this heading"></a></h2>
+<section id="query-column-processor-py">
+<h3>query_column_processor.py<a class="headerlink" href="#query-column-processor-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-25</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.</span></span><span class="sig-name descname"><span class="pre">QueryColumnProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_start_at_query_col_nr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LoggingMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">CheckpointMixin</span></code></p>
+<p>QueryColumnProcessor class.</p>
+<p>This class handles query columns in batches, managing checkpoints,
+validating prompts, and saving results. It supports robust handling
+of interruptions and allows users to control how to proceed in case of
+errors or invalid query results.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">answers_collection</span></span></dt>
+<dd><p>A set to collect unique answers from processed queries, used to
+validate prompts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>set</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">can_save</span></span></dt>
+<dd><p>Indicates whether the current results can be saved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">checkpoint</span></span></dt>
+<dd><p>The checkpoint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.checkpoint.Checkpoint" title="SentimentAnalysis.src.data_structures.checkpoint.Checkpoint">Checkpoint</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">chunk_size</span></span></dt>
+<dd><p>The size of the chunk (i.e. the number of query columns), according to
+the sentiment analysis configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">chunk_start_at_query_col_nr</span></span></dt>
+<dd><p>The query column number with which to start a chunk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">config</span></span></dt>
+<dd><p>Configuration settings for the sentiment analysis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SentimentAnalysisConfig</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">language</span></span></dt>
+<dd><p>The language code corresponding to the language of the samples to
+process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">query_counter</span></span></dt>
+<dd><p>Class-level counter to track the number of queries processed
+across all instances.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">samples</span></span></dt>
+<dd><p>A MyDataFrame with the samples whose query columns to process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">load_samples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None:</span></span></span></dt>
+<dd><p>Loads the samples if they are not already loaded.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span> <span class="pre">|</span> <span class="pre">int:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor.process_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>No description available.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_query_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_col_nr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor.process_query_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Processes the specified query column.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_query_columns</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor.process_query_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Processes the different query types in a chunk.</p>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-54c15a4ea9462962173280ef0ab7fe5fd2f0eb94.png" alt="Inheritance diagram of SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor" class="inheritance graphviz" /></div>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_start_at_query_col_nr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Initializes the QueryColumnProcessor with the specified parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>language</strong> (<em>str</em>) – Language code.</p></li>
+<li><p><strong>samples</strong> (<a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><em>MyDataFrame</em></a>) – The MyDataFrame with the samples whose query columns to process.</p></li>
+<li><p><strong>chunk_start_at_query_col_nr</strong> (<em>int</em>) – Defines the query column number with which to start a chunk.
+This number is needed to set the corresponding checkpoint and to
+calculate the end of the range needed to iterate through the query
+columns in the process_query_columns method.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_ask_continue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor._ask_continue"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Asks the user if and how the program should continue.</p>
+<p>Asks the user to decide whether to proceed and save the column
+result, to continue without saving or to stop the program altogether.
+If the user decides to discard the column result, the can_save
+property of this class is set to false, otherwise to True.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_extract_chunk_nr_from_checkpoint_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor._extract_chunk_nr_from_checkpoint_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Extracts and returns the chunk number from the checkpoint’s name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The chunk number</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_get_start_query_col_nr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor._get_start_query_col_nr"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Retrieves the query column number from which to start.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The query column number.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_keep_track</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor._keep_track"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Outputs the number of the currently processed query in the console.</p>
+<p>If validation is required (‘with_validation’ parameter in
+SentimentAnalysisConfig is set to True), checks the validity of the
+prompt used in the query column and stops the execution of
+the query column processor if the prompt is revealed to be
+invalid.</p>
+<p>The prompt is esteemed to be invalid if, after a given amount
+of processed rows, the number of different answers in the answers
+set of the class is insufficient:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>only one answer type after 50 rows</p></li>
+<li><p>only two answer types after 100 rows</p></li>
+</ul>
+</div></blockquote>
+<p>In case the prompt is found to be invalid, its answers are
+not saved to the DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.PromptInvalidException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.PromptInvalidException"><strong>PromptInvalidException</strong></a> – If validation is required and the prompt is found to be
+    invalid.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The _validate_batch_result and the _validate_half_batch methods only
+perform validation attempts if self.config.get(‘with_validation’) is
+set to True.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_report_failed_answers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_nr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor._report_failed_answers"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Reports any failed answers occured.</p>
+<p>Reports any failed answers occured during the processing of a query
+column.</p>
+<p>If the query column produced failed answers, the user is asked to
+decide whether to proceed and save the column result, to continue
+without saving or to stop the program altogether.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>query_nr</strong> (<em>int</em>) – The number of the query column.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_reset_answers_collection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor._reset_answers_collection"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Resets the answers_collection set.</p>
+<p>Resets the answers_collection set that collects unique answers from
+the queries.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_save_col_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_nr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor._save_col_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Saves the results of the processed query column to the DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>DataFrame</em>) – The DataFrame containing the results to save.</p></li>
+<li><p><strong>query_nr</strong> (<em>int</em>) – The number of the query column.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_set_current_chunk_nr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_col_nr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor._set_current_chunk_nr"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Updates the current chunk number based on the query column number.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>query_col_nr</strong> (<em>int</em>) – The current query column number.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_update_query_counter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor._update_query_counter"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Increments the query counters by 1.</p>
+<p>Increments the query counters by 1 and outputs the overall
+query_counter to the console, thus monitoring the progress of the
+program.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_validate_batch_result</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor._validate_batch_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Checks the validity of the prompt at the end of the batch.</p>
+<p>If validation is required, the batch results are verified.
+Results must have produced all three different sentiment
+classes. Otherwise, the prompt is discarded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.PromptInvalidException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.PromptInvalidException"><strong>PromptInvalidException</strong></a> – If validation is required and the prompt is found to be
+    invalid.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The check in this method takes into account that answers may also be
+empty strings if no sentiment could be extracted from the LLM’s
+response. If the answers include empty strings, the required number of
+answer categories must be increased by one.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_validate_half_batch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor._validate_half_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Checks the validity of the prompt half-way through the batch.</p>
+<p>If validation is required, the batch results are verified in mid-batch.
+Results must have produced at least two different sentiment
+classes. Otherwise, the prompt is discarded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.PromptInvalidException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.PromptInvalidException"><strong>PromptInvalidException</strong></a> – If validation is required and the prompt is found to be
+    invalid.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The check in this method takes into account that answers may also be
+empty strings if no sentiment could be extracted from the LLM’s
+response. If the answers include empty strings, the required number of
+answer categories must be increased by one</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">chunk_size</span></span></dt>
+<dd><p>Set to collect the different types of answers.</p>
+<p>The number of collected items in this set enables to check the validity
+of the prompt in the query column. The number of different
+answers should be 3 (‘positive’, ‘negative’ and ‘neutral’). If this is
+not the case after a sufficient amount of rows has been treated,
+the prompt is rejected as invalid.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor.process_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Processes a single query payload using the QueryProcessor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>payload</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – The input data for the query.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The response from the QueryProcessor.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str | int</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.PromptInvalidException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.PromptInvalidException"><strong>PromptInvalidException</strong></a> – If the query is invalid when validation is performed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_query_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_col_nr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor.process_query_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Processes the specified query column.</p>
+<p>Processes the specified query column by applying the query logic
+to each row.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>query_col_nr</strong> (<em>int</em>) – The number of the query column.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.PromptInvalidException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.PromptInvalidException"><strong>PromptInvalidException</strong></a> – If the prompt in the column is deemed invalid.</p></li>
+<li><p><a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.ChunkFinishedException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.ChunkFinishedException"><strong>ChunkFinishedException</strong></a> – If the “try” block raises a KeyError because all rows in the chunk
+    have been processed.</p></li>
+<li><p><strong>KeyError</strong> – If the specified column does not exist in the DataFrame.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_query_columns</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_column_processor.html#QueryColumnProcessor.process_query_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Processes the different query types in a chunk.</p>
+<p>Creates a checkpoint at the end of each processed query type so that
+the program can resume after an interruption where it left off.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">prompt_specific_query_counter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">query_counter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></em></dt>
+<dd><p>Gets the samples to process in batches.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="sentimentanalysis-src-sentiment-analysis-retrieval-query-processor-module">
+<h2>SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor module<a class="headerlink" href="#sentimentanalysis-src-sentiment-analysis-retrieval-query-processor-module" title="Link to this heading"></a></h2>
+<section id="query-processor-py">
+<h3>query_processor.py<a class="headerlink" href="#query-processor-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-15</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor.</span></span><span class="sig-name descname"><span class="pre">QueryProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_processor.html#QueryProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LoggingMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">TokenizationMixin</span></code></p>
+<p>QueryProcessor class.</p>
+<p>This class is responsible for processing queries sent to a Hugging Face
+LLM API. It manages query payloads, handles API responses, extracts
+relevant results, and tracks failed queries for further analysis.</p>
+<section id="features">
+<h3>Features:<a class="headerlink" href="#features" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Validates and sends query payloads to the LLM API.</p></li>
+<li><p>Processes API responses to extract sentiment predictions.</p></li>
+<li><p>Implements error-handling mechanisms for API interactions.</p></li>
+<li><p>Provides utilities for managing failed queries.</p></li>
+<li><p>Includes configurable tokenization for response processing.</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">HF</span></span></dt>
+<dd><p>An instance of the HuggingFaceStrategy class for interacting with the
+LLM API</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.authentication.html#SentimentAnalysis.src.authentication.hugging_face_strategy.HuggingFaceStrategy" title="SentimentAnalysis.src.authentication.hugging_face_strategy.HuggingFaceStrategy">HuggingFaceStrategy</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">failed_answers</span></span></dt>
+<dd><p>A class-level attribute to track failed answers across instances</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">api</span></span></dt>
+<dd><p>The API endpoint to which queries are sent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">payload</span></span></dt>
+<dd><p>The query payload containing input data for the LLM.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">prompt_is_invalid</span></span></dt>
+<dd><p>Tracks the validity of the prompt.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="inherited-attributes">
+<h3>Inherited Attributes<a class="headerlink" href="#inherited-attributes" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>DEFAULT_SENTENCE_STRATEGY<span class="classifier">str</span></dt><dd><p>The name of the default sentence strategy.</p>
+</dd>
+<dt>DEFAULT_WORD_STRATEGY<span class="classifier">str</span></dt><dd><p>The name of the default word strategy.</p>
+</dd>
+<dt>sentence_tokenizer<span class="classifier">SentenceTokenizer</span></dt><dd><p>The sentence tokenizer.</p>
+</dd>
+<dt>word_tokenizer<span class="classifier">WordTokenizer</span></dt><dd><p>The word tokenizer.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_query</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_processor.html#QueryProcessor.process_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Processes the query by sending it to the LLM API and handling the
+response.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">send_query</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict[str,</span> <span class="pre">Any]:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_processor.html#QueryProcessor.send_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Sends the query with the payload to the LLM’s API.</p>
+</dd></dl>
+
+</section>
+<section id="inherited-methods">
+<h3>Inherited Methods<a class="headerlink" href="#inherited-methods" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>set_sentence_tokenizer(tokenization_strategy_name: str = ‘’) -&gt; None:</dt><dd><p>Sets the sentence tokenizer using the specified strategy.</p>
+</dd>
+<dt>set_word_tokenizer(tokenization_strategy_name: str = ‘’) -&gt; None:</dt><dd><p>Sets the word tokenizer using the specified strategy.</p>
+</dd>
+</dl>
+<div class="graphviz"><img src="_images/inheritance-0a4b10dcf53e8be547949725cc6f934f6aa405c6.png" alt="Inheritance diagram of SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor.QueryProcessor" class="inheritance graphviz" /></div>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">HF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;src.authentication.hugging_face_strategy.HuggingFaceStrategy</span> <span class="pre">object&gt;</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">NEGATIVE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'negative'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">NEUTRAL</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'neutral'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">POSITIVE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'positive'</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">POSSIBLE_RESULTS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['negative',</span> <span class="pre">'positive',</span> <span class="pre">'neutral']</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_extract_sentiment_from_answer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">answer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_processor.html#QueryProcessor._extract_sentiment_from_answer"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Extracts the sentiment from the answer.</p>
+<p>Splits the answer into words and returns the first word if this
+equals one of the sentiment polarities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>answer</strong> (<em>str</em>) – The answer returned from the API, minus the payload text of the
+query.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The extracted sentiment. An empty string if the first word is not
+one of the expected sentiment polarities.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_get_generated_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_processor.html#QueryProcessor._get_generated_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Retrieves the generated text from the API response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – The raw API response.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated text contained in the response.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_get_input_data_from_payload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_processor.html#QueryProcessor._get_input_data_from_payload"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Retrieves the input data from the query payload.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>payload</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – The query payload.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The input data string extracted from the payload.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_process_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_processor.html#QueryProcessor._process_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Extracts the predicted sentiment from the response provided by the LLM.</p>
+<p>The method performs the following steps:</p>
+<ul class="simple">
+<li><p>Remove the input string from the output data.</p></li>
+<li><p>Split the remaining string at punctuation marks.</p></li>
+<li><p>Choose only the first element, which is the requested sentiment.</p></li>
+<li><p>Remove leading and trailing whitespace</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>response</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – The response from the LLM.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The predicted sentiment. An empty string if the result could
+not be matched with one of the expected results.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_remove_input_data_from_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_processor.html#QueryProcessor._remove_input_data_from_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Removes the input data from the response text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>response</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – The raw API response containing the generated text.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The response text with input data removed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">failed_answers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flush_failed_answers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_processor.html#QueryProcessor.flush_failed_answers"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Returns the list of failed answers and resets the list.</p>
+<p>Returns the list of failed answers and resets the list to an empty
+list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The list of failed answers before it is reset.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_failed_answers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_processor.html#QueryProcessor.get_failed_answers"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Returns the list of failed answers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The list of failed answers that could not be processed correctly.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">process_query</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_processor.html#QueryProcessor.process_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Processes the query by sending it to the LLM API.</p>
+<p>Extracts the predicted sentiment from the response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The predicted sentiment or an empty string if no valid sentiment
+is found.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">send_query</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/retrieval/query_processor.html#QueryProcessor.send_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Sends the query with the payload to the LLM’s API.</p>
+<p>Sends the query with the payload defined in this class to the LLM’s
+API.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The response returned by the API.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, Any]</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Exception</strong> – Unexpected exception of unknown type that could not be caught by
+    the error handling decorator function.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The query_error_handling decorator of this method catches various
+exceptions regarding the connection and the kind of response
+received.</p>
+<ul>
+<li><p>ConnectionError
+If there is a problem with the connection to the API,
+the program waits 5 minutes before retrying to send the query.</p></li>
+<li><p>KeyError
+This exception is raised when the Hugging Face rate limit is
+reached. In this case, the program needs to wait 1 hour for the
+rate limit to expire.</p></li>
+</ul>
+</li>
+<li><p>The query originally returns a List[Dict[str, Any]]. This is
+checked by the query_error_handling decorator, that in turn
+only returns the first element of the response list (response[0]) as
+the return value of this method. This change of data type may not be
+recognized by static type checkers, which may make them complain
+about the return type.</p></li>
+</ul>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.sentiment_analysis.retrieval">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-SentimentAnalysis.src.sentiment_analysis.retrieval" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html" class="btn btn-neutral float-left" title="SentimentAnalysis.src.sentiment_analysis.prompt_engineering package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SentimentAnalysis.src.sentiment_analysis.samples.html" class="btn btn-neutral float-right" title="SentimentAnalysis.src.sentiment_analysis.samples package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

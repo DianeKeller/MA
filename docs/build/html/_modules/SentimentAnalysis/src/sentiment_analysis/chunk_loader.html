@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.chunk_loader &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.chunk_loader</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.chunk_loader</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">chunk_loader.py</span>
+<span class="sd">---------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">constants</span> <span class="kn">import</span> <span class="n">DEFAULT_LANGUAGE</span>
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+
+<span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_dataframe_factory</span> <span class="kn">import</span> <span class="n">MyDataFrameFactory</span>
+<span class="kn">from</span> <span class="nn">src.decorators.data_check_decorators</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">input_not_none_or_empty</span><span class="p">,</span> <span class="n">output_not_none</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.chunk</span> <span class="kn">import</span> <span class="n">Chunk</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_analysis_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SentimentAnalysisConfig</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.serialization.directory</span> <span class="kn">import</span> <span class="n">Directory</span>
+<span class="kn">from</span> <span class="nn">src.serialization.directory_factory</span> <span class="kn">import</span> <span class="n">DirectoryFactory</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">src.utils.string_utils</span> <span class="kn">import</span> <span class="n">StringUtils</span>
+
+
+<div class="viewcode-block" id="ChunkLoader">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk_loader.ChunkLoader">[docs]</a>
+<span class="k">class</span> <span class="nc">ChunkLoader</span><span class="p">(</span><span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ChunkLoader class.</span>
+
+<span class="sd">    This class provides methods for loading serialized chunks from disk.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    language, base_dir and chunk_dir. See details in the __init__ method.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    chunks : Dict[int, Chunk]</span>
+<span class="sd">        Dictionary of all chunks for the current language where the keys are</span>
+<span class="sd">        the integer numbers of the chunks and the values are the chunks.</span>
+
+<span class="sd">    version : str</span>
+<span class="sd">        The query/prompt variants version set in the SentimentAnalysisConfig</span>
+<span class="sd">        settings. This attribute  only has a getter. If you need to change</span>
+<span class="sd">        the version, change the version in the SentimentAnalysisConfig</span>
+<span class="sd">        settings.</span>
+
+<span class="sd">    valid_queries_chunk : Chunk</span>
+<span class="sd">        A Chunk object with all valid queries combined from all chunks for the</span>
+<span class="sd">        current language.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    extract_best_queries(self, best_query_nrs: List[str]) -&gt; Chunk:</span>
+<span class="sd">        Extracts the columns of the best queries into a new chunk.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ChunkLoader.__init__">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk_loader.ChunkLoader.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">base_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">chunk_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;chunks&#39;</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the ChunkLoader with the specified parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">           Language code (default is &#39;en&#39;).</span>
+
+<span class="sd">        base_dir : str</span>
+<span class="sd">           Base directory path (default is &#39;&#39;).</span>
+
+<span class="sd">        chunk_dir : str</span>
+<span class="sd">           Chunk directory path (default is &#39;chunks&#39;).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">SentimentAnalysisConfig</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_language</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_base_dir</span><span class="p">:</span> <span class="n">Directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_directory</span><span class="p">(</span><span class="n">base_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chunk_dir</span><span class="p">:</span> <span class="n">Directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_directory</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">chunk_dir</span><span class="si">}</span><span class="s1">_v_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunks</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Chunk</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_chunks</span><span class="p">()</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the version from the _config variable.</span>
+
+<span class="sd">        Retrieves the version from the _config variable each time this getter</span>
+<span class="sd">        is called. This ensures that the getter always returns the latest</span>
+<span class="sd">        version.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The version.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">valid_queries_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Chunk</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the valid columns of the chunks in a single Chunk.</span>
+
+<span class="sd">        Assembles the valid columns from all chunks for the current language</span>
+<span class="sd">        in a single Chunk.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Chunk</span>
+<span class="sd">            The Chunk with the valid queries and answers from all the</span>
+<span class="sd">            chunks for the current language.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        &#39;Invalid&#39; query columns, i.e. columns having no corresponding answer</span>
+<span class="sd">        column, are discarded in this process.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">joined_chunk</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+            <span class="n">valid_chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_invalid_queries</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">joined_chunk</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+                <span class="n">joined_chunk</span> <span class="o">=</span> <span class="n">valid_chunk</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+                <span class="c1"># Change the joined chunks&#39; name to reflect the character of</span>
+                <span class="c1"># the joined data collection:</span>
+                <span class="c1"># Remove the file extension and the last 8 characters from</span>
+                <span class="c1"># the joined chunks&#39; name.</span>
+                <span class="n">joined_chunk</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">StringUtils</span><span class="o">.</span><span class="n">shorten_string_by_n_chars</span><span class="p">(</span>
+                        <span class="n">StringUtils</span><span class="o">.</span><span class="n">remove_extension_from_file_name</span><span class="p">(</span>
+                            <span class="n">joined_chunk</span><span class="o">.</span><span class="n">name</span>
+                        <span class="p">),</span> <span class="mi">8</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="n">joined_chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_valid_cols</span><span class="p">(</span>
+                    <span class="n">joined_chunk</span><span class="p">,</span> <span class="n">valid_chunk</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">joined_chunk</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="ChunkLoader.extract_best_queries">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk_loader.ChunkLoader.extract_best_queries">[docs]</a>
+    <span class="nd">@input_not_none_or_empty</span><span class="p">(</span><span class="s2">&quot;No best query numbers given!&quot;</span><span class="p">)</span>
+    <span class="nd">@output_not_none</span><span class="p">(</span><span class="s2">&quot;Chunk is None!&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">extract_best_queries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">best_query_nrs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="n">Chunk</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts the columns of the best queries into a new chunk.</span>
+
+<span class="sd">        Extracts the columns of the best queries from all chunks that exist</span>
+<span class="sd">        for the current language into a new chunk only containing the best</span>
+<span class="sd">        queries.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        best_query_nrs : List[str]</span>
+<span class="sd">            The string identifiers of the best queries.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Chunk</span>
+<span class="sd">            A Chunk containing the query and answer columns of the best</span>
+<span class="sd">            queries.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">chunk</span><span class="p">:</span> <span class="n">Chunk</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">processed_chunks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_query_nr_format</span><span class="p">(</span><span class="n">best_query_nrs</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">query_nr</span> <span class="ow">in</span> <span class="n">best_query_nrs</span><span class="p">:</span>
+            <span class="n">nr</span> <span class="o">=</span> <span class="n">StringUtils</span><span class="o">.</span><span class="n">get_int_behind_last_underscore</span><span class="p">(</span><span class="n">query_nr</span><span class="p">)</span>
+            <span class="n">chunk_nr</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span><span class="n">nr</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">))</span>
+
+            <span class="c1"># Make sure a chunk is not processed twice</span>
+            <span class="k">if</span> <span class="n">chunk_nr</span> <span class="ow">in</span> <span class="n">processed_chunks</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">chunk</span><span class="p">):</span>
+
+                <span class="c1"># The first processed chunk constitutes a problem,</span>
+                <span class="c1"># as it is entirely processed without knowing which</span>
+                <span class="c1"># of the best query numbers are contained.</span>
+                <span class="n">processed_chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chunk_nr</span><span class="p">)</span>
+
+                <span class="n">chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_first_best_queries</span><span class="p">(</span>
+                    <span class="n">chunk_nr</span><span class="p">,</span> <span class="n">best_query_nrs</span>
+                <span class="p">)</span>
+
+                <span class="n">base_chunk_name</span> <span class="o">=</span> <span class="n">StringUtils</span><span class="o">.</span><span class="n">get_str_before_last_underscore</span><span class="p">(</span>
+                    <span class="n">StringUtils</span><span class="o">.</span><span class="n">remove_extension_from_file_name</span><span class="p">(</span><span class="n">chunk</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="p">)</span>
+
+                <span class="n">chunk</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_chunk_name</span><span class="si">}</span><span class="s2">_1&quot;</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_single_query</span><span class="p">(</span><span class="n">nr</span><span class="p">,</span> <span class="n">chunk_nr</span><span class="p">,</span> <span class="n">chunk</span><span class="p">)</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">chunk</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+    <span class="k">def</span> <span class="nf">_validate_query_nr_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">best_query_nrs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">StringUtils</span><span class="o">.</span><span class="n">all_end_with_underscore_and_numbers</span><span class="p">(</span><span class="n">best_query_nrs</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;Query numbers have not the expected format: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                <span class="n">best_query_nrs</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_language</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">language</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;No language specified! Trying config settings ...&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+            <span class="n">language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">language</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;No language found! Using default ...&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+                <span class="n">language</span> <span class="o">=</span> <span class="n">DEFAULT_LANGUAGE</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">language</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Language set to </span><span class="si">{</span><span class="n">language</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ChunkLoader._get_query_cols_names">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk_loader.ChunkLoader._get_query_cols_names">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_query_cols_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">:</span> <span class="n">Chunk</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the names of the query columns in a given chunk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chunk : Chunk</span>
+<span class="sd">            The chunk whose query columns are to be found.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            The List of the names of the query columns in the given chunk.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">chunk</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+            <span class="s2">&quot;get_col_names_by_substring&quot;</span><span class="p">,</span>
+            <span class="n">substring</span><span class="o">=</span><span class="s2">&quot;query&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChunkLoader._get_answer_cols_names">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk_loader.ChunkLoader._get_answer_cols_names">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_answer_cols_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">:</span> <span class="n">Chunk</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the names of the answer columns in a given chunk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chunk : Chunk</span>
+<span class="sd">            The chunk whose answer columns are to be found.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            The List of the names of the answer columns in the given chunk.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">chunk</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+            <span class="s2">&quot;get_col_names_by_substring&quot;</span><span class="p">,</span>
+            <span class="n">substring</span><span class="o">=</span><span class="s2">&quot;answer&quot;</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_add_valid_cols</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">joined_chunks</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">,</span>
+            <span class="n">valid_chunk</span><span class="p">:</span> <span class="n">Chunk</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+
+        <span class="n">substrings</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;query_&#39;</span><span class="p">,</span> <span class="s1">&#39;answer_&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">substr</span> <span class="ow">in</span> <span class="n">substrings</span><span class="p">:</span>
+            <span class="n">extracted_my_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_valid_cols_by_substring</span><span class="p">(</span>
+                <span class="n">valid_chunk</span><span class="p">,</span>
+                <span class="n">substr</span>
+            <span class="p">)</span>
+
+            <span class="n">joined_chunks</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                <span class="s2">&quot;merge&quot;</span><span class="p">,</span>
+                <span class="n">other</span><span class="o">=</span><span class="n">extracted_my_df</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">joined_chunks</span>
+
+<div class="viewcode-block" id="ChunkLoader._set_directory">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk_loader.ChunkLoader._set_directory">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Directory</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the directory with the specified directory name.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dir_name : str</span>
+<span class="sd">            Name of the directory to set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Directory</span>
+<span class="sd">            An instance of the Directory class with the specified directory</span>
+<span class="sd">            name.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">DirectoryFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s1">&#39;csv&#39;</span><span class="p">,</span> <span class="n">dir_name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;Have you moved the created chunks to directory </span><span class="si">%s</span><span class="s2">? (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span>
+                    <span class="p">(</span><span class="n">dir_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ChunkLoader._load_chunks">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk_loader.ChunkLoader._load_chunks">[docs]</a>
+    <span class="k">def</span> <span class="nf">_load_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads chunks with the prompt variants results for the current language.</span>
+
+<span class="sd">        Loads chunks with the prompt variants results for the current</span>
+<span class="sd">        language from the local disk.</span>
+
+<span class="sd">        Sets the chunks property of this class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">chunk_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chunk_dir</span><span class="o">.</span><span class="n">file_names</span>
+
+        <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">chunk_files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_language</span><span class="si">}</span><span class="s2">_&quot;</span> <span class="ow">in</span> <span class="n">file_name</span><span class="p">:</span>
+                <span class="n">chunk</span> <span class="o">=</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create_chunk</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span>
+                <span class="n">chunk</span><span class="o">.</span><span class="n">file_type</span> <span class="o">=</span> <span class="s1">&#39;csv&#39;</span>
+                <span class="n">chunk</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chunk_dir</span><span class="o">.</span><span class="n">path</span>
+                <span class="n">chunk</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chunks</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_chunk_nr</span><span class="p">(</span><span class="n">file_name</span><span class="p">)]</span> <span class="o">=</span> <span class="n">chunk</span></div>
+
+
+<div class="viewcode-block" id="ChunkLoader._get_chunk_nr">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk_loader.ChunkLoader._get_chunk_nr">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_chunk_nr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts the chunk number from the file name of a chunk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_name : str</span>
+<span class="sd">            The name of the chunk file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The number of the chunk.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">StringUtils</span><span class="o">.</span><span class="n">get_int_behind_last_underscore</span><span class="p">(</span>
+            <span class="n">StringUtils</span><span class="o">.</span><span class="n">remove_extension_from_file_name</span><span class="p">(</span>
+                <span class="n">file_name</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_remove_invalid_queries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">:</span> <span class="n">Chunk</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Chunk</span><span class="p">:</span>
+
+        <span class="c1"># Keep the original chunk untouched</span>
+        <span class="n">valid_chunk</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">query_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_query_cols_names</span><span class="p">(</span><span class="n">valid_chunk</span><span class="p">)</span>
+        <span class="n">answer_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_answer_cols_names</span><span class="p">(</span><span class="n">valid_chunk</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">query_col</span> <span class="ow">in</span> <span class="n">query_cols</span><span class="p">:</span>
+            <span class="n">answer_col</span> <span class="o">=</span> <span class="n">query_col</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;query&quot;</span><span class="p">,</span> <span class="s2">&quot;answer&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">answer_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">answer_cols</span><span class="p">:</span>
+                <span class="n">valid_chunk</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                    <span class="s2">&quot;drop_column&quot;</span><span class="p">,</span>
+                    <span class="n">col_name</span><span class="o">=</span><span class="n">query_col</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">valid_chunk</span>
+
+    <span class="k">def</span> <span class="nf">_extract_valid_cols_by_substring</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">valid_chunk</span><span class="p">:</span> <span class="n">Chunk</span><span class="p">,</span>
+            <span class="n">substr</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+
+        <span class="n">extracted_cols</span> <span class="o">=</span> <span class="n">valid_chunk</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+            <span class="s2">&quot;extract_columns_by_name_substring&quot;</span><span class="p">,</span>
+            <span class="n">substring</span><span class="o">=</span><span class="n">substr</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">extracted_cols</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ChunkLoader._extract_first_best_queries">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk_loader.ChunkLoader._extract_first_best_queries">[docs]</a>
+    <span class="k">def</span> <span class="nf">_extract_first_best_queries</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">chunk_nr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">best_query_nrs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Chunk</span><span class="p">:</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts the first best_queries.</span>
+
+<span class="sd">        Determines the chunk that contains the first of the list of best</span>
+<span class="sd">        queries, copies the corresponding chunk and removes all query and</span>
+<span class="sd">        answer columns that do not match the list of best queries. This</span>
+<span class="sd">        method can lead to multiple elements from the list of best queries</span>
+<span class="sd">        being processed.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chunk_nr : int</span>
+<span class="sd">            Number of the chunk in which to look for queries matching the</span>
+<span class="sd">            best queries.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Chunk</span>
+<span class="sd">            A Chunk containing the query and answer columns of the</span>
+<span class="sd">            specified chunk that match one or more of the best query numbers.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Verify that the chunk is correct.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_chunk_nr</span><span class="p">(</span><span class="n">chunk_nr</span><span class="p">,</span> <span class="n">best_query_nrs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Copy chunk</span>
+        <span class="n">chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunks</span><span class="p">[</span><span class="n">chunk_nr</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># Remove all query and answer columns that do not match the</span>
+        <span class="c1"># best query numbers</span>
+
+        <span class="n">query_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_query_cols_names</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">query_col</span> <span class="ow">in</span> <span class="n">query_cols</span><span class="p">:</span>
+            <span class="n">query_col_nr</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+                <span class="n">StringUtils</span><span class="o">.</span><span class="n">get_int_behind_last_underscore</span><span class="p">(</span><span class="n">query_col</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_language</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">query_col_nr</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">not</span> <span class="ow">in</span>
+                    <span class="n">best_query_nrs</span><span class="p">):</span>
+                <span class="n">chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drop_query_and_answer_column</span><span class="p">(</span>
+                    <span class="n">chunk</span><span class="p">,</span> <span class="n">query_col_nr</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">chunk</span></div>
+
+
+<div class="viewcode-block" id="ChunkLoader._validate_chunk_nr">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk_loader.ChunkLoader._validate_chunk_nr">[docs]</a>
+    <span class="k">def</span> <span class="nf">_validate_chunk_nr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk_nr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">query_nr</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the specified chunk exists and contains the specified query.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chunk_nr : int</span>
+<span class="sd">            The integer chunk number.</span>
+
+<span class="sd">        query_nr : str</span>
+<span class="sd">            The query identifier as a string.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the chunk does not exist or the query is not found in the chunk.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunks</span><span class="p">[</span><span class="n">chunk_nr</span><span class="p">]</span>
+
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;Chunk n° </span><span class="si">%d</span><span class="s2"> not found! Verify the configuration &quot;</span>
+                    <span class="s2">&quot;settings. Is the chunk size correct? &quot;</span> <span class="o">%</span> <span class="n">chunk_nr</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">nr</span> <span class="o">=</span> <span class="n">StringUtils</span><span class="o">.</span><span class="n">get_int_behind_last_underscore</span><span class="p">(</span><span class="n">query_nr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;query_</span><span class="si">{</span><span class="n">nr</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chunk</span><span class="o">.</span><span class="n">col_names</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;Query n° </span><span class="si">%s</span><span class="s2"> not found in chunk n° </span><span class="si">%s</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">query_nr</span><span class="p">,</span> <span class="n">chunk_nr</span>
+                <span class="p">)</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChunkLoader._extract_single_query">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk_loader.ChunkLoader._extract_single_query">[docs]</a>
+    <span class="k">def</span> <span class="nf">_extract_single_query</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">query_nr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">chunk_nr</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">output_chunk</span><span class="p">:</span> <span class="n">Chunk</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Chunk</span><span class="p">:</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts a query from a chunk to the given chunk.</span>
+
+<span class="sd">        Extracts the query and answer column identified by the specified</span>
+<span class="sd">        number from the chunk identified by the specified chunk number and adds</span>
+<span class="sd">        the columns to the given output chunk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        query_nr : int</span>
+<span class="sd">            The number of the query and the answer column to extract from the</span>
+<span class="sd">            chunk.</span>
+
+<span class="sd">        chunk_nr : int</span>
+<span class="sd">            The number of the chunk from which to extract the query and</span>
+<span class="sd">            answer columns.</span>
+
+<span class="sd">        output_chunk : Chunk</span>
+<span class="sd">            The chunk in which to assemble the extracted columns.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Chunk</span>
+<span class="sd">            The output chunk with the extracted columns added.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Verify that the chunk is correct.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_chunk_nr</span><span class="p">(</span><span class="n">chunk_nr</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">query_nr</span><span class="p">))</span>
+
+        <span class="c1"># Add all query and answer columns that match the best query</span>
+        <span class="c1"># numbers</span>
+        <span class="n">cols_to_extract</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="sa">f</span><span class="s2">&quot;query_</span><span class="si">{</span><span class="n">query_nr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;answer_</span><span class="si">{</span><span class="n">query_nr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">extracted_query_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunks</span><span class="p">[</span><span class="n">chunk_nr</span><span class="p">]</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+            <span class="s1">&#39;extract_columns&#39;</span><span class="p">,</span> <span class="n">col_names</span><span class="o">=</span><span class="n">cols_to_extract</span>
+        <span class="p">)</span>
+
+        <span class="n">output_chunk</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+            <span class="s2">&quot;merge&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="n">extracted_query_cols</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">output_chunk</span></div>
+
+
+<div class="viewcode-block" id="ChunkLoader._drop_query_and_answer_column">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk_loader.ChunkLoader._drop_query_and_answer_column">[docs]</a>
+    <span class="k">def</span> <span class="nf">_drop_query_and_answer_column</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">chunk</span><span class="p">:</span> <span class="n">Chunk</span><span class="p">,</span>
+            <span class="n">query_nr</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Chunk</span><span class="p">:</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Drops the specified query and answer columns from the chunk.</span>
+
+<span class="sd">        Removes the query and answer columns with the specified query number</span>
+<span class="sd">        from the given chunk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chunk : Chunk</span>
+<span class="sd">            A chunk with query and answer columns.</span>
+
+<span class="sd">        query_nr : str</span>
+<span class="sd">            Number in string format by which the query and answer columns to</span>
+<span class="sd">            drop can be identified.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Chunk</span>
+<span class="sd">            The given chunk without the removed query and answer columns.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">col_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;query_</span><span class="si">{</span><span class="n">query_nr</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">chunk</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+            <span class="s2">&quot;drop_column&quot;</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="o">=</span><span class="n">col_name</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Check whether an answer column with the current</span>
+        <span class="c1"># query column number exists at all before trying to</span>
+        <span class="c1"># drop it (The corresponding query could be an</span>
+        <span class="c1"># invalid one, not having produced answers worth</span>
+        <span class="c1"># keeping.)</span>
+        <span class="n">col_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;answer_</span><span class="si">{</span><span class="n">query_nr</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_answer_cols_names</span><span class="p">(</span><span class="n">chunk</span><span class="p">):</span>
+            <span class="n">chunk</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                <span class="s2">&quot;drop_column&quot;</span><span class="p">,</span>
+                <span class="n">col_name</span><span class="o">=</span><span class="n">col_name</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">chunk</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

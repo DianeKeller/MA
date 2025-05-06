@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.stats.frequency_strategy &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.stats.frequency_strategy</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.stats.frequency_strategy</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">frequency_strategy.py</span>
+<span class="sd">---------------------</span>
+<span class="sd">Version 1.0, updated on 2025-01-27</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">constants</span> <span class="kn">import</span> <span class="n">MAX_ITEMS</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_ordered_dict</span> <span class="kn">import</span> <span class="n">MyOrderedDict</span>
+<span class="kn">from</span> <span class="nn">src.stats.statistics_strategy</span> <span class="kn">import</span> <span class="n">StatisticsStrategy</span>
+<span class="kn">from</span> <span class="nn">src.utils.dict_sort_utils</span> <span class="kn">import</span> <span class="n">sort_dict_by_desc_values_and_asc_keys</span>
+<span class="kn">from</span> <span class="nn">src.utils.print_utils</span> <span class="kn">import</span> <span class="n">WHITE_LINE</span><span class="p">,</span> <span class="n">SEPARATOR</span><span class="p">,</span> <span class="n">SUBSEPARATOR</span><span class="p">,</span> \
+    <span class="n">restrict_length</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">src.data_structures.item_list</span> <span class="kn">import</span> <span class="n">ItemList</span>
+
+
+<div class="viewcode-block" id="FrequencyStrategy">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.frequency_strategy.FrequencyStrategy">[docs]</a>
+<span class="k">class</span> <span class="nc">FrequencyStrategy</span><span class="p">(</span><span class="n">StatisticsStrategy</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is a concrete implementation of the StatisticsStrategy</span>
+<span class="sd">    interface for statistical analyses. This strategy is used for the analysis</span>
+<span class="sd">    of frequencies of given items collected in an ItemList object.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">CATEGORY</span> <span class="o">=</span> <span class="s1">&#39;Frequency&#39;</span>
+
+<div class="viewcode-block" id="FrequencyStrategy.__init__">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.frequency_strategy.FrequencyStrategy.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">items</span><span class="p">:</span> <span class="n">ItemList</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes a new instance of the FrequencyStrategy class with items</span>
+<span class="sd">        organized in an ItemList object.</span>
+<span class="sd">        .</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">items</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">CATEGORY</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FrequencyStrategy.compute_items_and_values">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.frequency_strategy.FrequencyStrategy.compute_items_and_values">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_items_and_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the items and their corresponding frequency values and sets</span>
+<span class="sd">        the _items_and_values attribute accordingly.</span>
+
+<span class="sd">        This method implements the abstract method in the StatisticsStrategy</span>
+<span class="sd">        parent class.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - For compatibility with the other statistics strategies, the Counter</span>
+<span class="sd">          object returned from the &#39;__count_frequencies&#39; method is converted to</span>
+<span class="sd">          a MyOrderedDict object, preserving the order from the highest to</span>
+<span class="sd">          the lowest frequency by using the &#39;most_common&#39; method of the</span>
+<span class="sd">          Counter object.</span>
+
+<span class="sd">        - The computed result is not returned, but used to set the</span>
+<span class="sd">          items_and_values property of this class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_items_and_values</span> <span class="o">=</span> <span class="n">MyOrderedDict</span><span class="p">(</span>
+            <span class="n">OrderedDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__count_frequencies</span><span class="p">()</span><span class="o">.</span><span class="n">most_common</span><span class="p">())</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FrequencyStrategy.compute_item_ids_and_values">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.frequency_strategy.FrequencyStrategy.compute_item_ids_and_values">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_item_ids_and_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the item ids and their corresponding frequency values and</span>
+<span class="sd">        sets the _item_ids_and_values attribute accordingly.</span>
+
+<span class="sd">        This method  implements the abstract method in the StatisticsStrategy</span>
+<span class="sd">        parent class.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The computed result is not returned, but used to set the</span>
+<span class="sd">        item_ids_and_values property of this class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_item_ids_and_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__count_frequencies_by_first_id</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">__count_frequencies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Counter</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Counts frequencies of items.</span>
+
+<span class="sd">        This private method contains the computing logic for the</span>
+<span class="sd">        compute_items_and_values method implementation in this subclass.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Counter[str]</span>
+<span class="sd">            The frequencies of the items in the item list, where the</span>
+<span class="sd">            unique items are the keys and the frequencies are the values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">Counter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">to_strings</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__count_frequencies_by_first_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyOrderedDict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Counts frequencies of items by their first id.</span>
+
+<span class="sd">        Counts frequencies of items remembering the index (&#39;id&#39;) of the first</span>
+<span class="sd">        occurrence of each item.</span>
+
+<span class="sd">        Gets ordered dictionary of the ids of the first occurrence of each</span>
+<span class="sd">        distinct item and the items&#39; frequencies, sorted first by frequencies</span>
+<span class="sd">        and then by id.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The dictionary does not contain the item itself, but only the id of</span>
+<span class="sd">        the first occurrence of the item in the original item list.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Creating an empty list to store and lookup unique items.</span>
+        <span class="n">freq</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Creating an empty dictionary to store the ids of the first</span>
+        <span class="c1"># occurrences of the items and the item frequencies.</span>
+        <span class="n">freq_by_id</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">to_strings</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">freq</span><span class="p">:</span>
+                <span class="n">freq_by_id</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">to_strings</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">item</span><span class="p">)]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">freq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="n">freq_by_id</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">to_strings</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">item</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">sort_dict_by_desc_values_and_asc_keys</span><span class="p">(</span><span class="n">freq_by_id</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FrequencyStrategy.to_string_showing_ids">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.frequency_strategy.FrequencyStrategy.to_string_showing_ids">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_string_showing_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns a string representation of the object similar to</span>
+<span class="sd">        the &#39;to_string&#39; method, but showing item IDs instead of item values.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The string representation of the object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">item</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">item_type</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1">s&#39;</span>
+
+        <span class="n">string</span> <span class="o">=</span> <span class="n">WHITE_LINE</span> <span class="o">+</span> \
+                 <span class="n">SEPARATOR</span> <span class="o">+</span> \
+                 <span class="n">WHITE_LINE</span> <span class="o">+</span> \
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="s1">&#39;(All IDs)</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="n">SUBSEPARATOR</span> <span class="o">+</span> \
+                 <span class="n">WHITE_LINE</span> <span class="o">+</span> \
+                 <span class="p">(</span>
+                     <span class="sa">f</span><span class="s1">&#39;Number of </span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s1">:            &#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">n_elements</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="p">)</span> <span class="o">+</span> \
+                 <span class="n">SUBSEPARATOR</span> <span class="o">+</span> \
+                 <span class="n">WHITE_LINE</span> <span class="o">+</span> \
+                 <span class="p">(</span>
+                     <span class="sa">f</span><span class="s1">&#39;Average </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s1"> frequency:           &#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mean_value</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="p">)</span> <span class="o">+</span> \
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s1"> with frequency close to average: </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ids_near_means</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="p">(</span>
+                     <span class="sa">f</span><span class="s1">&#39;Median </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s1"> frequency:         &#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">median_value</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="p">)</span> <span class="o">+</span> \
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s1"> with close to median frequency: </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ids_near_median</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="p">(</span>
+                     <span class="sa">f</span><span class="s1">&#39;Lowest </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s1"> frequency:       &#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lowest_value</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="p">)</span> <span class="o">+</span> \
+                 <span class="sa">f</span><span class="s1">&#39;Least frequent </span><span class="si">{</span><span class="n">items</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s1">: </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lowest_value_ids</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="p">(</span>
+                     <span class="sa">f</span><span class="s1">&#39;Highest </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1"> frequency:        &#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">highest_value</span><span class="si">}</span><span class="s1">  </span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="p">)</span> <span class="o">+</span> \
+                 <span class="sa">f</span><span class="s1">&#39;Most frequent </span><span class="si">{</span><span class="n">items</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s1">: </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">highest_value_ids</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="n">SEPARATOR</span> <span class="o">+</span> <span class="n">WHITE_LINE</span>
+
+        <span class="k">return</span> <span class="n">string</span></div>
+
+
+<div class="viewcode-block" id="FrequencyStrategy.visualize">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.frequency_strategy.FrequencyStrategy.visualize">[docs]</a>
+    <span class="k">def</span> <span class="nf">visualize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Visualizes the results of the frequency analysis.</span>
+
+<span class="sd">        This method uses the basic visualization method provided by the</span>
+<span class="sd">        StatisticsStrategy base class to visualize the results in a Pandas</span>
+<span class="sd">        DataFrame, and adds a Zipf frequency diagram.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ax : matplotlib.axes.Axes, optional</span>
+<span class="sd">            The axes on which to plot the data. If None, plots on the current</span>
+<span class="sd">            axes.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">visualize</span><span class="p">()</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">df</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">diagram</span><span class="o">.</span><span class="n">frequency_diagram</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">CATEGORY</span><span class="p">,</span>
+            <span class="n">n_rows</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">restrict_length</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FrequencyStrategy.to_string">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.frequency_strategy.FrequencyStrategy.to_string">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a string representation of the object, including various</span>
+<span class="sd">        statistics and examples derived from the items.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The string representation of the object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n_examples</span> <span class="o">=</span> <span class="n">MAX_ITEMS</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">item_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1">s&#39;</span>
+
+        <span class="n">string</span> <span class="o">=</span> <span class="n">WHITE_LINE</span> <span class="o">+</span> \
+                 <span class="n">SEPARATOR</span> <span class="o">+</span> \
+                 <span class="n">WHITE_LINE</span> <span class="o">+</span> \
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="s1">&#39;(Examples) </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="n">SUBSEPARATOR</span> <span class="o">+</span> \
+                 <span class="n">WHITE_LINE</span> <span class="o">+</span> \
+                 <span class="p">(</span>
+                     <span class="sa">f</span><span class="s1">&#39;Number of </span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s1">:            &#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">n_elements</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="p">)</span> <span class="o">+</span> \
+                 <span class="n">SUBSEPARATOR</span> <span class="o">+</span> \
+                 <span class="n">WHITE_LINE</span> <span class="o">+</span> \
+                 <span class="p">(</span>
+                     <span class="sa">f</span><span class="s1">&#39;Average </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1"> frequency:           &#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mean_value</span><span class="si">}</span><span class="s1">  </span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="p">)</span> <span class="o">+</span> \
+                 <span class="p">(</span>
+                     <span class="sa">f</span><span class="s1">&#39;Up to </span><span class="si">{</span><span class="n">n_examples</span><span class="si">}</span><span class="s1"> example </span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s1"> &#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;with frequency close to average: </span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="p">)</span> <span class="o">+</span> \
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">examples_near_means</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="p">(</span>
+                     <span class="sa">f</span><span class="s1">&#39;Median </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1"> frequency:         &#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">median_value</span><span class="si">}</span><span class="s1">  </span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="p">)</span> <span class="o">+</span> \
+                 <span class="p">(</span>
+                     <span class="sa">f</span><span class="s1">&#39;Up to </span><span class="si">{</span><span class="n">n_examples</span><span class="si">}</span><span class="s1"> example </span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s1"> &#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;with close to median frequency: </span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="p">)</span> <span class="o">+</span> \
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">examples_near_median</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="p">(</span>
+                     <span class="sa">f</span><span class="s1">&#39;Lowest </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1"> frequency:       &#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lowest_value</span><span class="si">}</span><span class="s1">  </span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="p">)</span> <span class="o">+</span> \
+                 <span class="p">(</span>
+                     <span class="sa">f</span><span class="s1">&#39;Up to </span><span class="si">{</span><span class="n">n_examples</span><span class="si">}</span><span class="s1"> examples &#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;of least frequent </span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s1">: </span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="p">)</span> <span class="o">+</span> \
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">examples_lowest_values</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="p">(</span>
+                     <span class="sa">f</span><span class="s1">&#39;Highest </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1"> frequency:        &#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">highest_value</span><span class="si">}</span><span class="s1">  </span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="p">)</span> <span class="o">+</span> \
+                 <span class="p">(</span>
+                     <span class="sa">f</span><span class="s1">&#39;Up to </span><span class="si">{</span><span class="n">n_examples</span><span class="si">}</span><span class="s1"> examples &#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;of most frequent </span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s1">: </span><span class="se">\n</span><span class="s1">&#39;</span>
+                 <span class="p">)</span> <span class="o">+</span> \
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">examples_highest_values</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> \
+                 <span class="n">SEPARATOR</span> <span class="o">+</span> <span class="n">WHITE_LINE</span>
+
+        <span class="k">return</span> <span class="n">string</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

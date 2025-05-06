@@ -1,0 +1,60 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+title Sentiment Retrieval
+
+' Define classes and their attributes
+class BatchProcessor {
+    - batch_size: int
+    - config: SentimentAnalysisConfig
+    - results: MyDataFrame
+    - samples: MyDataFrame
+    + process_batches(): void
+    + process_batch(batch_nr: int): void
+}
+
+class ChunkProcessor {
+    - chunk_size: int
+    - config: SentimentAnalysisConfig
+    - samples: MyDataFrame
+    + process_chunks(): MyDataFrame
+    + process_chunk(chunk: Dict): void
+}
+
+class LanguageProcessor {
+    - language: str
+    - samples: MyDataFrame
+    + process_language(): void
+}
+
+class QueryColumnProcessor {
+    - chunk_size: int
+    - config: SentimentAnalysisConfig
+    - samples: MyDataFrame
+    + process_query_columns(): void
+    + process_query_column(query_col_nr: int): void
+}
+
+class QueryProcessor {
+    - payload: Dict[str, str]
+    + process_query(): str
+    + send_query(): Dict[str, Any]
+}
+
+class DictionaryChunker {
+    - chunk_size: int
+    - dic: Dict
+    + get_next_chunk(): Tuple[Dict, int]
+}
+
+' Define relationships
+' Arrange classes vertically
+LanguageProcessor -down-> BatchProcessor : "uses"
+BatchProcessor -down-> ChunkProcessor : "uses"
+ChunkProcessor -down-> DictionaryChunker : "uses"
+ChunkProcessor -down-> QueryColumnProcessor : "uses"
+QueryColumnProcessor -down-> QueryProcessor : "uses"
+
+
+
+
+@enduml

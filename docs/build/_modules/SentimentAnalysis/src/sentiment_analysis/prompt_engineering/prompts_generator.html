@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompts_generator &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompts_generator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompts_generator</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">prompts_generator.py</span>
+<span class="sd">--------------------</span>
+<span class="sd">Version 1.0, updated on 2025-01-11</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.prompt_engineering.prompt_generator_factory</span> \
+    <span class="kn">import</span> <span class="nn">get_prompt_generator</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.history</span> <span class="kn">import</span> <span class="n">History</span>
+<span class="kn">from</span> <span class="nn">src.decorators.time_decorators</span> <span class="kn">import</span> <span class="n">duration</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_analysis_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SentimentAnalysisConfig</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.dict_utils</span> <span class="kn">import</span> <span class="n">value_is_in_dict</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">PromptsDictType</span><span class="p">,</span> <span class="n">PromptIngredientsType</span>
+
+
+<div class="viewcode-block" id="PromptsGenerator">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompts_generator.PromptsGenerator">[docs]</a>
+<span class="k">class</span> <span class="nc">PromptsGenerator</span><span class="p">(</span><span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    PromptsGenerator class</span>
+
+<span class="sd">    This class orchestrates the systematic generation of prompts, ensuring</span>
+
+<span class="sd">    - the desired number of prompts is generated from randomly chosen prompt</span>
+<span class="sd">      ingredients,</span>
+
+<span class="sd">    - no prompt is generated twice for the same LLM and data suite combination,</span>
+
+<span class="sd">    - each prompt is guaranteed to induce the requested API to return a</span>
+<span class="sd">      valid response.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : SentimentAnalysisConfig</span>
+<span class="sd">        The configuration object that holds settings for sentiment analysis.</span>
+
+<span class="sd">    llm: Llm</span>
+<span class="sd">        Llm instance.</span>
+
+<span class="sd">    prompt_counter : int</span>
+<span class="sd">        Counter for the prompts used to initialize and track the prompt</span>
+<span class="sd">        generation.</span>
+
+<span class="sd">    prompt_ingredients: PromptIngredientsType</span>
+<span class="sd">        A dictionary where the keys are prompt ingredients categories</span>
+<span class="sd">        and the values are lists of possible values the categories can</span>
+<span class="sd">        have.</span>
+
+<span class="sd">    prompt_ingredients_history: History</span>
+<span class="sd">        History to keep track of all prompts ever used.</span>
+
+<span class="sd">    target_n_prompts : int</span>
+<span class="sd">        The number of prompts to generate.</span>
+
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    generate_prompts() -&gt; PromptsDictType:</span>
+<span class="sd">        Generates the target number of prompts.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">prompt_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="PromptsGenerator.__init__">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompts_generator.PromptsGenerator.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">prompt_ingredients</span><span class="p">:</span> <span class="n">PromptIngredientsType</span><span class="p">,</span>
+            <span class="n">prompt_generation_strategy_nr</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes the PromptsGenerator class with the provided</span>
+<span class="sd">        prompt ingredients dictionary and sets the target number of</span>
+<span class="sd">        prompts to generate.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_previous_history</span><span class="p">:</span> <span class="n">History</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_generation_strategy_nr</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">prompt_generation_strategy_nr</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">:</span> <span class="n">Logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_ingredients</span><span class="p">:</span> <span class="n">PromptIngredientsType</span> <span class="o">=</span> <span class="n">prompt_ingredients</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SentimentAnalysisConfig</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;version&quot;</span><span class="p">)</span>
+        <span class="n">target_n_prompts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;target_n_prompts&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">llm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;llm&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">llm_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="c1"># Set history to keep track of all prompts ever used.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_ingredients_history</span> <span class="o">=</span> <span class="n">History</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">llm_name</span><span class="si">}</span><span class="s1">_&#39;</span>
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">target_n_prompts</span><span class="si">}</span><span class="s1">_prompt_ingredients_v_&#39;</span>
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_previous_history</span><span class="p">()</span>
+
+        <span class="c1"># Dictionary for all validated prompts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validated_prompts</span><span class="p">:</span> <span class="n">PromptsDictType</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Continue the prompt counter from the previous _prompt_engineering</span>
+        <span class="c1"># runs so that the history can be continued and ensure that the same</span>
+        <span class="c1"># prompt sets are not processed multiple times.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_counter_start</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_ingredients_history</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                                     <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_n_prompts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_counter_start</span> <span class="o">+</span> <span class="n">target_n_prompts</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_counter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_counter_start</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">prompt_generation_strategy_nr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_generation_strategy_nr</span>
+
+    <span class="nd">@prompt_generation_strategy_nr</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">prompt_generation_strategy_nr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy_nr</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_generation_strategy_nr</span> <span class="o">=</span> <span class="n">strategy_nr</span>
+
+    <span class="c1"># region --- Properties</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">target_n_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the target number of prompts.</span>
+
+<span class="sd">        Returns the target number of prompts including all prompts already</span>
+<span class="sd">        used. E.g., if a set of 150 prompts has already been generated in a</span>
+<span class="sd">        previous run, the count starts with 151 and the target number for</span>
+<span class="sd">        a new run of 150 prompts will be 300.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_n_prompts</span>
+
+    <span class="nd">@target_n_prompts</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">target_n_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_prompts</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the target number of prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_target_n_prompts</span> <span class="o">=</span> <span class="n">n_prompts</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">previous_history</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">History</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_previous_history</span>
+
+    <span class="nd">@previous_history</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">previous_history</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">history</span><span class="p">:</span> <span class="n">History</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_previous_history</span> <span class="o">=</span> <span class="n">history</span>
+
+    <span class="k">def</span> <span class="nf">_set_previous_history</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">strategy_nr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">strategy_nr</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">previous_version</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">strategy_nr</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="c1"># Do not rely on self.target_n_prompts but retrieve the original</span>
+            <span class="c1"># value from the config</span>
+            <span class="n">target_n_prompts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;target_n_prompts&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previous_history</span> <span class="o">=</span> <span class="n">History</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">llm_name</span><span class="si">}</span><span class="s1">_&#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">target_n_prompts</span><span class="si">}</span><span class="s1">_prompt_ingredients_v_&#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">previous_version</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+    <span class="nd">@duration</span>
+    <span class="k">def</span> <span class="nf">generate_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">PromptsDictType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates the target number of prompts.</span>
+
+<span class="sd">        The target number of prompts is set in the sentiment analysis</span>
+<span class="sd">        configuration via the _set_prompt_engineering_config method in the</span>
+<span class="sd">        PromptEngineeringStrategy class.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PromptsDictType</span>
+<span class="sd">            A dictionary with validated prompts, where the keys are the</span>
+<span class="sd">            integer numbers of the prompts and the values are dictionaries</span>
+<span class="sd">            containing the prompts, where the keys are the positions where</span>
+<span class="sd">            each prompt part should go and the values are the prompt parts.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        ------</span>
+<span class="sd">        Any errors that occur when querying the LLM are handled by the</span>
+<span class="sd">        query_error_handling decorator that decorates the send_query method</span>
+<span class="sd">        in the QueryProcessor class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_counter</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_n_prompts</span><span class="p">:</span>
+
+            <span class="c1"># Get a maximum of 5 elements from a randomly chosen ingredients</span>
+            <span class="c1"># category</span>
+            <span class="n">random_ingredients_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_random_ingredients_list</span><span class="p">()</span>
+
+            <span class="c1"># Get one randomly chosen element from each ot the other categories</span>
+            <span class="n">other_random_ingredients</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_other_random_ingredients_elements</span><span class="p">(</span>
+                    <span class="nb">list</span><span class="p">(</span><span class="n">random_ingredients_list</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">ingredient_type</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">random_ingredients_list</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># Iterate through the first ingredients list</span>
+            <span class="n">variants</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">random_ingredients_list</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">variant</span> <span class="ow">in</span> <span class="n">variants</span><span class="p">:</span>
+
+                <span class="c1"># Assemble the prompt ingredients (one of each category)</span>
+                <span class="n">selected_ingredients</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="o">**</span><span class="n">other_random_ingredients</span><span class="p">,</span>
+                    <span class="n">ingredient_type</span><span class="p">:</span> <span class="n">variant</span>
+                <span class="p">}</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_validated_prompt</span><span class="p">(</span><span class="n">selected_ingredients</span><span class="p">):</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Prompt could not be validated!&quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">)</span>
+
+                    <span class="k">break</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_counter</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">prompt_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_counter</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_n_prompts</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Last prompt processed!&quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">)</span>
+
+                    <span class="k">break</span>
+
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Validating next prompt...&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">,</span> <span class="s2">&quot;Validating next prompt&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validated_prompts</span>
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="PromptsGenerator._generate_validated_prompt">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompts_generator.PromptsGenerator._generate_validated_prompt">[docs]</a>
+    <span class="k">def</span> <span class="nf">_generate_validated_prompt</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">selected_ingredients</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates and validates a prompt based on the selected ingredients,</span>
+<span class="sd">        ensuring that there are no duplicates in the prompt history and that</span>
+<span class="sd">        the prompt itself yields valid responses.</span>
+
+<span class="sd">        This method incorporates a series of checks to verify:</span>
+<span class="sd">        1. The selected ingredients are not already used before.</span>
+<span class="sd">        2. The generated prompt based on the selected ingredients is valid.</span>
+<span class="sd">        3. No duplicate prompts are introduced in the validated prompt history.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        selected_ingredients : Dict[str, str]</span>
+<span class="sd">            A dictionary of selected ingredient names mapped to their</span>
+<span class="sd">            respective values, which are utilized to generate new prompts.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            Returns True if the generated prompt is successfully validated and</span>
+<span class="sd">            added to the history. Returns False otherwise.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            Raised if a duplicate prompt is found in the validated prompts,</span>
+<span class="sd">            indicating an issue during the validation or history-check</span>
+<span class="sd">            processes.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_are_not_in_history</span><span class="p">(</span><span class="n">selected_ingredients</span><span class="p">):</span>
+
+            <span class="n">prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_prompt</span><span class="p">(</span><span class="n">selected_ingredients</span><span class="p">)</span>
+
+            <span class="c1"># Ensure that the generated prompt produces a valid response</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_prompt</span><span class="p">(</span><span class="n">prompt</span><span class="p">):</span>
+                <span class="c1"># If no exception was raised, all is fine and can be saved.</span>
+                <span class="c1"># Double check for duplicates. Duplicates could only happen if</span>
+                <span class="c1"># something in the history check or in the transformation of</span>
+                <span class="c1"># the selected ingredients into a prompt went wrong:</span>
+                <span class="k">if</span> <span class="n">value_is_in_dict</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">validated_prompts</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                        <span class="s2">&quot;Duplicate prompt found&quot;</span>
+                    <span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">validated_prompts</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_counter</span><span class="p">)]</span> <span class="o">=</span> <span class="n">prompt</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">prompt_ingredients_history</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">selected_ingredients</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="PromptsGenerator._generate_prompt">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompts_generator.PromptsGenerator._generate_prompt">[docs]</a>
+    <span class="k">def</span> <span class="nf">_generate_prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selected_ingredients</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a prompt based on the given selected ingredients.</span>
+
+<span class="sd">        This method creates a prompt generator instance using the provided</span>
+<span class="sd">        ingredients dictionary and invokes its &#39;generate_prompt&#39; method to</span>
+<span class="sd">        produce a prompt.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        selected_ingredients : Dict[str, str]</span>
+<span class="sd">            A dictionary where keys are ingredient names and values are their</span>
+<span class="sd">            selected values.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, str]</span>
+<span class="sd">            A dictionary representing the generated prompt, based on the</span>
+<span class="sd">            selected ingredients.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">prompt_generator</span> <span class="o">=</span> <span class="n">get_prompt_generator</span><span class="p">(</span>
+            <span class="n">selected_ingredients</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_generation_strategy_nr</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">prompt_generator</span><span class="o">.</span><span class="n">generate_prompt</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PromptsGenerator._get_random_ingredients_list">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompts_generator.PromptsGenerator._get_random_ingredients_list">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_random_ingredients_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">PromptIngredientsType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a random list from the prompt ingredients lists.</span>
+
+<span class="sd">        Randomly chooses a list from the prompt ingredients lists. If the</span>
+<span class="sd">        chosen list has more elements than the maximum number of 5,</span>
+<span class="sd">        the elements in the returned list are limited to the maximum number,</span>
+<span class="sd">        picking them randomly from the chosen list. Otherwise, the entire</span>
+<span class="sd">        list is returned.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PromptIngredientsType</span>
+<span class="sd">            A dictionary with a single element where the key is the type of</span>
+<span class="sd">            the prompt ingredients and the value is the lists of equivalent</span>
+<span class="sd">            variants of the given prompt ingredients type.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">max_elements</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">prompt_ingredients</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_ingredients</span>
+
+        <span class="n">ingredients_type</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">prompt_ingredients</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prompt_ingredients</span><span class="p">[</span><span class="n">ingredients_type</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">max_elements</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="n">ingredients_type</span><span class="p">:</span> <span class="n">prompt_ingredients</span><span class="p">[</span><span class="n">ingredients_type</span><span class="p">]}</span>
+
+        <span class="c1"># Limit the number of elements, select the elements randomly</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">ingredients_type</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+            <span class="n">prompt_ingredients</span><span class="p">[</span><span class="n">ingredients_type</span><span class="p">],</span> <span class="n">max_elements</span>
+        <span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="PromptsGenerator._get_other_random_ingredients_elements">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompts_generator.PromptsGenerator._get_other_random_ingredients_elements">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_other_random_ingredients_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">excluded_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a randomly chosen element per prompt ingredient type.</span>
+
+<span class="sd">        Except for the prompt ingredient type specified by the</span>
+<span class="sd">        excluded_key, this method chooses one element per prompt</span>
+<span class="sd">        ingredient type and returns the chosen elements in a dictionary</span>
+<span class="sd">        where the keys serve to identify the respective ingredient type.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        excluded_key : str</span>
+<span class="sd">            The label of the prompt ingredients list that is not to be</span>
+<span class="sd">            included in the output dictionary.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, str]</span>
+<span class="sd">            A dictionary where the key is the prompt ingredient type and the</span>
+<span class="sd">            value is a randomly picked variant from the corresponding prompt</span>
+<span class="sd">            ingredient list.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">lst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_ingredients</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="n">excluded_key</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="PromptsGenerator._log_prompt_exists">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompts_generator.PromptsGenerator._log_prompt_exists">[docs]</a>
+    <span class="k">def</span> <span class="nf">_log_prompt_exists</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">selected_ingredients</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+            <span class="n">history</span><span class="p">:</span> <span class="n">History</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Logs cases where a prompt was found in the history.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        selected_ingredients : Dict[str, str]</span>
+<span class="sd">            Dictionary of selected ingredients where the keys are ingredient</span>
+<span class="sd">            categories and the values are the selected ingredient alternatives.</span>
+
+<span class="sd">        history : History</span>
+<span class="sd">            Prompt ingredients history to use for the check.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method does not return any value. Instead, it logs a message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">history</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_ingredients_history</span>
+
+        <span class="n">prompt_nr</span> <span class="o">=</span> <span class="n">history</span><span class="o">.</span><span class="n">get_nr</span><span class="p">(</span><span class="n">selected_ingredients</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Prompt </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_counter</span><span class="si">}</span><span class="s2"> already validated: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Prompt n° </span><span class="si">{</span><span class="n">prompt_nr</span><span class="si">}</span><span class="s2"> in &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">history</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptsGenerator._validate_prompt">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompts_generator.PromptsGenerator._validate_prompt">[docs]</a>
+    <span class="k">def</span> <span class="nf">_validate_prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates the generated prompt.</span>
+
+<span class="sd">        Calls the LLM&#39;s validate_prompt method to validate.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prompt : Dict[str, str]</span>
+<span class="sd">            Dictionary of prompt parts to validate.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the validation was successful, otherwise False</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="o">.</span><span class="n">validate_prompt</span><span class="p">(</span><span class="s1">&#39;en&#39;</span><span class="p">,</span> <span class="n">prompt</span><span class="p">):</span>
+
+            <span class="c1"># if the validation fails, the validate prompt method will raise an</span>
+            <span class="c1"># exception, otherwise the validation was successful:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Prompt successfully validated!&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">,</span> <span class="s2">&quot;Prompt successfully validated&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+<div class="viewcode-block" id="PromptsGenerator._are_not_in_history">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompts_generator.PromptsGenerator._are_not_in_history">[docs]</a>
+    <span class="k">def</span> <span class="nf">_are_not_in_history</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selected_ingredients</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ensures that the selected prompt ingredients set is not in the history.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        selected_ingredients : Dict[str, str]</span>
+<span class="sd">            A dictionary where the keys correspond to ingredients categories</span>
+<span class="sd">            and the values to selected ingredients values.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the selected prompt ingredients set is not in the history,</span>
+<span class="sd">            otherwise False.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_ingredients_history</span>
+        <span class="n">previous_history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_history</span>
+
+        <span class="c1"># Search assembled prompt ingredients in ingredients histories</span>
+        <span class="c1"># If found, the prompt is logged and discarded</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+                <span class="n">previous_history</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                <span class="n">selected_ingredients</span> <span class="ow">in</span> <span class="n">previous_history</span><span class="o">.</span><span class="n">data</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_prompt_exists</span><span class="p">(</span><span class="n">selected_ingredients</span><span class="p">,</span> <span class="n">previous_history</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">selected_ingredients</span> <span class="ow">in</span> <span class="n">history</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_prompt_exists</span><span class="p">(</span><span class="n">selected_ingredients</span><span class="p">,</span> <span class="n">history</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

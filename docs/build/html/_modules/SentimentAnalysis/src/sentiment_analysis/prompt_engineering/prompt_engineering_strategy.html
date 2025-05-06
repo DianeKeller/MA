@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">prompt_engineering_strategy.py</span>
+<span class="sd">-------------------------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+
+<span class="kn">from</span> <span class="nn">src.data_structures.history</span> <span class="kn">import</span> <span class="n">History</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.prompt_engineering.prompt_generator_factory</span> \
+    <span class="kn">import</span> <span class="nn">get_prompt_generator</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.prompt_engineering.prompt_ingredients_mixin</span> \
+    <span class="kn">import</span> <span class="nn">PromptIngredientsMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.prompt_engineering.prompts_generator</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PromptsGenerator</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_analysis_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SentimentAnalysisConfig</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.serialization.data_serialization_mixin</span> <span class="kn">import</span> <span class="n">DataSerializationMixin</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">src.utils.list_utils</span> <span class="kn">import</span> <span class="n">to_dict_with_str_keys</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">PromptsDictType</span><span class="p">,</span> <span class="n">PromptIngredientsType</span>
+
+
+<div class="viewcode-block" id="PromptEngineeringStrategy">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy.PromptEngineeringStrategy">[docs]</a>
+<span class="k">class</span> <span class="nc">PromptEngineeringStrategy</span><span class="p">(</span>
+    <span class="n">ABC</span><span class="p">,</span>
+    <span class="n">DataSerializationMixin</span><span class="p">,</span>
+    <span class="n">LoggingMixin</span><span class="p">,</span>
+    <span class="n">PromptIngredientsMixin</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    PromptEngineeringStrategy class.</span>
+
+<span class="sd">    Base class for PromptEngineeringStrategy subclasses.</span>
+
+<span class="sd">    Class for handling prompt engineering tasks for sentiment retrieval.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    file_name : str</span>
+<span class="sd">        The file name for the serialization of the queries.</span>
+
+<span class="sd">    file_type : str</span>
+<span class="sd">        The file type used for serialization, defaulting to &#39;txt&#39;.</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PromptEngineeringStrategy.__init__">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy.PromptEngineeringStrategy.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_n_prompts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the present class with the given parameters.</span>
+
+<span class="sd">        Initializes the present class with the target number of prompts to</span>
+<span class="sd">        generate and the file name for serialization of the queries.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_discarded_prompts</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prompts</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_ingredients_sets</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Default value:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_generating_strategy_nr</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># Configs used in this class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SentimentAnalysisConfig</span><span class="p">()</span>
+
+        <span class="c1"># Update the target_n_prompts value and other settings in the</span>
+        <span class="c1"># configuration that are specific for prompt engineering.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_prompt_engineering_config</span><span class="p">(</span><span class="n">target_n_prompts</span><span class="p">)</span>
+
+        <span class="c1"># Set file type and name for the serialization of prompt engineering</span>
+        <span class="c1"># results.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_file_properties</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompts_generator</span> <span class="o">=</span> <span class="n">PromptsGenerator</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompt_ingredients</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompt_generating_strategy_nr</span>
+        <span class="p">)</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">prompt_generating_strategy_nr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the number of the prompt generating strategy to use.</span>
+
+<span class="sd">        Returns the number of the prompt generating strategy to use for the</span>
+<span class="sd">        generation of a prompt.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The number of the prompt generating strategy to use.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            If the concrete stategy does not implement this abstract property.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">PromptsDictType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the prompts generated by propmpt engineering.</span>
+
+<span class="sd">        Returns the prompts property, if it is set. Otherwise,</span>
+<span class="sd">        tries to load prompts from disk. If this fails, tries to</span>
+<span class="sd">        generate new prompts. If this also fails to set the</span>
+<span class="sd">        prompts property, a CriticalException is raised.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PromptsDictType</span>
+<span class="sd">            A Dictionary with the prompts where the keys are</span>
+<span class="sd">            consecutive variant numbers starting from 1 and the values are</span>
+<span class="sd">            dictionaries where the keys are position labels and the values</span>
+<span class="sd">            are the texts to insert at the indicated positions.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the method fails to find prompts in the prompts</span>
+<span class="sd">            property or on disk, and also fails to generate new variants.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prompts</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_prompts</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prompts</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                    <span class="s2">&quot;No prompts could be found or generated! &quot;</span>
+                    <span class="s2">&quot;Cannot proceed.&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompts</span>
+
+    <span class="nd">@prompts</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompts</span><span class="p">:</span> <span class="n">PromptsDictType</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prompts</span>
+<span class="sd">            A Dictionary with generated prompts where the keys are</span>
+<span class="sd">            consecutive variant numbers starting from 1 and the values are</span>
+<span class="sd">            dictionaries where the keys are position labels and the values</span>
+<span class="sd">            are the texts to insert at the indicated positions.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">prompts</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;No prompts given!&quot;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prompts</span> <span class="o">=</span> <span class="n">prompts</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">discarded_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">PromptsDictType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the prompts discarded by propmpt engineering.</span>
+
+<span class="sd">        Returns the discardedprompts property, if it is set. Otherwise,</span>
+<span class="sd">        tries to load discarded prompts from disk. If this fails, the discarded</span>
+<span class="sd">        prompts property is set to an empty dictionary.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PromptsDictType</span>
+<span class="sd">           A Dictionary with the discarded prompts where the keys are</span>
+<span class="sd">           consecutive variant numbers starting from 1 and the values are</span>
+<span class="sd">           dictionaries where the keys are position labels and the values</span>
+<span class="sd">           are the texts to insert at the indicated positions.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_discarded_prompts</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_discarded_prompts</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_discarded_prompts</span>
+
+    <span class="nd">@discarded_prompts</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">discarded_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompts</span><span class="p">:</span> <span class="n">PromptsDictType</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the discarded prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prompts : PromptsDictType</span>
+<span class="sd">           A Dictionary with discarded prompts where the keys are</span>
+<span class="sd">           consecutive variant numbers starting from 1 and the values are</span>
+<span class="sd">           dictionaries where the keys are position labels and the values</span>
+<span class="sd">           are the texts to insert at the indicated positions.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_discarded_prompts</span> <span class="o">=</span> <span class="n">prompts</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">PromptsDictType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
+
+    <span class="nd">@data</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">PromptsDictType</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">prompt_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">PromptIngredientsType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the prompt ingredients used in the current strategy.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PromptIngredientsType</span>
+<span class="sd">            A dictionary where the keys are prompt ingredients categories</span>
+<span class="sd">            and the values are lists of possible values the categories can</span>
+<span class="sd">            have.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            If the concrete stategy does not implement this abstract method.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The prompt ingredients can be identical with the all_ingredients set</span>
+<span class="sd">        in the PromptIngredientsMixin, a part of them or a different set of</span>
+<span class="sd">        ingredients, depending on the concrete strategy. The property must</span>
+<span class="sd">        therefore be implemented by the concrete strategy subclasses.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">prompt_ingredients_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">PromptsDictType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the prompt ingredients sets.</span>
+
+<span class="sd">        If the prompt ingredients sets are not set,</span>
+<span class="sd">        the _set_prompt_ingredients_sets method is called to retrieve them</span>
+<span class="sd">        from the prompt ingriedients history loaded from disk, converting</span>
+<span class="sd">        the history into a PromptsDictType format.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prompt_ingredients_sets</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_prompt_ingredients_sets</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_ingredients_sets</span>
+
+    <span class="nd">@prompt_ingredients_sets</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">prompt_ingredients_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ingredients_sets</span><span class="p">:</span> <span class="n">PromptsDictType</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the prompt ingredients sets.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ingredients_sets : PromptsDictType</span>
+<span class="sd">            The ingredients sets to use for setting the prompt ingredients</span>
+<span class="sd">            sets.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_ingredients_sets</span> <span class="o">=</span> <span class="n">ingredients_sets</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">prompt_ingredients_history</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">History</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the prompt ingredients history.</span>
+
+<span class="sd">        Default implementation. May be overridden by subclasses</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        History</span>
+<span class="sd">           A History object containing data in a HistoryDataType format.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">           If the concrete stategy does not implement this abstract method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_generator</span><span class="o">.</span><span class="n">prompt_ingredients_history</span>
+
+        <span class="k">if</span> <span class="n">history</span><span class="o">.</span><span class="n">can_load</span><span class="p">():</span>
+            <span class="n">history</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">history</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">basic_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">PromptIngredientsType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the basic ingredients used in the current strategy.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PromptIngredientsType</span>
+<span class="sd">            A dictionary where the keys are prompt ingredients categories</span>
+<span class="sd">            and the values are lists of possible values the categories can</span>
+<span class="sd">            have.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            If the concrete stategy does not implement this abstract method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">basic_and_composed_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the basic ingredients used in the current strategy.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[Tuple[str, str]]</span>
+<span class="sd">            The list of tuples of basic and composed ingredients types.</span>
+<span class="sd">            The first element of each tuple is a basic ingredient type and</span>
+<span class="sd">            the second a composed ingredient type the basic ingredient</span>
+<span class="sd">            type contributes to compose. A basic ingredient type can</span>
+<span class="sd">            be used in various composed ingredients types and a composed</span>
+<span class="sd">            ingredient type usually is composed of multiple basic</span>
+<span class="sd">            ingredients types.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            If the concrete stategy does not implement this abstract method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="PromptEngineeringStrategy.add_query_cols">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy.PromptEngineeringStrategy.add_query_cols">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">add_query_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">chunk</span><span class="p">:</span> <span class="n">PromptsDictType</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds query columns to the provided samples.</span>
+
+<span class="sd">        Abstract method to add query columns composed from the prompt parts</span>
+<span class="sd">        in the provided chunk to the samples. This method must be</span>
+<span class="sd">        implemented by the subclasses.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        samples : DataFrame</span>
+<span class="sd">            A samples DataFrame to which to add query columns.</span>
+
+<span class="sd">        chunk : PromptsDictType</span>
+<span class="sd">            Chunk of different prompts to use to create queries for each of</span>
+<span class="sd">            the samples and add them in columns in the samples DataFrame.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            The provided samples DataFrame with the different query columns</span>
+<span class="sd">            added.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            If the concrete stategy does not implement this abstract method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+
+<div class="viewcode-block" id="PromptEngineeringStrategy.decompose_prompt_part">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy.PromptEngineeringStrategy.decompose_prompt_part">[docs]</a>
+    <span class="k">def</span> <span class="nf">decompose_prompt_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prompt_part</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decomposes a prompt part into its basic ingredients.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        category : str</span>
+<span class="sd">            The category of the prompt part to be decomposed.</span>
+
+<span class="sd">        prompt_part : str</span>
+<span class="sd">            The prompt part to be decomposed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, str]</span>
+<span class="sd">            A dictionary containing the basic ingredients of the prompt part</span>
+<span class="sd">            where the keys are the basic ingredient categories and the values</span>
+<span class="sd">            are the basic ingredients.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">prompt_generator</span> <span class="o">=</span> <span class="n">get_prompt_generator</span><span class="p">(</span>
+            <span class="p">{},</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_generating_strategy_nr</span>
+        <span class="p">)</span>
+
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">prompt_generator</span><span class="o">.</span><span class="n">get_prompt_part_generation_pattern</span><span class="p">(</span>
+            <span class="n">category</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_pattern</span><span class="p">(</span><span class="n">prompt_part</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Abstract Methods</span>
+
+<div class="viewcode-block" id="PromptEngineeringStrategy._generate_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy.PromptEngineeringStrategy._generate_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">_generate_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates and saves prompts.</span>
+
+<span class="sd">        Default implementation for generating and saving prompts. May be</span>
+<span class="sd">        overridden by subclasses.</span>
+
+<span class="sd">        Dynamically computes a given number of prompts by systematically</span>
+<span class="sd">        combining conceivable variants for different parts of a prompt.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_generator</span><span class="o">.</span><span class="n">generate_prompts</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_prompts</span><span class="p">()</span></div>
+
+
+    <span class="c1"># endregion --- Abstract Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="PromptEngineeringStrategy._set_prompt_engineering_config">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy.PromptEngineeringStrategy._set_prompt_engineering_config">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_prompt_engineering_config</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">n_prompts</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adapt the SentimentAnalysisConfig parameters to the needs of prompt</span>
+<span class="sd">        engineering.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n_prompts : int</span>
+<span class="sd">            Number of prompts the target_n_prompts value is to be assigned.</span>
+
+<span class="sd">       &quot;&quot;&quot;</span>
+
+        <span class="c1"># For finding errors in the implementation of the prompt</span>
+        <span class="c1"># engineering loop, you may want to set the number of prompts to a</span>
+        <span class="c1"># smaller number than in production. If you want to change the</span>
+        <span class="c1"># target number of prompts, change the N_PROMPTS constant in the</span>
+        <span class="c1"># concrete prompt engineering strategy.</span>
+        <span class="k">if</span> <span class="n">n_prompts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;target_n_prompts&#39;</span><span class="p">,</span> <span class="n">n_prompts</span><span class="p">)</span>
+
+            <span class="c1"># Adapt the chunk size to the number of prompts if the latter is</span>
+            <span class="c1"># smaller than the chunk size, otherwise the</span>
+            <span class="c1"># &#39;parameters_not_empty&#39; decorator of the &#39;__init__&#39; method of</span>
+            <span class="c1"># the QueryColumnProcessor will raise a CriticalException:</span>
+            <span class="k">if</span> <span class="n">n_prompts</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">,</span> <span class="n">n_prompts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptEngineeringStrategy._set_file_properties">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy.PromptEngineeringStrategy._set_file_properties">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_file_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the file properties.</span>
+
+<span class="sd">        Sets the file type and file name for saving and loading the</span>
+<span class="sd">        prompts. The file name is composed using some of the sentiment</span>
+<span class="sd">        analysis configuration settings (llm and version) and the number of</span>
+<span class="sd">        the prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">llm</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;llm&#39;</span><span class="p">)</span>
+        <span class="n">n_prompts</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target_n_prompts&#39;</span><span class="p">)</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">llm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">n_prompts</span><span class="si">}</span><span class="s2">_prompts_v&quot;</span>
+                          <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span> <span class="o">=</span> <span class="s1">&#39;json&#39;</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_set_discarded_prompts_file_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">llm</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;llm&#39;</span><span class="p">)</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">llm</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_invalid_prompts_v&quot;</span>
+                          <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span> <span class="o">=</span> <span class="s1">&#39;json&#39;</span>
+
+<div class="viewcode-block" id="PromptEngineeringStrategy._save_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy.PromptEngineeringStrategy._save_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">_save_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves prompts locally on disk.</span>
+
+<span class="sd">        Checks whether the number of prompts matches the expected number. If</span>
+<span class="sd">        it does not, logs an informational message.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - To disable the Pylint message &#39;attribute-defined-outside-init&#39;, the</span>
+<span class="sd">          corresponding code &#39;W0201&#39; is used to avoid a &#39;line-too-long&#39; error.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n_prompts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompts</span><span class="p">)</span>
+        <span class="n">target_n_prompts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target_n_prompts&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n_prompts</span> <span class="o">!=</span> <span class="n">target_n_prompts</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Number of prompts is </span><span class="si">%d</span><span class="s2">. Expected number was: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">n_prompts</span><span class="p">,</span> <span class="n">target_n_prompts</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">)</span>
+
+        <span class="c1"># The data property is provided by the DataSerializationMixin.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PromptEngineeringStrategy._load_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy.PromptEngineeringStrategy._load_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">_load_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads prompts from disk.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PromptsDictType</span>
+<span class="sd">            A Dictionary with the prompts where the keys are</span>
+<span class="sd">            consecutive prompt numbers starting from 1 and the values are</span>
+<span class="sd">            dictionaries where the keys are position labels and the values</span>
+<span class="sd">            are the texts to insert at the indicated positions.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_load</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="PromptEngineeringStrategy._load_discarded_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy.PromptEngineeringStrategy._load_discarded_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">_load_discarded_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads discprompts from disk.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Set the file properties to the discarded prompts file.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_discarded_prompts_file_properties</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_load</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+            <span class="c1"># Convert list of dicts to PromptsDictType</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">discarded_prompts</span> <span class="o">=</span> <span class="n">to_dict_with_str_keys</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="mi">1</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Reset the file_properties to the normal prompts file.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_file_properties</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PromptEngineeringStrategy._set_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy.PromptEngineeringStrategy._set_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the prompts property by loading or generating prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_prompts</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prompts</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_generate_prompts</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PromptEngineeringStrategy._set_discarded_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy.PromptEngineeringStrategy._set_discarded_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_discarded_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the discarded prompts property by loading them from disk.</span>
+
+<span class="sd">        If the discarded prompts file is not found, an empty dictionary is set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_discarded_prompts</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PromptEngineeringStrategy._set_prompt_ingredients_sets">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_engineering_strategy.PromptEngineeringStrategy._set_prompt_ingredients_sets">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_prompt_ingredients_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the prompt ingredients sets converting history data.</span>
+
+<span class="sd">        Sets the prompt ingredients sets converting the history data loaded</span>
+<span class="sd">        from disk into a PromptsDictType format.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_ingredients_sets</span> <span class="o">=</span> <span class="n">to_dict_with_str_keys</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompt_ingredients_history</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_match_pattern</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">prompt_part</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">pattern</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+
+        <span class="n">matches</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">current_position</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Track position in the string to analyze</span>
+
+        <span class="k">for</span> <span class="n">pattern_type</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pattern</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pattern_type</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span><span class="p">:</span>
+                <span class="c1"># Match a plain string in the pattern</span>
+                <span class="k">if</span> <span class="n">prompt_part</span><span class="p">[</span><span class="n">current_position</span><span class="p">:]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                    <span class="n">current_position</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># If the string doesn&#39;t match, return no matches</span>
+
+            <span class="k">elif</span> <span class="n">pattern_type</span> <span class="o">==</span> <span class="s1">&#39;ingredient&#39;</span><span class="p">:</span>
+                <span class="c1"># Match an ingredient from the specified list</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">ingredient</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_ingredients</span><span class="p">[</span><span class="n">value</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">prompt_part</span><span class="p">[</span><span class="n">current_position</span><span class="p">:]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span>
+                            <span class="n">ingredient</span><span class="p">):</span>
+                        <span class="n">matches</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">value</span><span class="p">,</span> <span class="n">ingredient</span><span class="p">))</span>
+                        <span class="n">current_position</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ingredient</span><span class="p">)</span>
+                        <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># If no ingredient matches, return no matches</span>
+
+        <span class="k">return</span> <span class="n">matches</span></div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

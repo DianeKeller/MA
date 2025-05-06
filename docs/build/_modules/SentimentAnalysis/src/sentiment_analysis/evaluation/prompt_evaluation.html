@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.evaluation.prompt_evaluation &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.evaluation.prompt_evaluation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.evaluation.prompt_evaluation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">prompt_evaluation.py</span>
+<span class="sd">--------------------</span>
+<span class="sd">Version 1.0, updated on 2025-02-05</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.evaluation.all_languages_evaluation</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AllLanguagesEvaluation</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.evaluation.language_results_processor</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LanguageResultsProcessor</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.prompt_engineering.prompt_engineer_factory</span> \
+    <span class="kn">import</span> <span class="nn">get_prompt_engineer</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_analysis_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SentimentAnalysisConfig</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">src.utils.dict_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_inner_keys_of_dict_of_dict</span><span class="p">,</span>
+    <span class="n">get_unique_values_for_inner_key</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.list_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">find_list_of_dicts_entries_with_same_values_for_inner_key</span><span class="p">,</span>
+    <span class="n">remove_elements_from_list</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.print_utils</span> <span class="kn">import</span> <span class="n">print_in_box</span><span class="p">,</span> <span class="n">WHITE_SPACE</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">PromptsDictType</span>
+
+
+<div class="viewcode-block" id="PromptEvaluation">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.prompt_evaluation.PromptEvaluation">[docs]</a>
+<span class="k">class</span> <span class="nc">PromptEvaluation</span><span class="p">(</span><span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    PromptEvaluation class.</span>
+
+<span class="sd">    This class initializes and manages objects required for the evaluation of</span>
+<span class="sd">    sentiment analysis results. It provides logging capabilities through the</span>
+<span class="sd">    &#39;LoggingMixin&#39; class.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : SentimentAnalysisConfig</span>
+<span class="sd">        The sentiment analysis configuration object that holds configuration</span>
+<span class="sd">        values and settings for the analysis process.</span>
+
+<span class="sd">    prompt_engineer : PromptEngineer</span>
+<span class="sd">        The prompt engineer instance responsible for generating prompt</span>
+<span class="sd">        configurations based on the provided version.</span>
+
+<span class="sd">    prompt_ingredients_sets: PromptsDictType</span>
+<span class="sd">        The collection of prompt ingredient sets generated by the prompt</span>
+<span class="sd">        engineer.</span>
+
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PromptEvaluation.__init__">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.prompt_evaluation.PromptEvaluation.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes the PromptEvaluation class.</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_language_results_processor</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">LanguageResultsProcessor</span> <span class="o">|</span> <span class="kc">None</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_languages_evaluation</span><span class="p">:</span> <span class="n">AllLanguagesEvaluation</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+
+        <span class="c1"># Make the sentiment analysis configuration available in this class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SentimentAnalysisConfig</span><span class="p">()</span>
+
+        <span class="c1"># Make the prompt ingredients sets available in this class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_engineer</span> <span class="o">=</span> <span class="n">get_prompt_engineer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;version&#39;</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_ingredients_sets</span><span class="p">:</span> <span class="n">PromptsDictType</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompt_engineer</span><span class="o">.</span><span class="n">get_prompt_ingredients_sets</span><span class="p">())</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">languages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the list of languages that are to be evaluated.</span>
+
+<span class="sd">        If the languages have not been initialized, it retrieves them from</span>
+<span class="sd">        the llm set in the sentiment analysis configuration.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            A list of language codes, corresponding to languages to evaluate.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_languages</span><span class="p">):</span>
+            <span class="c1"># Get the languages that are to be evaluated</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">languages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;llm&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">compatible_languages</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span>
+
+    <span class="nd">@languages</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">languages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">languages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the list of languages to evaluate.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        languages : List[str]</span>
+<span class="sd">            A list of language codes representing languages to evaluate.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span> <span class="o">=</span> <span class="n">languages</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">language</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the language from the configuration settings.</span>
+
+<span class="sd">        If the language is not set, an exception is raised to</span>
+<span class="sd">        indicate the critical nature of the missing configuration.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The language retrieved from the configuration.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the language is not set in the configuration.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;Language is not set!&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">)</span>
+
+    <span class="nd">@language</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">language</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the language and resets properties dependent on the language.</span>
+
+<span class="sd">        This setter uses the specified language to set the corresponding</span>
+<span class="sd">        setting in the sentiment analysis configuration. It performs a reset</span>
+<span class="sd">        operation on any properties that depend on the selected</span>
+<span class="sd">        language. Typically used to update the language dynamically within the</span>
+<span class="sd">        application while ensuring coherence in dependent components.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">            The new language to set in the configuration.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_language_dependent_properties</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">all_languages_evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">AllLanguagesEvaluation</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an instance of the AllLanguagesEvaluation class.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        AllLanguagesEvaluation</span>
+<span class="sd">            An instance of the AllLanguagesEvaluation class which provides</span>
+<span class="sd">            various methods for the evaluation of the sentiment analysis</span>
+<span class="sd">            results for all languages that have been processed.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            if the AllLanguagesEvaluation instance has not been set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_languages_evaluation</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;AllLanguagesEvaluation has not been initialized yet. &quot;</span>
+                   <span class="s2">&quot;Please initialize it before attempting to access this &quot;</span>
+                   <span class="s2">&quot;property!&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_languages_evaluation</span>
+
+    <span class="nd">@all_languages_evaluation</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">all_languages_evaluation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">all_languages_evaluation</span><span class="p">:</span> <span class="n">AllLanguagesEvaluation</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets an instance of the AllLanguagesEvaluation class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        all_languages_evaluation : AllLanguagesEvaluation</span>
+<span class="sd">            The instance of the AllLanguagesEvaluation class to set the</span>
+<span class="sd">            property with.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_languages_evaluation</span> <span class="o">=</span> <span class="n">all_languages_evaluation</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">language_results_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">LanguageResultsProcessor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an instance of the LanguageResultsProcessor class.</span>
+
+<span class="sd">        The language results processor provides functionality required</span>
+<span class="sd">        for processing the results of a language analysis. If the</span>
+<span class="sd">        processor does not already exist, this method initializes it by</span>
+<span class="sd">        invoking the &#39;_set_language_results_processor&#39; method and then</span>
+<span class="sd">        returns it.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        LanguageResultsProcessor</span>
+<span class="sd">            The language results processor for handling language-related</span>
+<span class="sd">            results.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_language_results_processor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_language_results_processor</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_language_results_processor</span>
+
+    <span class="nd">@language_results_processor</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">language_results_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processor</span><span class="p">:</span> <span class="n">LanguageResultsProcessor</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the language results processor with the provided instance.</span>
+
+<span class="sd">        Sets the language results processor used for processing</span>
+<span class="sd">        language-specific results. This function allows associating a</span>
+<span class="sd">        LanguageResultsProcessor object with the current class instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        processor : LanguageResultsProcessor</span>
+<span class="sd">            An instance of LanguageResultsProcessor that performs processing</span>
+<span class="sd">            of language-specific results.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_language_results_processor</span> <span class="o">=</span> <span class="n">processor</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="PromptEvaluation.evaluate_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.prompt_evaluation.PromptEvaluation.evaluate_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">evaluate_prompts</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">partial_metrics</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates the prompts for all languages.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        partial_metrics : List[str] | None</span>
+<span class="sd">            A list of specific metrics to display for the best and worst</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_languages_evaluation</span> <span class="o">=</span> <span class="n">AllLanguagesEvaluation</span><span class="p">()</span>
+        <span class="n">all_languages_evaluation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_languages_evaluation</span>
+
+        <span class="k">for</span> <span class="n">language</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span><span class="p">:</span>
+            <span class="n">language_results_processor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_prompts_for_language</span><span class="p">(</span>
+                <span class="n">language</span><span class="p">,</span>
+                <span class="n">partial_metrics</span>
+            <span class="p">)</span>
+            <span class="n">all_languages_evaluation</span><span class="o">.</span><span class="n">add_to_overall_metrics</span><span class="p">(</span>
+                <span class="n">language_results_processor</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span>
+            <span class="n">all_languages_evaluation</span><span class="o">.</span><span class="n">add_to_overall_sentiment_data</span><span class="p">(</span>
+                <span class="n">language_results_processor</span><span class="o">.</span><span class="n">data</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Remove language setting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">)</span>
+
+        <span class="n">all_languages_evaluation</span><span class="o">.</span><span class="n">show_overall_rankings</span><span class="p">()</span>
+
+        <span class="n">all_languages_evaluation</span><span class="o">.</span><span class="n">show_mean_metrics</span><span class="p">()</span>
+
+        <span class="n">all_languages_evaluation</span><span class="o">.</span><span class="n">show_freqs_comparisons_by_prompt</span><span class="p">()</span>
+        <span class="n">all_languages_evaluation</span><span class="o">.</span><span class="n">_show_pairwise_freqs_comparisons</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PromptEvaluation.evaluate_prompts_for_language">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.prompt_evaluation.PromptEvaluation.evaluate_prompts_for_language">[docs]</a>
+    <span class="k">def</span> <span class="nf">evaluate_prompts_for_language</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">partial_metrics</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LanguageResultsProcessor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates the prompts for the given language.</span>
+
+<span class="sd">        Calculates the metrics and displays correlation maps and partial</span>
+<span class="sd">        metrics for the number of best and worst prompts specified in the</span>
+<span class="sd">        sentiment analysis configuration and finally for all prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language: str</span>
+<span class="sd">            Language code of the language for which the prompts are to be</span>
+<span class="sd">            evaluated.</span>
+
+<span class="sd">        partial_metrics: List[str]</span>
+<span class="sd">            List of partial metrics to be analyzed. The partial metrics names</span>
+<span class="sd">            can be chosen from the following list:</span>
+<span class="sd">            - &#39;macro&#39;,</span>
+<span class="sd">            - &#39;f1&#39;,</span>
+<span class="sd">            - &#39;precision&#39;,</span>
+<span class="sd">            - &#39;recall&#39;,</span>
+<span class="sd">            - &#39;positive&#39;,</span>
+<span class="sd">            - &#39;negative&#39;,</span>
+<span class="sd">            - &#39;neutral&#39;</span>
+<span class="sd">            E.g., &#39;macro&#39; will calculate and display all metrics belonging</span>
+<span class="sd">            to the macro metrics, i.e. macro f1 score, macro precision,</span>
+<span class="sd">            macro recall and the accuracy, &#39;positive&#39; will calculate and</span>
+<span class="sd">            display all metrics concerning the samples being classified as</span>
+<span class="sd">            &#39;positive&#39; by the sentiment analysis.</span>
+
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        LanguageResultsProcessor</span>
+<span class="sd">            An instance of the LanguageResultsProcessor, enabling the caller</span>
+<span class="sd">            to perform further statistical analyses, if required.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        ATTENTION: Before you run this method you should ensure you have moved</span>
+<span class="sd">        the generated chunks files in the csv data folder to a subfolder named</span>
+<span class="sd">        &quot;chunks_v_&quot; + the two-digit number of the prompt engineering strategy</span>
+<span class="sd">        it was created by (e.g. &quot;chunks_v_01&quot;).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+
+        <span class="n">processor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">language_results_processor</span>
+
+        <span class="n">processor</span><span class="o">.</span><span class="n">analyze_prompts</span><span class="p">(</span><span class="n">partial_metrics</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">partial_metrics</span><span class="p">):</span>
+            <span class="n">processor</span><span class="o">.</span><span class="n">show_partial_metrics</span><span class="p">(</span><span class="n">partial_metrics</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">processor</span></div>
+
+
+<div class="viewcode-block" id="PromptEvaluation.evaluate_prompt_group">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.prompt_evaluation.PromptEvaluation.evaluate_prompt_group">[docs]</a>
+    <span class="k">def</span> <span class="nf">evaluate_prompt_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompt_group</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates the specified group of prompts.</span>
+
+<span class="sd">        Analyzes the provided group of prompts by inspecting the</span>
+<span class="sd">        corresponding ingredient sets and searching for hints why the group</span>
+<span class="sd">        performed in the way it did. It establishes which ingredients were</span>
+<span class="sd">        used throughout the group and which ingredients varied. It</span>
+<span class="sd">        especially identifies the ingredients that were not used in any</span>
+<span class="sd">        other prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prompt_group : List[int]</span>
+<span class="sd">            A list of integer identifiers representing the prompt numbers of</span>
+<span class="sd">            the members of the group to be evaluated.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The results of the evaluation are displayed in the console.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">group_ingredients_sets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_group_ingredients_sets</span><span class="p">(</span><span class="n">prompt_group</span><span class="p">)</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">get_inner_keys_of_dict_of_dict</span><span class="p">(</span><span class="n">group_ingredients_sets</span><span class="p">)</span>
+
+        <span class="c1"># Initialize lists to store the results</span>
+        <span class="n">only_in_group</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">variations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">inconspicious</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">extended_inconspicious</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">get_unique_values_for_inner_key</span><span class="p">(</span><span class="n">group_ingredients_sets</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># Find other prompts that use the same ingredients and</span>
+                <span class="c1"># exclude the members of the group from the other prompts</span>
+                <span class="c1"># having used the same ingredients</span>
+                <span class="n">others</span> <span class="o">=</span> <span class="n">remove_elements_from_list</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_find_other_prompts</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                    <span class="n">prompt_group</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">others</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">only_in_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="si">}</span><span class="s1">:  </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">inconspicious</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="si">}</span><span class="s1">:  </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s1"> &#39;</span>
+                    <span class="p">)</span>
+
+                    <span class="c1"># Mark invalid others as invalid</span>
+                    <span class="n">revised_others</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mark_invalid_prompts</span><span class="p">(</span><span class="n">others</span><span class="p">)</span>
+
+                    <span class="n">extended_inconspicious</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="si">}</span><span class="s1">:  </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1">&#39;</span>
+                        <span class="sa">f</span><span class="s1">&#39;Others: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">revised_others</span><span class="p">)</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="si">{</span><span class="n">WHITE_SPACE</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">variations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="si">}</span><span class="s1">:  </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Only in group </span><span class="si">{</span><span class="n">prompt_group</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="n">only_in_group</span>
+
+        <span class="n">print_in_box</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span>
+
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Variations&quot;</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="n">variations</span>
+
+        <span class="n">print_in_box</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span>
+
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Inconspicious&quot;</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="n">inconspicious</span>
+
+        <span class="n">print_in_box</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span>
+
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Inconspicious with invalid prompts marked by brackets&quot;</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="n">extended_inconspicious</span>
+
+        <span class="n">print_in_box</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="PromptEvaluation._find_other_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.prompt_evaluation.PromptEvaluation._find_other_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">_find_other_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds prompt ingredient sets that contain the given key/value pair.</span>
+
+<span class="sd">        Finds entries in the prompt ingredient sets that contain the specified</span>
+<span class="sd">        value for the specified key.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : Any</span>
+<span class="sd">            The key to look up within the prompt ingredient sets.</span>
+
+<span class="sd">        value : Any</span>
+<span class="sd">            The value that must match for the given key in the prompt</span>
+<span class="sd">            ingredient sets.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[Any]</span>
+<span class="sd">            list containing the numbers of all matched prompt ingredient sets.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">find_list_of_dicts_entries_with_same_values_for_inner_key</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompt_ingredients_sets</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptEvaluation._calculate_prompt_metrics_for_language">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.prompt_evaluation.PromptEvaluation._calculate_prompt_metrics_for_language">[docs]</a>
+    <span class="k">def</span> <span class="nf">_calculate_prompt_metrics_for_language</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LanguageResultsProcessor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates prompt evaluation metrics for a specific language.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">            Language for which metrics are calculated.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        LanguageResultsProcessor</span>
+<span class="sd">            LanguageResultsProcessor instance containing calculated metrics</span>
+<span class="sd">            and analysis tools.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">processor</span> <span class="o">=</span> <span class="n">LanguageResultsProcessor</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+        <span class="n">processor</span><span class="o">.</span><span class="n">process_language</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">processor</span></div>
+
+
+<div class="viewcode-block" id="PromptEvaluation._get_group_ingredients_sets">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.prompt_evaluation.PromptEvaluation._get_group_ingredients_sets">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_group_ingredients_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompt_group</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the prompt ingredient sets for the specified prompt group.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prompt_group : List[int]</span>
+<span class="sd">            List of prompt numbers.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[int, Dict[str, str]]</span>
+<span class="sd">            Dictionary with prompt numbers as keys and prompt ingredient sets</span>
+<span class="sd">            as values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">group_ingredients_sets</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">nr</span> <span class="ow">in</span> <span class="n">prompt_group</span><span class="p">:</span>
+            <span class="n">group_ingredients_sets</span><span class="p">[</span><span class="n">nr</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prompt_ingredients_sets</span><span class="o">.</span><span class="n">get_entry</span><span class="p">(</span><span class="n">nr</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">group_ingredients_sets</span></div>
+
+
+<div class="viewcode-block" id="PromptEvaluation._mark_invalid_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.prompt_evaluation.PromptEvaluation._mark_invalid_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">_mark_invalid_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">others</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Surrounds invalid prompt numbers in parentheses.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        others : List[str]</span>
+<span class="sd">            List of prompt numbers.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            List of prompt numbers with invalid prompt numbers surrounded in</span>
+<span class="sd">            parentheses.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">revised_others</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
+
+            <span class="n">processor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">language_results_processor</span>
+
+            <span class="n">answer_cols</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">answer_cols</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;answer_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span>
+                    <span class="n">answer_cols</span><span class="p">):</span>
+                <span class="n">revised_others</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">revised_others</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">revised_others</span></div>
+
+
+<div class="viewcode-block" id="PromptEvaluation._reset_language_dependent_properties">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.prompt_evaluation.PromptEvaluation._reset_language_dependent_properties">[docs]</a>
+    <span class="k">def</span> <span class="nf">_reset_language_dependent_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets the language-dependent properties.</span>
+
+<span class="sd">        This method reinitializes the &#39;language_results_processor&#39; property of</span>
+<span class="sd">        the class by assigning it to None so that next time the processor is</span>
+<span class="sd">        needed, it must be reinitialized with the updated language setting.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">language_results_processor</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_set_language_results_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_language_results_processor</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_prompt_metrics_for_language</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

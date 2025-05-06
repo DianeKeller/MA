@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.decorators package &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9bcbadda"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SentimentAnalysis.src.nlp package" href="SentimentAnalysis.src.nlp.html" />
+    <link rel="prev" title="SentimentAnalysis.src.data_structures package" href="SentimentAnalysis.src.data_structures.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">SentimentAnalysis</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="SentimentAnalysis.html">SentimentAnalysis package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="SentimentAnalysis.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="SentimentAnalysis.src.html">SentimentAnalysis.src package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.action">SentimentAnalysis.action module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.constants">SentimentAnalysis.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#sentimentanalysis-logger-module">SentimentAnalysis.logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.main">SentimentAnalysis.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.settings">SentimentAnalysis.settings module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.setup">SentimentAnalysis.setup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.type_aliases">SentimentAnalysis.type_aliases module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.view_log">SentimentAnalysis.view_log module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">SentimentAnalysis</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.html">SentimentAnalysis package</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.src.html">SentimentAnalysis.src package</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.decorators package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/SentimentAnalysis.src.decorators.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sentimentanalysis-src-decorators-package">
+<h1>SentimentAnalysis.src.decorators package<a class="headerlink" href="#sentimentanalysis-src-decorators-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-SentimentAnalysis.src.decorators.attribute_chain_decorators">
+<span id="sentimentanalysis-src-decorators-attribute-chain-decorators-module"></span><h2>SentimentAnalysis.src.decorators.attribute_chain_decorators module<a class="headerlink" href="#module-SentimentAnalysis.src.decorators.attribute_chain_decorators" title="Link to this heading"></a></h2>
+<section id="attribute-chain-decorators-py">
+<h3>attribute_chain_decorators.py<a class="headerlink" href="#attribute-chain-decorators-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-04</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.attribute_chain_decorators._check_attribute_chain">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.attribute_chain_decorators.</span></span><span class="sig-name descname"><span class="pre">_check_attribute_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute_chain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/attribute_chain_decorators.html#_check_attribute_chain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.attribute_chain_decorators._check_attribute_chain" title="Link to this definition"></a></dt>
+<dd><p>Checks if the given object has a valid attribute chain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<em>object</em>) – The object to check the attribute chain on.</p></li>
+<li><p><strong>attribute_chain</strong> (<em>str</em>) – The chain of attributes to check.</p></li>
+<li><p><strong>error_prefix</strong> (<em>str</em>) – The prefix for the error message.</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>) – A logger instance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the attribute chain is valid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException"><strong>CriticalException</strong></a> – If the attribute chain is invalid.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function never returns False as it raises an exception if the check
+of the attribute chain fails.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">C</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">B</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">C</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyObject</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">B</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">MyObject</span><span class="p">()</span>
+
+<span class="go"># Checking a valid attribute chain:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ok</span> <span class="o">=</span> <span class="n">_check_attribute_chain</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">obj</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s1">&#39;a.b.c&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s1">&#39;Attribute chain is not valid&#39;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">True</span>
+
+<span class="go"># Checking an invalid attribute chain:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ok</span> <span class="o">=</span> <span class="n">_check_attribute_chain</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">obj</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s1">&#39;a.b.x&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s1">&#39;Attribute chain is not valid&#39;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="w">  </span><span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Attribute chain is not valid. Attribute &#39;x&#39; of chain &#39;a.b.x&#39;</span>
+<span class="x">is missing or None.</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.attribute_chain_decorators._generic_attribute_chain_not_none">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.attribute_chain_decorators.</span></span><span class="sig-name descname"><span class="pre">_generic_attribute_chain_not_none</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">what</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute_chain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'output'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/attribute_chain_decorators.html#_generic_attribute_chain_not_none"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.attribute_chain_decorators._generic_attribute_chain_not_none" title="Link to this definition"></a></dt>
+<dd><p>Decorator factory to create decorators that ensure the presence and
+non-None value of an attribute chain either on the input object or the
+output object of a method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>what</strong> (<em>str</em>) – Description of the object or value being checked, formatted dynamically
+using the parameters of the method it decorates.</p></li>
+<li><p><strong>attribute_chain</strong> (<em>str</em>) – The attribute chain to validate, specified as a dot-separated string.</p></li>
+<li><p><strong>target</strong> (<em>str</em>) – Specifies whether the ‘input’ or ‘output’ object is being validated.
+Default is ‘output’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A decorator that applies the attribute chain validation to the method’s
+input or output.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable[[Callable[…, Any]], Callable[…, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.attribute_chain_decorators.input_attribute_chain_not_none">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.attribute_chain_decorators.</span></span><span class="sig-name descname"><span class="pre">input_attribute_chain_not_none</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">what</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute_chain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/attribute_chain_decorators.html#input_attribute_chain_not_none"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.attribute_chain_decorators.input_attribute_chain_not_none" title="Link to this definition"></a></dt>
+<dd><p>Checks the given attribute_chain on the input object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>what</strong> (<em>str</em>) – The format string to be used in the error message.</p></li>
+<li><p><strong>attribute_chain</strong> (<em>str</em>) – The attribute chain to be validated on the input object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A decorator that validates the attribute chain on the input object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable[[Callable[…, Any]], Callable[…, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.attribute_chain_decorators.output_attribute_chain_not_none">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.attribute_chain_decorators.</span></span><span class="sig-name descname"><span class="pre">output_attribute_chain_not_none</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">what</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute_chain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/attribute_chain_decorators.html#output_attribute_chain_not_none"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.attribute_chain_decorators.output_attribute_chain_not_none" title="Link to this definition"></a></dt>
+<dd><p>Checks the given attribute_chain on the output object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>what</strong> (<em>str</em>) – The format string to be used in the error message.</p></li>
+<li><p><strong>attribute_chain</strong> (<em>str</em>) – The attribute_chain to be validated on the output object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A decorator that validates the attribute chain on the output object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable[[Callable[…, Any]], Callable[…, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.attribute_chain_decorators.self_attribute_chain_not_none">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.attribute_chain_decorators.</span></span><span class="sig-name descname"><span class="pre">self_attribute_chain_not_none</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute_chain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/attribute_chain_decorators.html#self_attribute_chain_not_none"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.attribute_chain_decorators.self_attribute_chain_not_none" title="Link to this definition"></a></dt>
+<dd><p>Ensures attributes in self before method execution.</p>
+<p>Ensures that attributes on the <cite>self</cite> object of a method contain a
+valid and non-None attribute chain before method execution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>attribute_chain</strong> (<em>str</em>) – The attribute chain to be validated on the <cite>self</cite> object.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A decorator that checks the attribute chain on the <cite>self</cite> object
+before executing the method.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable[[Callable[…, Any]], Callable[…, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.decorators.communication_error_handling_decorators">
+<span id="sentimentanalysis-src-decorators-communication-error-handling-decorators-module"></span><h2>SentimentAnalysis.src.decorators.communication_error_handling_decorators module<a class="headerlink" href="#module-SentimentAnalysis.src.decorators.communication_error_handling_decorators" title="Link to this heading"></a></h2>
+<section id="error-handling-decorators-py">
+<h3>error_handling_decorators.py<a class="headerlink" href="#error-handling-decorators-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-17</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.communication_error_handling_decorators.analyze_connection_error">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.communication_error_handling_decorators.</span></span><span class="sig-name descname"><span class="pre">analyze_connection_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Exception</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/communication_error_handling_decorators.html#analyze_connection_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.communication_error_handling_decorators.analyze_connection_error" title="Link to this definition"></a></dt>
+<dd><p>Inspects the nested exception structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>object</em>) – The logger object used for logging.</p></li>
+<li><p><strong>err</strong> (<em>Exception</em>) – The connection error that occurred.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.communication_error_handling_decorators.communication_error_handling">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.communication_error_handling_decorators.</span></span><span class="sig-name descname"><span class="pre">communication_error_handling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/communication_error_handling_decorators.html#communication_error_handling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.communication_error_handling_decorators.communication_error_handling" title="Link to this definition"></a></dt>
+<dd><p>Handles communication-related errors with automatic retries and backoff.</p>
+<p>Handles communication-related errors that occur when sending requests
+to external APIs.</p>
+<p>The decorator wraps the given operation and handles specific
+communication-related errors, logging appropriate messages and retrying
+the operation with exponential backoff.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.communication_error_handling_decorators.get_error_type_as_string">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.communication_error_handling_decorators.</span></span><span class="sig-name descname"><span class="pre">get_error_type_as_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">err</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Exception</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/communication_error_handling_decorators.html#get_error_type_as_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.communication_error_handling_decorators.get_error_type_as_string" title="Link to this definition"></a></dt>
+<dd><p>Gets the error type from the exception formatting it as a string.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.communication_error_handling_decorators.get_traceback">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.communication_error_handling_decorators.</span></span><span class="sig-name descname"><span class="pre">get_traceback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">err</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Exception</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/communication_error_handling_decorators.html#get_traceback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.communication_error_handling_decorators.get_traceback" title="Link to this definition"></a></dt>
+<dd><p>Gets the traceback from the exception formatting it as a string.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.communication_error_handling_decorators.handle_key_error">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.communication_error_handling_decorators.</span></span><span class="sig-name descname"><span class="pre">handle_key_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Exception</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/communication_error_handling_decorators.html#handle_key_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.communication_error_handling_decorators.handle_key_error" title="Link to this definition"></a></dt>
+<dd><p>Handles key errors when handling query errors.</p>
+<p>Handles different kinds of key errors that can be reported in an API’s
+response to a query.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>object</em>) – The logger object used for logging.</p></li>
+<li><p><strong>response</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – The query response reporting the key error.</p></li>
+<li><p><strong>err</strong> (<em>Exception</em>) – The key error that occurred.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.communication_error_handling_decorators.handle_query_error">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.communication_error_handling_decorators.</span></span><span class="sig-name descname"><span class="pre">handle_query_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Exception</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">waiting_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/communication_error_handling_decorators.html#handle_query_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.communication_error_handling_decorators.handle_query_error" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>object</em>) – The logger object used for logging.</p></li>
+<li><p><strong>err</strong> (<em>Exception</em>) – The error that occurred.</p></li>
+<li><p><strong>msg</strong> (<em>str</em>) – The error message to be logged and raised.</p></li>
+<li><p><strong>waiting_time</strong> (<em>int</em>) – The number of seconds to wait before the program can be resumed.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.communication_error_handling_decorators.query_error_handling">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.communication_error_handling_decorators.</span></span><span class="sig-name descname"><span class="pre">query_error_handling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/communication_error_handling_decorators.html#query_error_handling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.communication_error_handling_decorators.query_error_handling" title="Link to this definition"></a></dt>
+<dd><p>Handles errors that occur when a query is sent to an API.</p>
+<p>Catches the errors, logs them and retries to execute the operation after
+some waiting time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>operation</strong> (<em>Callable</em>) – The function to be decorated, which sends a query to an API.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A wrapped function that handles exceptions and retries the query.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.communication_error_handling_decorators.raise_unknown_exception">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.communication_error_handling_decorators.</span></span><span class="sig-name descname"><span class="pre">raise_unknown_exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/communication_error_handling_decorators.html#raise_unknown_exception"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.communication_error_handling_decorators.raise_unknown_exception" title="Link to this definition"></a></dt>
+<dd><p>Re-raises an exception with a custom error message and traceback.</p>
+<p>This method is called when an unexpected exception occurs. It logs the
+error message and raises a new exception with the original traceback.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong></p></li>
+<li><p><strong>err</strong> (<em>Exception</em>) – The original exception that was caught.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.decorators.data_check_decorators">
+<span id="sentimentanalysis-src-decorators-data-check-decorators-module"></span><h2>SentimentAnalysis.src.decorators.data_check_decorators module<a class="headerlink" href="#module-SentimentAnalysis.src.decorators.data_check_decorators" title="Link to this heading"></a></h2>
+<section id="data-check-decorators-py">
+<h3>data_check_decorators.py<a class="headerlink" href="#data-check-decorators-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-17</p>
+<p>This module contains decorators for validating inputs, outputs, and class
+properties. It includes mechanisms for logging and handling empty or None
+values in method calls.</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.data_check_decorators._get_input_value">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.data_check_decorators.</span></span><span class="sig-name descname"><span class="pre">_get_input_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/data_check_decorators.html#_get_input_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.data_check_decorators._get_input_value" title="Link to this definition"></a></dt>
+<dd><p>Determines the input value depending on the operation type.</p>
+<p>Determines which argument represents the input type depending on the
+type of the decorated operation: Instance and class methods provide a
+“self” or “cls” parameter, while static or standalone methods do not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> (<em>Tuple</em><em>[</em><em>Any</em><em>, </em><em>...</em><em>]</em>) – Positional arguments passed to the decorated method.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The input value, if found, None otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.data_check_decorators._log_msg">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.data_check_decorators.</span></span><span class="sig-name descname"><span class="pre">_log_msg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/data_check_decorators.html#_log_msg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.data_check_decorators._log_msg" title="Link to this definition"></a></dt>
+<dd><p>Logs a message using the provided logging mechanism.</p>
+<p>Depending on the context of the method call, this function determines
+whether to use the instance’s logger or a default logger. It supports
+various logging levels such as ‘info’, ‘warning’, and ‘error’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<em>Any</em>) – The instance from which the log is triggered.</p></li>
+<li><p><strong>msg</strong> (<em>str</em>) – The message to be logged.</p></li>
+<li><p><strong>level</strong> (<em>str</em>) – The severity level of the log message (‘info’, ‘warning’, ‘error’).</p></li>
+<li><p><strong>*args</strong> (<em>Tuple</em><em>[</em><em>Any</em><em>, </em><em>...</em><em>]</em>) – Additional arguments that may include an object with its own log
+method.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>If the first argument in <cite>args</cite> has a <cite>log</cite> method, it is used.</p></li>
+<li><p>If <cite>self</cite> has a <cite>log</cite> method, it is used.</p></li>
+<li><p>If neither condition is met, the module-level logger is used.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.data_check_decorators._prepare_params">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.data_check_decorators.</span></span><span class="sig-name descname"><span class="pre">_prepare_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">what</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/data_check_decorators.html#_prepare_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.data_check_decorators._prepare_params" title="Link to this definition"></a></dt>
+<dd><p>Helper function to format parameters for logging and error messages.</p>
+<p>This function prepares a dictionary (context) containing references to
+the ‘self’ instance, positional arguments (args), and keyword arguments
+(kwargs). It then uses this dictionary to replace placeholders in the
+‘what’ format string, returning the resulting formatted string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – The instance of the class that contains the method being decorated.</p></li>
+<li><p><strong>operation</strong> (<em>Callable</em>) – The method being decorated.</p></li>
+<li><p><strong>what</strong> (<em>str</em>) – A format string that describes the context of the operation being
+performed.</p></li>
+<li><p><strong>args</strong> (<em>Tuple</em><em>[</em><em>Any</em><em>, </em><em>...</em><em>]</em>) – Positional arguments passed to the decorated method.</p></li>
+<li><p><strong>kwargs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – Keyword arguments passed to the decorated method.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>formatted_params</strong> – A string where placeholders in ‘what’ have been replaced with the
+corresponding values from self, args, and kwargs.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.data_check_decorators.info_input_empty">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.data_check_decorators.</span></span><span class="sig-name descname"><span class="pre">info_input_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">what:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_empty:</span> <span class="pre">~typing.Callable</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">&lt;lambda&gt;&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/data_check_decorators.html#info_input_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.data_check_decorators.info_input_empty" title="Link to this definition"></a></dt>
+<dd><p>Decorator that executes a function if the first input parameter is empty.</p>
+<p>Checks if the first input parameter of the decorated method is empty. If
+so, it logs a message and executes a specified function to potentially
+remedy the situation. The decorated method is then called with the new
+or existing input.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>what</strong> (<em>str</em>) – A format string describing the context of the input being checked,
+which can be formatted using ‘<a href="#id1"><span class="problematic" id="id2">*</span></a>args’ and ‘<a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs’ from the method.</p></li>
+<li><p><strong>on_empty</strong> (<em>Callable</em>) – A function to execute if the input is empty. It receives the ‘self’
+instance and the empty value as parameters. It typically sets the
+required value of the first input parameter so that this is not
+empty anymore.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul>
+<li><p><em>Callable</em> – A decorator that can be applied to methods to enforce the presence of a
+non-empty first argument.</p></li>
+<li><p><em>Usage</em></p></li>
+<li><p><em>—–</em></p></li>
+<li><p><em>class DataProcessor</em> –</p>
+<dl class="simple">
+<dt>def log_info(self, message):</dt><dd><p>print(message)  # Logging to console or elsewhere</p>
+</dd>
+<dt>&#64;info_input_empty(</dt><dd><p>‘Processing input for user {user_id}’,
+on_empty=lambda self, input: self.log_info(“Input was empty!”)</p>
+</dd>
+</dl>
+<p>)
+def process_data(self, data, user_id):</p>
+<blockquote>
+<div><p># Method implementation…
+pass</p>
+</div></blockquote>
+</li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.data_check_decorators.info_output_empty">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.data_check_decorators.</span></span><span class="sig-name descname"><span class="pre">info_output_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">what</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_empty=&lt;function</span> <span class="pre">&lt;lambda&gt;&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/data_check_decorators.html#info_output_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.data_check_decorators.info_output_empty" title="Link to this definition"></a></dt>
+<dd><p>Decorator that executes a function if the output is empty.</p>
+<p>Checks if the output  of the decorated method is empty. If so, it logs a
+message and executes a specified function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>what</strong> (<em>str</em>) – A format string describing the context of the input being checked,
+which can be formatted using ‘<a href="#id5"><span class="problematic" id="id6">*</span></a>args’ and ‘<a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs’ from the method.</p></li>
+<li><p><strong>on_empty</strong> (<em>callable</em>) – A function to execute if the output is empty. It receives the ‘self’
+instance and the output value as parameters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A decorator that can be applied to methods to enforce the presence of a
+non-empty output.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.data_check_decorators.info_requires_property">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.data_check_decorators.</span></span><span class="sig-name descname"><span class="pre">info_requires_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">attrs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/data_check_decorators.html#info_requires_property"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.data_check_decorators.info_requires_property" title="Link to this definition"></a></dt>
+<dd><p>Decorator ensuring that the current object has the specified properties.</p>
+<p>Checks whether the required properties of the calling object are set and
+not empty before the decorated method is executed. If a required
+property is None or empty, the decorator sets it to a default value and
+logs an informational message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>default_value</strong> (<em>Any</em>) – The value to set for any property that is found to be None or empty.</p></li>
+<li><p><strong>attrs</strong> (<em>str</em>) – Names of one or more attributes/properties that are required for the
+execution of the decorated method.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A decorator that can be applied to a method to enforce the presence of
+the specified properties, setting default values where necessary.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.data_check_decorators.input_not_none_or_empty">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.data_check_decorators.</span></span><span class="sig-name descname"><span class="pre">input_not_none_or_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">what</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/data_check_decorators.html#input_not_none_or_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.data_check_decorators.input_not_none_or_empty" title="Link to this definition"></a></dt>
+<dd><p>Decorator to check if the first input parameter is empty.</p>
+<p>This decorator checks if the first input parameter of the decorated method
+is empty. If so, it logs a message and raises a ValueError.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>what</strong> (<em>str</em>) – A format string describing the context of the input being checked,
+which can be formatted using ‘<a href="#id9"><span class="problematic" id="id10">*</span></a>args’ and ‘<a href="#id11"><span class="problematic" id="id12">**</span></a>kwargs’ from the method.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A decorator that can be applied to a method to ensure the first
+parameter of the decorated method is set and not empty.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the first parameter is empty.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.data_check_decorators.output_not_none">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.data_check_decorators.</span></span><span class="sig-name descname"><span class="pre">output_not_none</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">what</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/data_check_decorators.html#output_not_none"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.data_check_decorators.output_not_none" title="Link to this definition"></a></dt>
+<dd><p>Decorator that ensures that the output of a method is not None.</p>
+<p>Decorator that checks if the output of a method is None and raises an
+error if so.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>what</strong> (<em>str</em>) – A format string used to describe the context of the operation in error
+messages.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A decorator function that can be applied to methods to enforce that
+their output is not None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This decorator does accept empty outputs like empty strings or empty
+lists. If you need to exclude those as well as ‘None’ outputs, use the
+‘output_not_none_or_empty’ decorator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the output is None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.data_check_decorators.output_not_none_or_empty">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.data_check_decorators.</span></span><span class="sig-name descname"><span class="pre">output_not_none_or_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">what</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/data_check_decorators.html#output_not_none_or_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.data_check_decorators.output_not_none_or_empty" title="Link to this definition"></a></dt>
+<dd><p>Decorator that ensures that the output of a method is not None or empty.</p>
+<p>Decorator that checks if the output of a method is None or empty and
+raises an error if so.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>what</strong> (<em>str</em>) – A format string used to describe the context of the operation in error
+messages.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A decorator function that can be applied to methods to enforce that
+their output is neither None nor empty.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the output is empty or not set.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This decorator rejects empty outputs like empty strings or empty
+lists as well as ‘None’ outputs. If empty outputs are acceptable, though,
+use the ‘output_not_none’ decorator instead.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.data_check_decorators.parameters_not_empty">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.data_check_decorators.</span></span><span class="sig-name descname"><span class="pre">parameters_not_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">param_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/data_check_decorators.html#parameters_not_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.data_check_decorators.parameters_not_empty" title="Link to this definition"></a></dt>
+<dd><p>Decorator to ensure specified parameters are not None or empty.</p>
+<p>This decorator ensures specified parameters passed to the decorated
+function are not None or empty. If no parameter names are specified,
+all parameters are checked.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>param_names</strong> (<em>str</em>) – Names of the parameters to check. If empty, all parameters (excluding
+‘self’ and ‘cls’) are checked.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A decorator that can be applied to a method to ensure specified
+parameters are not None or empty.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException"><strong>CriticalException</strong></a> – If a parameter is None or empty.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>‘Self’ and ‘cls’ parameters of the decorated function are automatically
+excluded from the check, as they are always automatically set.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.data_check_decorators.requires_property">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.data_check_decorators.</span></span><span class="sig-name descname"><span class="pre">requires_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">attrs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/data_check_decorators.html#requires_property"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.data_check_decorators.requires_property" title="Link to this definition"></a></dt>
+<dd><p>Decorator ensuring that the current object has the specified properties.</p>
+<p>Ensures the required properties of the calling object are set and
+not empty before the decorated method is executed. If the required
+properties are None or empty, a ValueError is raised and the decorated
+method is not executed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>attrs</strong> (<em>str</em>) – Names of one or more attributes/properties that must be set and not
+empty.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A decorator that can be applied to a method to enforce the presence of
+the specified properties.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If any of the required properties is empty or not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.decorators.data_decorators">
+<span id="sentimentanalysis-src-decorators-data-decorators-module"></span><h2>SentimentAnalysis.src.decorators.data_decorators module<a class="headerlink" href="#module-SentimentAnalysis.src.decorators.data_decorators" title="Link to this heading"></a></h2>
+<section id="object-checking-decorators-py">
+<h3>object_checking_decorators.py<a class="headerlink" href="#object-checking-decorators-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-17</p>
+<p>This module contains decorators for ensuring the ‘data’ property is set in
+the class where the decorator is used.</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.data_decorators.info_requires_data">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.data_decorators.</span></span><span class="sig-name descname"><span class="pre">info_requires_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">default_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/data_decorators.html#info_requires_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.data_decorators.info_requires_data" title="Link to this definition"></a></dt>
+<dd><p>Checks if self.data is set before proceeding.</p>
+<p>If self.data is empty or None, logs an informational message and returns a
+default value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>default_value</strong> (<em>any</em>) – The value to return if self.data is found to be empty or None.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">DataHandler</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">level</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@info_requires_data</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">process_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Assuming some processing logic here</span>
+        <span class="k">return</span> <span class="s2">&quot;Data processed successfully!&quot;</span>
+
+    <span class="nd">@info_requires_data</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_get_n_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_rows</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.data_decorators.requires_data">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.data_decorators.</span></span><span class="sig-name descname"><span class="pre">requires_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/data_decorators.html#requires_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.data_decorators.requires_data" title="Link to this definition"></a></dt>
+<dd><p>This decorator makes sure the data property of the class is set when
+executing a given operation.</p>
+<p>The decorator wraps the given operation and raises a ValueError if the data
+is empty.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>A decorator that can be applied to a method to ensure the ‘data’</em></p></li>
+<li><p><em>property is set.</em></p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException"><strong>CriticalException</strong></a> – If the ‘data’ property is not set or empty</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.decorators.ensure_implements_decorator">
+<span id="sentimentanalysis-src-decorators-ensure-implements-decorator-module"></span><h2>SentimentAnalysis.src.decorators.ensure_implements_decorator module<a class="headerlink" href="#module-SentimentAnalysis.src.decorators.ensure_implements_decorator" title="Link to this heading"></a></h2>
+<section id="ensure-implements-decorator-py">
+<h3>ensure_implements_decorator.py<a class="headerlink" href="#ensure-implements-decorator-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-17</p>
+<p>This module contains the ensure_implements decorator used to ensure that the
+class where the decorator is used conforms to a specified protocol.</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.ensure_implements_decorator.ensure_implements">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.ensure_implements_decorator.</span></span><span class="sig-name descname"><span class="pre">ensure_implements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/ensure_implements_decorator.html#ensure_implements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.ensure_implements_decorator.ensure_implements" title="Link to this definition"></a></dt>
+<dd><p>Decorator that ensures a class implements a specific protocol.</p>
+<p>This decorator checks if the class instance where the decorated method
+is used implements a specified protocol (interface). If the class does
+not implement the protocol, a ‘TypeError’ is raised.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>protocol</strong> (<em>Type</em>) – The protocol or interface that the decorated method’s class must
+implement.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A decorator that validates the protocol implementation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TypeError</strong> – If the class instance invoking the method does not implement the
+    specified protocol.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.decorators.error_handling_decorators">
+<span id="sentimentanalysis-src-decorators-error-handling-decorators-module"></span><h2>SentimentAnalysis.src.decorators.error_handling_decorators module<a class="headerlink" href="#module-SentimentAnalysis.src.decorators.error_handling_decorators" title="Link to this heading"></a></h2>
+<section id="id13">
+<h3>error_handling_decorators.py<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-15</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.error_handling_decorators.delete_error_handling">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.error_handling_decorators.</span></span><span class="sig-name descname"><span class="pre">delete_error_handling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/error_handling_decorators.html#delete_error_handling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.error_handling_decorators.delete_error_handling" title="Link to this definition"></a></dt>
+<dd><p>Handles errors that occur when files are attempted to be deleted.</p>
+<p>Catches all file deletion errors and logs them.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.error_handling_decorators.load_error_handling">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.error_handling_decorators.</span></span><span class="sig-name descname"><span class="pre">load_error_handling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/error_handling_decorators.html#load_error_handling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.error_handling_decorators.load_error_handling" title="Link to this definition"></a></dt>
+<dd><p>Handles errors that occur when files are attempted to be loaded.</p>
+<p>Catches all file loading errors and logs them.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.error_handling_decorators.save_error_handling">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.error_handling_decorators.</span></span><span class="sig-name descname"><span class="pre">save_error_handling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/error_handling_decorators.html#save_error_handling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.error_handling_decorators.save_error_handling" title="Link to this definition"></a></dt>
+<dd><p>Handles errors that occur when saving data.</p>
+<p>The decorator wraps the given operation and handles specific file-related
+errors, logging appropriate messages.</p>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.decorators.execution_time_decorator">
+<span id="sentimentanalysis-src-decorators-execution-time-decorator-module"></span><h2>SentimentAnalysis.src.decorators.execution_time_decorator module<a class="headerlink" href="#module-SentimentAnalysis.src.decorators.execution_time_decorator" title="Link to this heading"></a></h2>
+<p>execution_time_decorator.py</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.execution_time_decorator.execution_time">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.execution_time_decorator.</span></span><span class="sig-name descname"><span class="pre">execution_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/execution_time_decorator.html#execution_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.execution_time_decorator.execution_time" title="Link to this definition"></a></dt>
+<dd><p>A decorator for calculating the execution time of a function.</p>
+<p>The decorator wraps the given operation and logs the execution time.</p>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.decorators.method_check_decorator">
+<span id="sentimentanalysis-src-decorators-method-check-decorator-module"></span><h2>SentimentAnalysis.src.decorators.method_check_decorator module<a class="headerlink" href="#module-SentimentAnalysis.src.decorators.method_check_decorator" title="Link to this heading"></a></h2>
+<p>method_check_decorator.py</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.method_check_decorator.require_method">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.method_check_decorator.</span></span><span class="sig-name descname"><span class="pre">require_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/method_check_decorator.html#require_method"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.method_check_decorator.require_method" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.decorators.object_checking_decorators">
+<span id="sentimentanalysis-src-decorators-object-checking-decorators-module"></span><h2>SentimentAnalysis.src.decorators.object_checking_decorators module<a class="headerlink" href="#module-SentimentAnalysis.src.decorators.object_checking_decorators" title="Link to this heading"></a></h2>
+<section id="id14">
+<h3>object_checking_decorators.py<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-04</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.object_checking_decorators.requires_data">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.object_checking_decorators.</span></span><span class="sig-name descname"><span class="pre">requires_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/object_checking_decorators.html#requires_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.object_checking_decorators.requires_data" title="Link to this definition"></a></dt>
+<dd><p>This decorator makes sure data exist when executing a given
+operation.</p>
+<p>The decorator wraps the given operation and emits a warning if the data is
+empty.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.object_checking_decorators.requires_file">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.object_checking_decorators.</span></span><span class="sig-name descname"><span class="pre">requires_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/object_checking_decorators.html#requires_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.object_checking_decorators.requires_file" title="Link to this definition"></a></dt>
+<dd><p>This decorator ensures a file is set when executing a given
+operation.</p>
+<p>The decorator wraps the given operation and raises a ValueError if the
+file is not set.</p>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.decorators.program_flow_decorators">
+<span id="sentimentanalysis-src-decorators-program-flow-decorators-module"></span><h2>SentimentAnalysis.src.decorators.program_flow_decorators module<a class="headerlink" href="#module-SentimentAnalysis.src.decorators.program_flow_decorators" title="Link to this heading"></a></h2>
+<section id="program-flow-decorators-py">
+<h3>program_flow_decorators.py<a class="headerlink" href="#program-flow-decorators-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-19</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.program_flow_decorators.analysis_breakpoint">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.program_flow_decorators.</span></span><span class="sig-name descname"><span class="pre">analysis_breakpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/program_flow_decorators.html#analysis_breakpoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.program_flow_decorators.analysis_breakpoint" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.decorators.time_decorators">
+<span id="sentimentanalysis-src-decorators-time-decorators-module"></span><h2>SentimentAnalysis.src.decorators.time_decorators module<a class="headerlink" href="#module-SentimentAnalysis.src.decorators.time_decorators" title="Link to this heading"></a></h2>
+<section id="time-decorators-py">
+<h3>time_decorators.py<a class="headerlink" href="#time-decorators-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-08-12</p>
+<p>This module contains decorators for measuring time durations.</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.time_decorators.duration">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.time_decorators.</span></span><span class="sig-name descname"><span class="pre">duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/time_decorators.html#duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.time_decorators.duration" title="Link to this definition"></a></dt>
+<dd><p>Monitors the execution time of the decorated function or method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>operation</strong> (<em>Callable</em>) – The function or method to be decorated.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The decorated operation which logs its execution time.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.decorators.trace_decorators">
+<span id="sentimentanalysis-src-decorators-trace-decorators-module"></span><h2>SentimentAnalysis.src.decorators.trace_decorators module<a class="headerlink" href="#module-SentimentAnalysis.src.decorators.trace_decorators" title="Link to this heading"></a></h2>
+<p>trace_decorators.py</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.trace_decorators.trace_method_calls">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.trace_decorators.</span></span><span class="sig-name descname"><span class="pre">trace_method_calls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/trace_decorators.html#trace_method_calls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.trace_decorators.trace_method_calls" title="Link to this definition"></a></dt>
+<dd><p>Traces the calls to the decorated instance method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>method</strong> (<em>Callable</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.decorators.type_check_decorators">
+<span id="sentimentanalysis-src-decorators-type-check-decorators-module"></span><h2>SentimentAnalysis.src.decorators.type_check_decorators module<a class="headerlink" href="#module-SentimentAnalysis.src.decorators.type_check_decorators" title="Link to this heading"></a></h2>
+<section id="type-check-decorators-py">
+<h3>type_check_decorators.py<a class="headerlink" href="#type-check-decorators-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-02</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators._check_arg_type">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">_check_arg_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#_check_arg_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators._check_arg_type" title="Link to this definition"></a></dt>
+<dd><p>Checks if the argument matches the expected type, including generics.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators._check_return_type">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">_check_return_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#_check_return_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators._check_return_type" title="Link to this definition"></a></dt>
+<dd><p>Checks if the return value matches the expected type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – If the return value does not match the expected type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators._check_typevar_bound">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">_check_typevar_bound</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_var</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#_check_typevar_bound"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators._check_typevar_bound" title="Link to this definition"></a></dt>
+<dd><p>Checks if a value matches the bound of a TypeVar.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators._check_union_type">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">_check_union_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#_check_union_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators._check_union_type" title="Link to this definition"></a></dt>
+<dd><p>Checks if a value matches any of the types in a Union.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators._construct_type_error_message">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">_construct_type_error_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#_construct_type_error_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators._construct_type_error_message" title="Link to this definition"></a></dt>
+<dd><p>Constructs an error message for type mismatch.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators._get_operation_name">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">_get_operation_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#_get_operation_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators._get_operation_name" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the qualified name of an operation if available.</p>
+<p>Otherwise, returns its basic name.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators._is_instance_of_union">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">_is_instance_of_union</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">union_member_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#_is_instance_of_union"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators._is_instance_of_union" title="Link to this definition"></a></dt>
+<dd><p>Helper to check if a value matches one of the types in a Union.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators._merge_args_with_hints">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">_merge_args_with_hints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#_merge_args_with_hints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators._merge_args_with_hints" title="Link to this definition"></a></dt>
+<dd><p>Merges args and kwargs into a single dictionary with respect to the
+operation’s signature.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators._raise_type_error">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">_raise_type_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#_raise_type_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators._raise_type_error" title="Link to this definition"></a></dt>
+<dd><p>Raises a TypeError with a descriptive message.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators._resolve_typevar_bound">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">_resolve_typevar_bound</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursive_guard</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#_resolve_typevar_bound"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators._resolve_typevar_bound" title="Link to this definition"></a></dt>
+<dd><p>Resolves the bound for a TypeVar, if present.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators._validate_args_types">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">_validate_args_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#_validate_args_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators._validate_args_types" title="Link to this definition"></a></dt>
+<dd><p>Validates types of all arguments based on the type hints.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators._validate_return_type">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">_validate_return_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#_validate_return_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators._validate_return_type" title="Link to this definition"></a></dt>
+<dd><p>Validates the type of the return value based on the type hints.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators.enforce_input_types">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">enforce_input_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#enforce_input_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators.enforce_input_types" title="Link to this definition"></a></dt>
+<dd><p>Ensures that the input parameters actually have the correct data types.</p>
+<p>Ensures that the input parameters actually have the type specified in
+the type hints.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators.enforce_output_types">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">enforce_output_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#enforce_output_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators.enforce_output_types" title="Link to this definition"></a></dt>
+<dd><p>Enforces the correct type of the return value.</p>
+<p>Ensures that the return value actually has the type specified in the
+corresponding type hint.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators.log_error">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">log_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#log_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators.log_error" title="Link to this definition"></a></dt>
+<dd><p>Logs an error message.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.decorators.type_check_decorators.resolve_typevar_bound">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.decorators.type_check_decorators.</span></span><span class="sig-name descname"><span class="pre">resolve_typevar_bound</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_var</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/decorators/type_check_decorators.html#resolve_typevar_bound"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.decorators.type_check_decorators.resolve_typevar_bound" title="Link to this definition"></a></dt>
+<dd><p>Resolves a TypeVar bound, handling forward references if necessary.</p>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.decorators">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-SentimentAnalysis.src.decorators" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="SentimentAnalysis.src.data_structures.html" class="btn btn-neutral float-left" title="SentimentAnalysis.src.data_structures package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SentimentAnalysis.src.nlp.html" class="btn btn-neutral float-right" title="SentimentAnalysis.src.nlp package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

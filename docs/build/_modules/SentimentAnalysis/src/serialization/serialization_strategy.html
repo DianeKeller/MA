@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.serialization.serialization_strategy &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.serialization.serialization_strategy</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.serialization.serialization_strategy</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">serialization_strategy.py</span>
+<span class="sd">-------------------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">no_type_check</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">settings</span> <span class="kn">import</span> <span class="n">SettingCategories</span><span class="p">,</span> <span class="n">get_setting</span>
+
+<span class="kn">from</span> <span class="nn">src.decorators.error_handling_decorators</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">delete_error_handling</span><span class="p">,</span>
+    <span class="n">save_error_handling</span><span class="p">,</span> <span class="n">load_error_handling</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.decorators.object_checking_decorators</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">requires_file</span><span class="p">,</span>
+    <span class="n">requires_data</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.serialization.file</span> <span class="kn">import</span> <span class="n">File</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">Serializable</span>
+
+
+<div class="viewcode-block" id="SerializationStrategy">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.serialization_strategy.SerializationStrategy">[docs]</a>
+<span class="k">class</span> <span class="nc">SerializationStrategy</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    SerializationStrategy class.</span>
+
+<span class="sd">    Abstract base class for all serialization strategies.</span>
+
+<span class="sd">    This class serves as an interface that declares common operations</span>
+<span class="sd">    for all supported file serialization strategies. Specifically,</span>
+<span class="sd">    it defines the essential operations for saving, loading and deleting </span>
+<span class="sd">    data, which concrete strategies must implement. Within the framework of</span>
+<span class="sd">    a strategy pattern, this design enables a dynamic change of serialization</span>
+<span class="sd">    strategies according to the varying requirements of different data</span>
+<span class="sd">    structures and file formats.</span>
+
+
+<span class="sd">    Attributes </span>
+<span class="sd">    ---------- </span>
+<span class="sd">    DATA_STRUCTURE : str</span>
+<span class="sd">        A string constant representing the data structure type, to be used</span>
+<span class="sd">        in logging messages</span>
+
+<span class="sd">    FILE_TYPE : str</span>
+<span class="sd">        A string constant representing the file type, to be used in logging</span>
+<span class="sd">        messages</span>
+
+<span class="sd">    file : File | None</span>
+<span class="sd">        The &#39;File&#39; object to be serialized or deserialized.</span>
+
+<span class="sd">    logger : Logger</span>
+<span class="sd">        Overrides the default logger of the &#39;LoggingMixin&#39; class.</span>
+
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    add(data: Serializable) -&gt; None:</span>
+<span class="sd">        Saves data to an existing file.</span>
+
+<span class="sd">    delete() -&gt; str:</span>
+<span class="sd">        Attempts to delete the file associated with this strategy.</span>
+
+<span class="sd">    does_path_exist() -&gt; bool:</span>
+<span class="sd">        Checks if the path of the file associated with this strategy exists.</span>
+
+<span class="sd">    load() -&gt; Serializable | None:</span>
+<span class="sd">        Loads and returns data from a file.</span>
+
+<span class="sd">    save(data: Serializable) -&gt; None:</span>
+<span class="sd">        Saves data to a file.</span>
+
+<span class="sd">    set_file_path(category: SettingCategories) -&gt; None:</span>
+<span class="sd">        Sets the file path.</span>
+
+
+<span class="sd">    Abstract Methods</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    _add(data: Serializable) -&gt; None:</span>
+<span class="sd">        Actual data adding logic, to be implemented by subclasses.</span>
+
+<span class="sd">    _load() -&gt; Serializable | None:</span>
+<span class="sd">        Actual data loading logic, to be implemented by subclasses.</span>
+
+<span class="sd">    _save(data: Serializable) -&gt; None:</span>
+<span class="sd">        Actual data saving logic, to be implemented by subclasses.</span>
+
+
+
+
+<span class="sd">    Properties</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file : File</span>
+<span class="sd">        Gets or sets the &#39;File&#39; object associated with this strategy. The</span>
+<span class="sd">        &#39;File&#39; object contains details about the file name and extension,</span>
+<span class="sd">        which are used in save, load and delete operations.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - Concrete strategy implementations must provide specific serialization</span>
+<span class="sd">      and deserialization logic by overriding the &#39;save&#39; and &#39;load&#39; methods.</span>
+
+<span class="sd">    - It is the responsibility of the concrete strategy to handle cases where</span>
+<span class="sd">      &#39;File&#39; is not provided before an operation is attempted.</span>
+
+<span class="sd">    - As the deletion of files works the same for all file formats,</span>
+<span class="sd">      the deletion method provided here is specific so that the implementing</span>
+<span class="sd">      strategies are spared the trouble of defining their own deletion methods.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># The following class constants should be overridden by the subclasses:</span>
+
+    <span class="c1"># The data structure type, to be used in logging messages</span>
+    <span class="n">DATA_STRUCTURE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Any data structure&quot;</span>
+
+    <span class="c1"># The file type, to be used in logging messages</span>
+    <span class="n">FILE_TYPE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Any file type&quot;</span>
+
+<div class="viewcode-block" id="SerializationStrategy.__init__">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.serialization_strategy.SerializationStrategy.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">file</span><span class="p">:</span> <span class="n">File</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes a new instance of the SerializationStrategy class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file : File | None</span>
+<span class="sd">            Custom &#39;File&#39; object used for saving or loading data or</span>
+<span class="sd">            for removing a file from the file system. The &#39;File&#39; object</span>
+<span class="sd">            contains attributes detailing the name and extension of the file</span>
+<span class="sd">            involved in the intended file operations. If not provided,</span>
+<span class="sd">            the concrete strategy implementations must ensure that a &#39;File&#39;</span>
+<span class="sd">            object is provided before attempting any file operation.</span>
+
+<span class="sd">            In cases where a concrete serialization strategy involves</span>
+<span class="sd">            storing data across several files, &#39;file&#39; represents the directory</span>
+<span class="sd">            where these files are located. Additionally, the file extension</span>
+<span class="sd">            specified in the object indicates the file extension used by the</span>
+<span class="sd">            files in the directory.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__file</span><span class="p">:</span> <span class="n">File</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">file</span>
+
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">File</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the &#39;File&#39; object to be serialized or deserialized.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        File</span>
+<span class="sd">            The &#39;File&#39; object with which the specific serialisation strategy</span>
+<span class="sd">            is concerned.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        As the &#39;File&#39; object might not have been provided at the moment of</span>
+<span class="sd">        the initialization of the class, it might have defaulted to None.</span>
+<span class="sd">        Therefore, this method might return None.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__file</span>
+
+    <span class="nd">@file</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="n">File</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the &#39;File&#39; object to be serialized or deserialized.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file : File</span>
+<span class="sd">            The &#39;File&#39; object detailing the name and extension of the file</span>
+<span class="sd">            to be operated on.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__file</span> <span class="o">=</span> <span class="n">file</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Methods</span>
+
+<div class="viewcode-block" id="SerializationStrategy.set_file_path">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.serialization_strategy.SerializationStrategy.set_file_path">[docs]</a>
+    <span class="nd">@requires_file</span>
+    <span class="k">def</span> <span class="nf">set_file_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="n">SettingCategories</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the file path.</span>
+
+<span class="sd">        Sets the file path getting it from the settings corresponding to the</span>
+<span class="sd">        settings category defined in the concrete serialization strategy.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        category : SettingCategories</span>
+<span class="sd">            The category of the settings corresponding to the serialization</span>
+<span class="sd">            strategy used.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Ensure that Mypy recognizes that self.file is not None</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_setting</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="s1">&#39;PATH&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="SerializationStrategy.does_path_exist">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.serialization_strategy.SerializationStrategy.does_path_exist">[docs]</a>
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@requires_file</span>
+    <span class="k">def</span> <span class="nf">does_path_exist</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the path of the file associated with this strategy exists.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the file path exists, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">full_path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SerializationStrategy.save">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.serialization_strategy.SerializationStrategy.save">[docs]</a>
+    <span class="nd">@requires_file</span>
+    <span class="nd">@requires_data</span>
+    <span class="nd">@save_error_handling</span>
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Serializable</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves data to a file.</span>
+
+<span class="sd">        Calls the abstract _save method, which must be implemented by each</span>
+<span class="sd">        concrete strategy. Logs the attempt and re-raises any exceptions of the</span>
+<span class="sd">        concrete strategy class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Serializable</span>
+<span class="sd">            The content to be saved. The type of this parameter depends on</span>
+<span class="sd">            the format of the data and the serialization strategy chosen</span>
+<span class="sd">            and has to be fixed by the concrete implementation.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        Exception</span>
+<span class="sd">            For any error that occurs during the save operation.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_info_before_saving</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_info_after_saving</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_error_after_saving</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="SerializationStrategy.add">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.serialization_strategy.SerializationStrategy.add">[docs]</a>
+    <span class="nd">@requires_file</span>
+    <span class="nd">@requires_data</span>
+    <span class="nd">@save_error_handling</span>
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Serializable</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves data to an existing file.</span>
+
+<span class="sd">        Calls the abstract _add method, which must be implemented by each</span>
+<span class="sd">        concrete strategy. Logs the attempt and re-raises any exceptions of the</span>
+<span class="sd">        concrete strategy class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Serializable</span>
+<span class="sd">            The content to be added. The type of this parameter depends on</span>
+<span class="sd">            the format of the data and the serialization strategy chosen</span>
+<span class="sd">            and has to be fixed by the concrete implementation.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        Exception</span>
+<span class="sd">            For any error that occurs during the save operation.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_info_before_saving</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_info_after_saving</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_error_after_saving</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="SerializationStrategy.load">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.serialization_strategy.SerializationStrategy.load">[docs]</a>
+    <span class="nd">@requires_file</span>
+    <span class="nd">@load_error_handling</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Serializable</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads data from a file.</span>
+
+<span class="sd">        Calls the abstract _load method, which must be implemented by each</span>
+<span class="sd">        concrete strategy. Logs the attempt and re-raises any exceptions of the</span>
+<span class="sd">        concrete strategy class.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Serializable | None</span>
+<span class="sd">            The data extracted from the file. The type of this parameter</span>
+<span class="sd">            depends on the format of the data and the (de-)serialization</span>
+<span class="sd">            strategy chosen and has to be fixed by the concrete implementation.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_info_before_loading</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_info_after_loading</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                    <span class="s2">&quot;No data loaded!&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">data</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_error_after_loading</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="SerializationStrategy.delete">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.serialization_strategy.SerializationStrategy.delete">[docs]</a>
+    <span class="nd">@delete_error_handling</span>
+    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attempts to delete the file associated with this strategy.</span>
+
+<span class="sd">        Attempts to delete the file with which this strategy is concerned</span>
+<span class="sd">        from the filesystem. Logs the attempt and re-raises any exceptions</span>
+<span class="sd">        encountered to allow for error handling by the serializer.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        Exception</span>
+<span class="sd">            For any error that occurs during the delete operation.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;File or path is missing.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">full_path</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;Full path is missing.&quot;</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Deleting file </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">full_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">full_path</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;File </span><span class="si">%s</span><span class="s2"> deleted!&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">full_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span></div>
+
+
+    <span class="c1"># endregion --- Methods</span>
+
+    <span class="c1"># region --- Abstract Methods</span>
+
+<div class="viewcode-block" id="SerializationStrategy._save">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.serialization_strategy.SerializationStrategy._save">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Serializable</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Actual data saving logic, to be implemented by subclasses.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Serializable</span>
+<span class="sd">            The content to be saved. The type of this parameter depends on</span>
+<span class="sd">            the format of the data and the serialization strategy chosen</span>
+<span class="sd">            and has to be fixed by the concrete implementation.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SerializationStrategy._add">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.serialization_strategy.SerializationStrategy._add">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Serializable</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Actual data adding logic, to be implemented by subclasses.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Serializable</span>
+<span class="sd">            The content to be saved. The type of this parameter depends on</span>
+<span class="sd">            the format of the data and the serialization strategy chosen</span>
+<span class="sd">            and has to be fixed by the concrete implementation.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SerializationStrategy._load">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.serialization_strategy.SerializationStrategy._load">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Serializable</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Actual data loading logic, to be implemented by subclasses.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Serializable | None</span>
+<span class="sd">            The data extracted from the file. The type of this parameter</span>
+<span class="sd">            depends on the format of the data and the (de-)serialization</span>
+<span class="sd">            strategy chosen and has to be fixed by the concrete implementation.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+    <span class="c1"># endregion --- Abstract Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@requires_file</span>
+    <span class="k">def</span> <span class="nf">_log_info_before_saving</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saving </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_STRUCTURE</span><span class="si">}</span><span class="s2"> to&quot;</span>
+               <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">FILE_TYPE</span><span class="si">}</span><span class="s2"> file&quot;</span>
+               <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">full_path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="s1">&#39;log_info_before_saving&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_log_info_after_saving</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_STRUCTURE</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2"> saved &quot;</span>
+               <span class="s2">&quot;successfully.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="s1">&#39;log_info_after_saving&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_log_error_after_saving</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">err</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_STRUCTURE</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2"> could &quot;</span>
+               <span class="sa">f</span><span class="s2">&quot;not be saved. Error: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@requires_file</span>
+    <span class="k">def</span> <span class="nf">_log_info_before_loading</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_STRUCTURE</span><span class="si">}</span><span class="s2"> from&quot;</span>
+               <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">FILE_TYPE</span><span class="si">}</span><span class="s2"> file&quot;</span>
+               <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">full_path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_log_info_after_loading</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_STRUCTURE</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2"> loaded &quot;</span>
+               <span class="s2">&quot;successfully.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_log_error_after_loading</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">err</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_STRUCTURE</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2"> could &quot;</span>
+               <span class="sa">f</span><span class="s2">&quot;not be loaded. Error: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span></div>
+
+
+    <span class="c1"># endregion  --- ProtectedMethods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

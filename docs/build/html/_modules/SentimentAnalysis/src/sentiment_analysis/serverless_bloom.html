@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.serverless_bloom &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.serverless_bloom</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.serverless_bloom</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">serverless_bloom.py</span>
+<span class="sd">-------------------</span>
+<span class="sd">Version 1.0, updated on 2024-12-14</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">src.data_sources.mad_tsc_workflow</span> <span class="kn">import</span> <span class="n">MadTscWorkflow</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.bloom_fact_sheet_mixin</span> <span class="kn">import</span> <span class="n">BloomFactSheetMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.llm</span> <span class="kn">import</span> <span class="n">Llm</span><span class="p">,</span> <span class="n">T</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.serverless_bloom_prompt_validation_mixin</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ServerlessBloomPromptValidationMixin</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+
+
+<div class="viewcode-block" id="ServerlessBloom">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.serverless_bloom.ServerlessBloom">[docs]</a>
+<span class="k">class</span> <span class="nc">ServerlessBloom</span><span class="p">(</span>
+    <span class="n">Llm</span><span class="p">,</span>
+    <span class="n">BloomFactSheetMixin</span><span class="p">,</span>
+    <span class="n">ServerlessBloomPromptValidationMixin</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ServerlessBloom class.</span>
+
+<span class="sd">    This class implements the Llm class with properties and methods specific</span>
+<span class="sd">    to the serverless use of BLOOM.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    languages: List[str]</span>
+<span class="sd">        The list of languages the LLM supports.</span>
+
+<span class="sd">    suite: DataSourceSuite</span>
+<span class="sd">        The data source suite from which to get the data samples.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ServerlessBloom.__init__">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.serverless_bloom.ServerlessBloom.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes the class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_suite</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">languages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the list of languages the LLM supports.</span>
+
+<span class="sd">        If the languages have not been initialized, it retrieves them from</span>
+<span class="sd">        the AVAILABLE_LANGUAGES attribute set in the BloomFactSheetMixin.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            A list of language codes, corresponding to the supported languages.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_languages</span><span class="p">):</span>
+            <span class="c1"># Languages the LLM supports</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">languages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">AVAILABLE_LANGUAGES</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span>
+
+    <span class="nd">@languages</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">languages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">languages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the list of languages the LLM supports.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        languages : List[str]</span>
+<span class="sd">            A list of language codes representing the supported languages.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span> <span class="o">=</span> <span class="n">languages</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">suite</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the data source suite from which to get the data samples.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataSourceSuite</span>
+<span class="sd">            The initialized data suite providing the data samples.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_suite</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_suite</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_suite</span>
+
+    <span class="nd">@suite</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">suite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suite</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the data source suite from which to get the data samples.</span>
+
+<span class="sd">        Resets the samples_manager property because the suite is used in the</span>
+<span class="sd">        initialisation of the SamplesManager class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        suite : DataSourceSuite</span>
+<span class="sd">            The initialized data source suite.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_suite</span> <span class="o">=</span> <span class="n">suite</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_samples_manager</span><span class="p">()</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="ServerlessBloom._set_suite">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.serverless_bloom.ServerlessBloom._set_suite">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_suite</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads the data suite and makes it available via the suite property.</span>
+
+<span class="sd">        Initializes the suite and loads its subsets using the MadTscWorkflow.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method must be changed if the user wants to use another</span>
+<span class="sd">        suite with BLOOM.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">mad_wf</span> <span class="o">=</span> <span class="n">MadTscWorkflow</span><span class="p">()</span>
+        <span class="n">mad_wf</span><span class="o">.</span><span class="n">load_subsets</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">suite</span> <span class="o">=</span> <span class="n">mad_wf</span><span class="o">.</span><span class="n">suite</span></div>
+
+
+<div class="viewcode-block" id="ServerlessBloom._add_api_to_config">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.serverless_bloom.ServerlessBloom._add_api_to_config">[docs]</a>
+    <span class="k">def</span> <span class="nf">_add_api_to_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds the the LLM-specific API to the configuration settings.</span>
+
+<span class="sd">        Adds the LLM-specific API to the _config variable, which is passed</span>
+<span class="sd">        to the different sentiment retrieval processors, so that it is</span>
+<span class="sd">        accessible from the query processor that needs it for sending the</span>
+<span class="sd">        queries.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;api&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">API</span><span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

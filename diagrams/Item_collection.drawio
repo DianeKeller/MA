@@ -1,0 +1,67 @@
+<mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" background="none" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <mxCell id="node1" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_structures.item_collection.ItemCollection&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; _elements: &lt;br/&gt; _name: &lt;br/&gt; logger: &lt;br/&gt; _distinct_elements: &lt;br/&gt; _sorted_elements: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(             self,             elements: Any,             name: str     ): &lt;br/&gt; __str__(self): &lt;br/&gt; name(self): &lt;br/&gt; name(self, name: str): &lt;br/&gt; elements(self): &lt;br/&gt; elements(self, elements: Any): &lt;br/&gt; element_type(self): &lt;br/&gt; n_elements(self): &lt;br/&gt; n_distinct_elements(self): &lt;br/&gt; distinct_elements(self): &lt;br/&gt; sorted_elements(self): &lt;br/&gt; first_element(self): &lt;br/&gt; last_element(self): &lt;br/&gt; add_element(self, element: T): &lt;br/&gt; remove_element(self, element: T): &lt;br/&gt; get_element_by_id(self, element_id: int): &lt;br/&gt; to_strings(self): &lt;br/&gt; _reset_computed_properties(self): &lt;br/&gt; _count_frequencies(self): &lt;br/&gt; _add(self, element: T): &lt;br/&gt; _remove(self, element: T): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-469" y="623" width="352" height="685" as="geometry" />
+    </mxCell>
+    <mxCell id="node5" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_structures.item_collection_factories.ItemListFactory&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; create(             data: Any,             name: str = &amp;#39;&amp;#39;     ): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-257" y="1331" width="424" height="64" as="geometry" />
+    </mxCell>
+    <mxCell id="node3" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_structures.item_collection_factories.ItemSeriesFactory&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; create(             data: Any | None = None,             name: str | None = None     ): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-797" y="1331" width="442" height="64" as="geometry" />
+    </mxCell>
+    <mxCell id="node4" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_structures.item_list.ItemList&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; _distinct_elements: &lt;br/&gt; _sorted_elements: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(             self,             elements: List[T],             name: str     ): &lt;br/&gt; distinct_elements(self): &lt;br/&gt; sorted_elements(self): &lt;br/&gt; random_element(self): &lt;br/&gt; first_element(self): &lt;br/&gt; last_element(self): &lt;br/&gt; frequencies(self): &lt;br/&gt; to_strings(self): &lt;br/&gt; _add(self, element: T): &lt;br/&gt; _remove(self, element: T): &lt;br/&gt; _count_frequencies(self): &lt;br/&gt; _compute_distinct_elements(self): &lt;br/&gt; _compute_sorted_elements(self): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-257" y="1487" width="289" height="410" as="geometry" />
+    </mxCell>
+    <mxCell id="node0" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_structures.item_series.ItemSeries&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; _elements: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(             self,             elements: Series,             name: str     ): &lt;br/&gt; distinct_objects(self): &lt;br/&gt; distinct_elements(self): &lt;br/&gt; n_unique_elements(self): &lt;br/&gt; sorted_elements(self): &lt;br/&gt; first_element(self): &lt;br/&gt; last_element(self): &lt;br/&gt; frequencies(self): &lt;br/&gt; frequencies_in_alpha_order(self): &lt;br/&gt; frequencies_in_freq_order(self): &lt;br/&gt; stats(self): &lt;br/&gt; frequencies_diagram(             self,             x_label: str,             min_freq: int = 0,             max_n: int = 1000     ): &lt;br/&gt; get_element_by_id(self, element_id: int): &lt;br/&gt; print_frequencies(self, order: str = &amp;#39;alpha&amp;#39;): &lt;br/&gt; to_strings(self): &lt;br/&gt; _add(self, element: T): &lt;br/&gt; _remove(self, element: T): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-658" y="1487" width="303" height="485" as="geometry" />
+    </mxCell>
+    <mxCell id="node7" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_structures.num_series.NumSeries&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(             self,             elements: pd.Series,             name: str     ): &lt;br/&gt; __str__(self): &lt;br/&gt; max(self): &lt;br/&gt; min(self): &lt;br/&gt; sum(self): &lt;br/&gt; dev(self): &lt;br/&gt; mean(self): &lt;br/&gt; median(self): &lt;br/&gt; stats(self): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-478" y="2093" width="304" height="259" as="geometry" />
+    </mxCell>
+    <mxCell id="node6" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_structures.str_series.StrSeries&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(             self,             elements: pd.Series,             name: str     ): &lt;br/&gt; __str__(self): &lt;br/&gt; n_most_frequent_unique_elements(self): &lt;br/&gt; n_least_frequent_unique_elements(self): &lt;br/&gt; most_frequent_unique_elements(self): &lt;br/&gt; least_frequent_unique_elements(self): &lt;br/&gt; max_frequency(self): &lt;br/&gt; min_frequency(self): &lt;br/&gt; mean_frequency(self): &lt;br/&gt; median_frequency(self): &lt;br/&gt; dev_frequency(self): &lt;br/&gt; max_percentage_of_occurrences(self): &lt;br/&gt; min_percentage_of_occurrences(self): &lt;br/&gt; mean_percentage_of_occurrences(self): &lt;br/&gt; median_percentage_of_occurrences(self): &lt;br/&gt; std_dev_percentage_of_occurrences(self): &lt;br/&gt; stats(self): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-853" y="2093" width="297" height="459" as="geometry" />
+    </mxCell>
+    <mxCell id="node2" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;logging_mixin.LoggingMixin&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; logger: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; log(cls, message: str, level: str = &amp;#39;info&amp;#39;, msg_id: str = &amp;#39;&amp;#39;): &lt;br/&gt; _log(self, message: str, level: str = &amp;#39;info&amp;#39;, msg_id: str = &amp;#39;&amp;#39;): &lt;br/&gt; _get_caller_name(): &lt;br/&gt; _is_disallowed(msg_id: str): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-466" y="365" width="346" height="160" as="geometry" />
+    </mxCell>
+    <mxCell id="edge1" edge="1" value="" parent="1" source="node1" target="node2" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge2" edge="1" value="" parent="1" source="node4" target="node1" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-113" y="1418" />
+          <mxPoint x="-293" y="1418" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge0" edge="1" value="" parent="1" source="node0" target="node1" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-507" y="1418" />
+          <mxPoint x="-293" y="1418" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge4" edge="1" value="" parent="1" source="node7" target="node0" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-326" y="2032" />
+          <mxPoint x="-507" y="2032" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge3" edge="1" value="" parent="1" source="node6" target="node0" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-705" y="2032" />
+          <mxPoint x="-507" y="2032" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+  </root>
+</mxGraphModel>

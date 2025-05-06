@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.serverless_bloom_prompt_validation_mixin &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.serverless_bloom_prompt_validation_mixin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.serverless_bloom_prompt_validation_mixin</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">serverless_bloom_prompt_validation_mixin.py</span>
+<span class="sd">-------------------------------------------</span>
+<span class="sd">Version 1.0, updated on 2025-01-25</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+
+<span class="kn">from</span> <span class="nn">src.data_structures.history</span> <span class="kn">import</span> <span class="n">History</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PromptInvalidException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.query_processor</span> <span class="kn">import</span> <span class="n">QueryProcessor</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">PromptsDictType</span>
+
+
+<div class="viewcode-block" id="ServerlessBloomPromptValidationMixin">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.serverless_bloom_prompt_validation_mixin.ServerlessBloomPromptValidationMixin">[docs]</a>
+<span class="k">class</span> <span class="nc">ServerlessBloomPromptValidationMixin</span><span class="p">(</span><span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ServerlessBloomPromptValidationMixin class.</span>
+
+<span class="sd">    A mixin class that provides validation methods for processing and</span>
+<span class="sd">    validating prompts in a serverless Bloom-based application.</span>
+
+<span class="sd">    This mixin includes properties and methods that support the validation of</span>
+<span class="sd">    sentiment analysis prompts. It handles setting prompts and</span>
+<span class="sd">    validation flags, as well as processing data batches with the appropriate</span>
+<span class="sd">    language configurations.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    prompts : PromptsDictType</span>
+<span class="sd">        The prompts used for generating query-specific prompts.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    process_query(payload: Dict[str, str]) -&gt; str | int:</span>
+<span class="sd">        Processes a single query by sending it to the &#39;QueryProcessor&#39;.</span>
+
+<span class="sd">    validate_prompt(language: str = &#39;en&#39;, prompts: PromptsDictType = None)</span>
+<span class="sd">            -&gt; None:</span>
+<span class="sd">        Validates a prompt.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">PromptsDictType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the prompts used for generating query-specific prompts.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PromptsDictType</span>
+<span class="sd">            A dictionary containing prompts for prompt generation.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_prompts&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@prompts</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompts</span><span class="p">:</span> <span class="n">PromptsDictType</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the prompts used for generating query-specific prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prompts : PromptsDictType</span>
+<span class="sd">            A dictionary of prompts to generate prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_prompts&#39;</span><span class="p">,</span> <span class="n">prompts</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">invalid_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">History</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_invalid_prompts&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_invalid_prompts_history</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_invalid_prompts&#39;</span><span class="p">,</span> <span class="n">History</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">_initialize_invalid_prompts_history</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">invalid_prompts_history</span> <span class="o">=</span> <span class="n">History</span><span class="p">(</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_&#39;</span>
+                 <span class="sa">f</span><span class="s1">&#39;invalid_prompts_v_&#39;</span>
+                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_invalid_prompts&#39;</span><span class="p">,</span> <span class="n">invalid_prompts_history</span><span class="p">)</span>
+
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="ServerlessBloomPromptValidationMixin.validate_prompt">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.serverless_bloom_prompt_validation_mixin.ServerlessBloomPromptValidationMixin.validate_prompt">[docs]</a>
+    <span class="k">def</span> <span class="nf">validate_prompt</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span>
+            <span class="n">prompt</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates a single prompt.</span>
+
+<span class="sd">        Validates a prompt by setting language and prompts, iterating</span>
+<span class="sd">        through data batches, and processing sentiment analysis.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">           The language for prompt validation (default is &#39;en&#39;).</span>
+
+<span class="sd">        prompt : Dict[str, str]</span>
+<span class="sd">           Prompt consisting of different parts whose names constitute the</span>
+<span class="sd">           keys in the dictionary and whose values are the values of the</span>
+<span class="sd">           dictionary&#39;s entries.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the prompt was validated, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Save the parameters as properties so that they can be used from</span>
+        <span class="c1"># the different methods.</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">language</span>
+
+        <span class="c1"># Wrap the prompt in the expected prompts dictionary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompts</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;1&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">}</span>
+
+        <span class="c1"># The number of batches to process for each query variant</span>
+        <span class="c1"># The configuration is a property of the ServerlessBloom class this</span>
+        <span class="c1"># mixin is mixed into.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_n_batches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;n_batches&quot;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Language: </span><span class="si">{</span><span class="n">language</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Iterate through the subsets to find the subset for the current</span>
+        <span class="c1"># language</span>
+        <span class="k">for</span> <span class="n">subset_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">subset_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">language</span><span class="si">}</span><span class="s2">_&quot;</span> <span class="ow">in</span> <span class="n">subset_name</span><span class="p">:</span>
+                <span class="c1"># Once a subset with the specified language is found,</span>
+                <span class="c1"># it can be processed:</span>
+
+                <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_manager</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">df</span>
+
+                <span class="c1"># Add the queries of the chunks</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_add_query_col</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retrieve_sentiment_for_validation</span><span class="p">():</span>
+                    <span class="c1"># Collect invalid prompts in special file</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">invalid_prompts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Prompt is valid!&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+                <span class="c1"># The subset having been processed, the subset_names loop</span>
+                <span class="c1"># can be quit:</span>
+                <span class="k">break</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="ServerlessBloomPromptValidationMixin.process_query">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.serverless_bloom_prompt_validation_mixin.ServerlessBloomPromptValidationMixin.process_query">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_query</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">payload</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+            <span class="n">expected_answer</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes a single query by sending it to the &#39;QueryProcessor&#39;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        payload : Dict[str, str]</span>
+<span class="sd">            A dictionary containing the query inputs.</span>
+
+<span class="sd">        expected_answer : str</span>
+<span class="sd">            The expected answer for the query.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str | int</span>
+<span class="sd">            The processed answer or error code.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">query_processor</span> <span class="o">=</span> <span class="n">QueryProcessor</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="n">query_processor</span><span class="o">.</span><span class="n">process_query</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">answer</span> <span class="o">!=</span> <span class="n">expected_answer</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Wrong answer: &#39;</span><span class="si">%s</span><span class="s2">&#39; instead of &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">answer</span><span class="p">,</span> <span class="n">expected_answer</span>
+            <span class="p">)</span>
+
+            <span class="k">raise</span> <span class="n">PromptInvalidException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">answer</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+<div class="viewcode-block" id="ServerlessBloomPromptValidationMixin._add_query_col">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.serverless_bloom_prompt_validation_mixin.ServerlessBloomPromptValidationMixin._add_query_col">[docs]</a>
+    <span class="k">def</span> <span class="nf">_add_query_col</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Composes the queries and inserts them in a column of the DataFrame.</span>
+
+<span class="sd">        Composes the prompts from their ingredients and inserts the</span>
+<span class="sd">        corresponding prompts for each sample in a separate column</span>
+<span class="sd">        corresponding to the respective query variant.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;query_1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;before_sentence&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;sentence_normalized&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;before_mention&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;mention&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;scale&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;question&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;answer_before_mention&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;mention&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;answer_start&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">),</span>
+                <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="ServerlessBloomPromptValidationMixin._retrieve_sentiment_for_validation">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.serverless_bloom_prompt_validation_mixin.ServerlessBloomPromptValidationMixin._retrieve_sentiment_for_validation">[docs]</a>
+    <span class="k">def</span> <span class="nf">_retrieve_sentiment_for_validation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the sentiment predictions for the data.</span>
+
+<span class="sd">        This method simulates the retrieval of the sentiment predictions for</span>
+<span class="sd">        the samples in the data DataFrame.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            Whether the query was successfully processed and returned the</span>
+<span class="sd">            correct answers.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_query_for_validation</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ServerlessBloomPromptValidationMixin._process_query_for_validation">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.serverless_bloom_prompt_validation_mixin.ServerlessBloomPromptValidationMixin._process_query_for_validation">[docs]</a>
+    <span class="k">def</span> <span class="nf">_process_query_for_validation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes a query for validation purposes.</span>
+
+<span class="sd">        Processes a query in a single batch, sending the prompt of each row</span>
+<span class="sd">        to the API, collecting and reporting failed answers and returning the</span>
+<span class="sd">        result for further validation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            Whether the query was successfully processed and returned the</span>
+<span class="sd">            correct answers.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">failed_answers</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Extract random batch from DataFrame</span>
+        <span class="n">batch_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_batch_df</span><span class="p">()</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Validating prompt&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">,</span> <span class="s2">&quot;Validating prompt&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Apply the query function to each row in the batch</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">batch_df</span><span class="p">[</span><span class="s1">&#39;answer_1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">batch_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">process_query</span><span class="p">({</span><span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;query_1&quot;</span><span class="p">]},</span>
+                                       <span class="n">expected_answer</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;polarity&quot;</span><span class="p">])</span>
+                <span class="p">),</span>
+                <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">PromptInvalidException</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_report_failed_answer</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="ServerlessBloomPromptValidationMixin._get_batch_df">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.serverless_bloom_prompt_validation_mixin.ServerlessBloomPromptValidationMixin._get_batch_df">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_batch_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Selects a random batch of data. based on the batch size specified in</span>
+<span class="sd">        the configuration.</span>
+
+<span class="sd">        Selects a random batch of data based on the batch size specified in</span>
+<span class="sd">        the configuration.</span>
+
+<span class="sd">        - For a batch size of 1, a single random row from &#39;self.data&#39; is</span>
+<span class="sd">          selected.</span>
+<span class="sd">        - For a batch size of 3, random samples with three distinct</span>
+<span class="sd">          polarities are selected from the dataset.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            A DataFrame containing the selected batch of data, filtered based</span>
+<span class="sd">            on the specified batch size and polarity criteria.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Set default return value</span>
+        <span class="n">batch_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">match</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;batch_size&#39;</span><span class="p">):</span>
+            <span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># Select a random sample</span>
+                <span class="n">batch_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">case</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="c1"># Select 3 random samples with 3 different polarities</span>
+                <span class="n">batch_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;polarity&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">droplevel</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">batch_df</span></div>
+
+
+<div class="viewcode-block" id="ServerlessBloomPromptValidationMixin._report_failed_answer">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.serverless_bloom_prompt_validation_mixin.ServerlessBloomPromptValidationMixin._report_failed_answer">[docs]</a>
+    <span class="k">def</span> <span class="nf">_report_failed_answer</span><span class="p">(</span>
+            <span class="bp">self</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reports an answer that failed to be of the expected type.</span>
+
+<span class="sd">        Reports answers that failed to meet expected response types by</span>
+<span class="sd">        logging the count and details of failed queries.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n_failed</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">failed_answers</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n_failed</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_failed</span><span class="si">}</span><span class="s2"> unexpected answer to query:&quot;</span><span class="p">)</span>
+            <span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">failed_answers</span><span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

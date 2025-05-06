@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_config &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_config</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_config</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">sentiment_analysis_config.py</span>
+<span class="sd">----------------------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.print_utils</span> <span class="kn">import</span> <span class="n">print_in_box</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s1">&#39;Llm&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SentimentAnalysisConfig">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_config.SentimentAnalysisConfig">[docs]</a>
+<span class="k">class</span> <span class="nc">SentimentAnalysisConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    SentimentAnalysisConfig class.</span>
+
+<span class="sd">    This static class is used to store and manage user-defined and other</span>
+<span class="sd">    settings for the sentiment analysis workflows. It follows a singleton</span>
+<span class="sd">    pattern, which ensures that only one instance of this class exists at any</span>
+<span class="sd">    time throughout the application while being accessible globally from all</span>
+<span class="sd">    classes.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _instance : SentimentAnalysisConfig</span>
+<span class="sd">        The singleton instance of the class.</span>
+
+<span class="sd">    _settings : Dict[str, Any]</span>
+<span class="sd">        A dictionary to store the configuration settings.</span>
+
+<span class="sd">    _initialized : bool</span>
+<span class="sd">        A flag indicating whether the configuration has been initialized.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    get(cls, key: str) -&gt; Any:</span>
+<span class="sd">        Retrieves the value associated with a given key from the settings.</span>
+
+<span class="sd">    set(cls, key: str, val: Any) -&gt; None:</span>
+<span class="sd">        Sets the value for a given key in the settings.</span>
+
+<span class="sd">    remove(cls, key: str) -&gt; None:</span>
+<span class="sd">        Removes a key-value pair from the settings.</span>
+
+<span class="sd">    update(cls, **kwargs) -&gt; None:</span>
+<span class="sd">        Updates multiple settings at once based on provided keyword arguments.</span>
+
+<span class="sd">    print(cls) -&gt; None:</span>
+<span class="sd">        Prints the current settings.</span>
+
+<span class="sd">    to_str(cls) -&gt; str:</span>
+<span class="sd">        Returns a string representation of the current settings.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_instance</span><span class="p">:</span> <span class="n">SentimentAnalysisConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_settings</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_initialized</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">log</span> <span class="o">=</span> <span class="n">LoggingMixin</span><span class="p">()</span><span class="o">.</span><span class="n">log</span>
+
+<div class="viewcode-block" id="SentimentAnalysisConfig.__new__">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_config.SentimentAnalysisConfig.__new__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">SentimentAnalysisConfig</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates and initializes a singleton instance of this class.</span>
+
+<span class="sd">        Creates a new instance of this class if one does not already exist and</span>
+<span class="sd">        initializes it with any provided parameters.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        SentimentAnalysisConfig</span>
+<span class="sd">            The singleton instance of the class.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        For the arguments and keyword arguments that can be passed as</span>
+<span class="sd">        parameters, see the parameters of the _initialize method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SentimentAnalysisConfig</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span></div>
+
+
+<div class="viewcode-block" id="SentimentAnalysisConfig._initialize">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_config.SentimentAnalysisConfig._initialize">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_initialize</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="p">,</span>
+            <span class="n">api</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">llm</span><span class="p">:</span> <span class="n">T</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">from_sample</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">to_sample</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">9999999</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="n">data_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">n_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;00&#39;</span><span class="p">,</span>
+            <span class="n">balance</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">33</span><span class="p">,</span>
+            <span class="n">balanced</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">n_best_prompts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="n">target_n_prompts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">150</span><span class="p">,</span>
+            <span class="n">with_validation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the configuration settings with the provided values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        - api : str</span>
+<span class="sd">            API for the queries to the LLM. Will be set when a concrete Llm</span>
+<span class="sd">            instance like ServerlessBloom is initiated.</span>
+
+<span class="sd">        - llm : T | None</span>
+<span class="sd">            A concrete Llm instance like ServerlessBloom. Is set when a</span>
+<span class="sd">            concrete Llm instance is created.</span>
+
+<span class="sd">        - from_sample : int</span>
+<span class="sd">            Sample number from which to start any operations. Defines the</span>
+<span class="sd">            first part of the subdirectory&#39;s name where the data are stored.</span>
+
+<span class="sd">        - to_sample : int</span>
+<span class="sd">            Sample number at which to stop any operations. Defines the</span>
+<span class="sd">            second part of the subdirectory&#39;s name where the data are stored.</span>
+
+<span class="sd">        - batch_size : int</span>
+<span class="sd">            Number of samples to process in a batch. Defaults to 100. If the</span>
+<span class="sd">            &quot;balanced&quot; parameter is set to &quot;True&quot;, the batch size should</span>
+<span class="sd">            accordingly be set to a multiple of 3 times the &quot;balance&quot;</span>
+<span class="sd">            parameter value.</span>
+
+<span class="sd">        - data_offset : int</span>
+<span class="sd">            Sample number from which to start any operations. Data in the</span>
+<span class="sd">            samples DataFrame will be removed before the rest of the data is</span>
+<span class="sd">            processed. Has no implications regarding the (sub)directory where</span>
+<span class="sd">            the data are stored.</span>
+
+<span class="sd">        - n_batches : int</span>
+<span class="sd">            Number of batches to process. Defaults to 1.</span>
+
+<span class="sd">        - chunk_size : int</span>
+<span class="sd">            Number of queries to include in one chunk. Defaults to 15.</span>
+
+<span class="sd">        - version : str</span>
+<span class="sd">            Version of prompt sets/validated queries to use to build chunks</span>
+<span class="sd">            from.</span>
+
+<span class="sd">        - balanced : bool</span>
+<span class="sd">            Whether to construct and use a balanced dataset where each</span>
+<span class="sd">            sentiment category appears as often as the other sentiment</span>
+<span class="sd">            categories.</span>
+
+<span class="sd">        - balance : int</span>
+<span class="sd">            Number of samples of the same sentiment category (positive/</span>
+<span class="sd">            negative/neutral) to use to build a balanced dataset.</span>
+<span class="sd">            Defaults to 33. If the &quot;balanced&quot; parameter is set to &quot;True&quot; The</span>
+<span class="sd">            batch size should accordingly be set to a multiple of the</span>
+<span class="sd">            &quot;balance&quot; value.</span>
+
+<span class="sd">        - n_best_prompts : int</span>
+<span class="sd">            The number of prompts that are to be included in the lists of</span>
+<span class="sd">            best and worst prompts. The analysis will show the n</span>
+<span class="sd">            best prompts and the n worst prompts.</span>
+
+<span class="sd">        - target_n_prompts : int</span>
+<span class="sd">            The total number of prompt variants to generate or to load from</span>
+<span class="sd">            the JSON files (prompt_sets_history, validated_queries).</span>
+<span class="sd">            Defaults to 150, because each query applied on 100 samples takes</span>
+<span class="sd">            about 1 minute. The rate limit being approximately 1500 prompts,</span>
+<span class="sd">            thus 15 different queries for 100 samples, and the waiting time</span>
+<span class="sd">            being set to 63 minutes, 15 queries need about 80 minutes. So,</span>
+<span class="sd">            extracting 150 examples and processing them will take about 13.5</span>
+<span class="sd">            hours, which is feasible if it is only done for one language.</span>
+
+<span class="sd">        - with_validation : bool</span>
+<span class="sd">            Whether the retrieval results should be checked for validity,</span>
+<span class="sd">            rejecting &#39;invalid&#39; results. Should be set to True for prompt</span>
+<span class="sd">            engineering, and to &quot;False&quot; for production. Default: True.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_initialized</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;api&#39;</span><span class="p">,</span> <span class="n">api</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;llm&#39;</span><span class="p">,</span> <span class="n">llm</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;from_sample&#39;</span><span class="p">,</span> <span class="n">from_sample</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;to_sample&#39;</span><span class="p">,</span> <span class="n">to_sample</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;batch_size&#39;</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;data_offset&#39;</span><span class="p">,</span> <span class="n">data_offset</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;n_batches&#39;</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;balance&#39;</span><span class="p">,</span> <span class="n">balance</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;balanced&#39;</span><span class="p">,</span> <span class="n">balanced</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;n_best_prompts&#39;</span><span class="p">,</span> <span class="n">n_best_prompts</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;target_n_prompts&#39;</span><span class="p">,</span> <span class="n">target_n_prompts</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;with_validation&#39;</span><span class="p">,</span> <span class="n">with_validation</span><span class="p">)</span>
+
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="SentimentAnalysisConfig.get">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_config.SentimentAnalysisConfig.get">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the value associated with a given key from the settings.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : str</span>
+<span class="sd">            The key to get from the settings.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SentimentAnalysisConfig.set">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_config.SentimentAnalysisConfig.set">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the value for a given key in the settings.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : str</span>
+<span class="sd">            The key to set in the settings.</span>
+
+<span class="sd">        val : Any</span>
+<span class="sd">            The value to associate with the key.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span></div>
+
+
+<div class="viewcode-block" id="SentimentAnalysisConfig.validate">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_config.SentimentAnalysisConfig.validate">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates config settings for logical consistency.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the config settings are invalid.</span>
+
+<span class="sd">        Usage</span>
+<span class="sd">        -----</span>
+<span class="sd">        &gt;&gt;&gt; SentimentAnalysisConfig.validate()</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;batch_size&#39;</span><span class="p">)</span>
+        <span class="n">balance</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;balance&#39;</span><span class="p">)</span>
+        <span class="n">balanced</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;balanced&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">balanced</span> <span class="ow">and</span> <span class="n">batch_size</span> <span class="o">%</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">balance</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="n">Logger</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;Batch size must be a multiple of 3 times the balance &quot;</span>
+                    <span class="s2">&quot;value when balanced=True.&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SentimentAnalysisConfig.remove">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_config.SentimentAnalysisConfig.remove">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes a key-value pair from the settings.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : str</span>
+<span class="sd">            The key to remove from the settings.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_settings</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="SentimentAnalysisConfig.update">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_config.SentimentAnalysisConfig.update">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates multiple settings at once based on provided keyword arguments.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs : Any</span>
+<span class="sd">            Key-value pairs of settings to update.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; config = SentimentAnalysisConfig()</span>
+<span class="sd">        &gt;&gt;&gt; config.update(version=&#39;01&#39;, balanced=True)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SentimentAnalysisConfig.reset_instance">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_config.SentimentAnalysisConfig.reset_instance">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">reset_instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets the single instance of this class.</span>
+
+<span class="sd">        This method is needed to reinitialize the class for test purposes.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="SentimentAnalysisConfig.print">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_config.SentimentAnalysisConfig.print">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">print</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the current settings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Settings in SentimentAnalysisConfig&quot;</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">to_str</span><span class="p">()</span>
+        <span class="n">print_in_box</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SentimentAnalysisConfig.to_str">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_config.SentimentAnalysisConfig.to_str">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">to_str</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a string representation of the settings.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The string representation of the settings.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">string</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_settings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">string</span><span class="si">}{</span><span class="n">key</span><span class="si">}</span><span class="s2">:</span><span class="se">\t</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">string</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

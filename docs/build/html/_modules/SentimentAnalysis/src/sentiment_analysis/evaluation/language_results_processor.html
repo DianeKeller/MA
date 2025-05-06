@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.evaluation.language_results_processor &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.evaluation.language_results_processor</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.evaluation.language_results_processor</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">language_results_processor.py</span>
+<span class="sd">-----------------------------</span>
+<span class="sd">Version 1.0, updated on 2025-01-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.chunk</span> <span class="kn">import</span> <span class="n">Chunk</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.chunk_loader</span> <span class="kn">import</span> <span class="n">ChunkLoader</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.evaluation.deep_prompt_evaluation</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DeepPromptEvaluation</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_analysis_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SentimentAnalysisConfig</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+
+
+<div class="viewcode-block" id="LanguageResultsProcessor">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.language_results_processor.LanguageResultsProcessor">[docs]</a>
+<span class="k">class</span> <span class="nc">LanguageResultsProcessor</span><span class="p">(</span><span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    LanguageResultsProcessor class.</span>
+
+<span class="sd">    This class processes managing and processing sentiment analysis results</span>
+<span class="sd">    for a given language. It evaluates metrics, analyzes prompts, and</span>
+<span class="sd">    facilitates comparison of results. </span>
+<span class="sd">    </span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    language : str</span>
+<span class="sd">        The language being processed (e.g., &quot;en&quot; for English).</span>
+
+<span class="sd">    </span>
+<span class="sd">    config : SentimentAnalysisConfig</span>
+<span class="sd">        Configuration settings for sentiment analysis and associated tasks</span>
+<span class="sd">        (prompt engineering, evaluation of predictions, etc.)</span>
+
+<span class="sd">    metrics : MyDataFrame</span>
+<span class="sd">        The metrics for the current language.</span>
+
+<span class="sd">    data : Chunk</span>
+<span class="sd">        The data with the batch samples and query and answer columns.</span>
+
+<span class="sd">    evaluation : DeepPromptEvaluation</span>
+<span class="sd">        A DeepPromptEvaluation instance, providing detailed prompt evaluation.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    analyze_prompts(partial_metrics: List[str] | None = None) -&gt; None:</span>
+<span class="sd">        Analyzes the prompts.</span>
+
+<span class="sd">    get_best_query_nrs() -&gt; List[str]:</span>
+<span class="sd">        Retrieves the indices of the best-performing queries.</span>
+
+<span class="sd">    process_language() -&gt; None:</span>
+<span class="sd">        Processes the language results.</span>
+
+<span class="sd">    show_best_prompts(partial_metrics: List[str] | None = None) -&gt; None:</span>
+<span class="sd">        Displays the best-performing prompts based on the evaluation metrics.</span>
+
+<span class="sd">    show_partial_metrics(partial_metrics: List[str], show_best: bool = False,</span>
+<span class="sd">            show_worst: bool = False) -&gt; None:</span>
+<span class="sd">        Displays specified metrics for the best and/or worst prompts.</span>
+
+<span class="sd">    show_worst_prompts(partial_metrics: List[str] | None = None) -&gt; None:</span>
+<span class="sd">        Displays the worst-performing prompts based on the evaluation metrics.</span>
+
+<span class="sd">    verify_metrics_are_equal(metric_1: str, metric_2: str) -&gt; bool:</span>
+<span class="sd">        Compares two metrics and verifies if they are equal.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LanguageResultsProcessor.__init__">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.language_results_processor.LanguageResultsProcessor.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+<span class="sd">        </span>
+<span class="sd">        Initializes the LanguageResultsProcessor class with the provided </span>
+<span class="sd">        language.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">            The language to process.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_evaluation</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SentimentAnalysisConfig</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">language</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the metrics for the current language.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            A MyDataFrame instance containing the sorted metrics DataFrame.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The metrics DataFrame is sorted in ascending order (from best to</span>
+<span class="sd">        worst rank) by the ranks of the prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span>
+
+    <span class="nd">@metrics</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the metrics for the current language.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        metrics : MyDataFrame</span>
+<span class="sd">            A MydataFrame instance containing a DataFrame with</span>
+<span class="sd">            language-specific metrics.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span> <span class="o">=</span> <span class="n">metrics</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Chunk</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the data with the batch samples and query and answer columns.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Chunk</span>
+<span class="sd">            A chunk object containing the data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
+
+    <span class="nd">@data</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Chunk</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the data with the batch samples and query and answer columns.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Chunk</span>
+<span class="sd">            A chunk object containing the he data including the batch samples</span>
+<span class="sd">            and query and answer columns.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">answer_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DeepPromptEvaluation</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides access to the evaluation instance.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DeepPromptEvaluation</span>
+<span class="sd">            The evaluation instance for analyzing metrics and prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluation</span>
+
+    <span class="nd">@evaluation</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">evaluation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">:</span> <span class="n">DeepPromptEvaluation</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the evaluation instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        evaluation : DeepPromptEvaluation</span>
+<span class="sd">            The evaluation instance to set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_evaluation</span> <span class="o">=</span> <span class="n">evaluation</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="LanguageResultsProcessor.process_language">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.language_results_processor.LanguageResultsProcessor.process_language">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_language</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes the language results.</span>
+
+<span class="sd">        Processes the language results by loading data chunks, creating an</span>
+<span class="sd">        evaluation instance, and computing sorted metrics.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data_from_chunks</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span> <span class="o">=</span> <span class="n">DeepPromptEvaluation</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">language</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">sorted</span><span class="p">(</span><span class="s1">&#39;rank&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LanguageResultsProcessor.show_best_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.language_results_processor.LanguageResultsProcessor.show_best_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">show_best_prompts</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">partial_metrics</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays the best-performing prompts based on the evaluation metrics.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        partial_metrics : List[str] | None</span>
+<span class="sd">            A list of specific metrics to display for the best prompts. If</span>
+<span class="sd">            None, only overall metrics are shown.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">show_best</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">partial_metrics</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">show_partial_metrics</span><span class="p">(</span><span class="n">partial_metrics</span><span class="p">,</span> <span class="n">show_best</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LanguageResultsProcessor.show_worst_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.language_results_processor.LanguageResultsProcessor.show_worst_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">show_worst_prompts</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">partial_metrics</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays the worst-performing prompts based on the evaluation metrics.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        partial_metrics : List[str] | None</span>
+<span class="sd">            A list of specific metrics to display for the worst prompts. If</span>
+<span class="sd">            None, only overall metrics are shown.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">show_worst</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">partial_metrics</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">show_partial_metrics</span><span class="p">(</span><span class="n">partial_metrics</span><span class="p">,</span> <span class="n">show_worst</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LanguageResultsProcessor.show_partial_metrics">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.language_results_processor.LanguageResultsProcessor.show_partial_metrics">[docs]</a>
+    <span class="k">def</span> <span class="nf">show_partial_metrics</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">partial_metrics</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">show_best</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">show_worst</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays specified metrics for the best and/or worst prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        partial_metrics : List[str]</span>
+<span class="sd">            A list of metrics to display.</span>
+
+<span class="sd">        show_best : bool</span>
+<span class="sd">            Whether to show the metrics for the best prompts.</span>
+
+<span class="sd">        show_worst : bool</span>
+<span class="sd">            Whether to show the metrics for the worst prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">partial_metrics</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">show_partial_metric</span><span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="n">show_best</span><span class="p">,</span> <span class="n">show_worst</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LanguageResultsProcessor.verify_metrics_are_equal">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.language_results_processor.LanguageResultsProcessor.verify_metrics_are_equal">[docs]</a>
+    <span class="k">def</span> <span class="nf">verify_metrics_are_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric_1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metric_2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compares two metrics and verifies if they are equal.</span>
+
+<span class="sd">        This method can be used to check two metrics that are supposed to be</span>
+<span class="sd">        identical.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        metric_1 : str</span>
+<span class="sd">            Name of the first metric. Should equal the column name of the</span>
+<span class="sd">            respective metric values in the metrics DataFrame.</span>
+
+<span class="sd">        metric_2 : str</span>
+<span class="sd">            Name of the second metric to compare. Should equal the column</span>
+<span class="sd">            name of the respective metric values in the metrics DataFrame.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the values of the metrics are equal, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">metrics_are_equal</span><span class="p">(</span><span class="n">metric_1</span><span class="p">,</span> <span class="n">metric_2</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2"> are not the same in </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">metric_1</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span>
+                <span class="n">metric_2</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2"> are the same for all prompts in </span><span class="si">%s</span><span class="s2">!&quot;</span> <span class="o">%</span>
+              <span class="p">(</span>
+                  <span class="n">metric_1</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span>
+                  <span class="n">metric_2</span><span class="p">,</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+              <span class="p">))</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="LanguageResultsProcessor.get_best_query_nrs">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.language_results_processor.LanguageResultsProcessor.get_best_query_nrs">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_best_query_nrs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the indices of the best-performing queries.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            A list of indices corresponding to the best queries.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">get_best</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="LanguageResultsProcessor.analyze_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.language_results_processor.LanguageResultsProcessor.analyze_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">analyze_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partial_metrics</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Analyzes the prompts.</span>
+
+<span class="sd">        Finds best and worst prompts and correlations of prompt ingredients</span>
+<span class="sd">        with valid/invalid prompts if there are enough different prompts to</span>
+<span class="sd">        perform such an analysis.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        partial_metrics : List[str]</span>
+<span class="sd">            List of partial metrics to show for the best and worst prompts.</span>
+<span class="sd">            Defaults to None. If no partial metrics are provided,</span>
+<span class="sd">            the show_best_prompts and show_worst_prompts methods will just</span>
+<span class="sd">            show the best and worst prompt overall metrics values but will not</span>
+<span class="sd">            display any partial metrics diagrams.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target_n_prompts&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">evaluation</span><span class="o">.</span><span class="n">analyze_correlation</span><span class="p">()</span>
+
+            <span class="c1"># If the total number of prompts is larger than the number of</span>
+            <span class="c1"># best or worst prompts to show, perform a correlation analysis</span>
+            <span class="c1"># for the prompt ingredients and show best and worst prompts:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target_n_prompts&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="s1">&#39;n_best_prompts&#39;</span>
+            <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">show_best_prompts</span><span class="p">(</span><span class="n">partial_metrics</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">show_worst_prompts</span><span class="p">(</span><span class="n">partial_metrics</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target_n_prompts&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Only one prompt to analyze: Correlation analysis and &quot;</span>
+                   <span class="s2">&quot;analysis of best vs. worst prompts are not possible.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Total number of prompts is 0 or non-existent:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;No prompts to analyze: Something must have gone wrong.&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="LanguageResultsProcessor._get_data_from_chunks">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.language_results_processor.LanguageResultsProcessor._get_data_from_chunks">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_data_from_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Chunk</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Uses the ChunKLoader to retrieve a valid queries chunk.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Chunk</span>
+<span class="sd">            A chunk object with valid queries.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">chunk_loader</span> <span class="o">=</span> <span class="n">ChunkLoader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">chunk_loader</span><span class="o">.</span><span class="n">valid_queries_chunk</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

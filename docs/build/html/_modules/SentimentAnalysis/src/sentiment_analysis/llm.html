@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.llm &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.llm</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.llm</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">llm.py</span>
+<span class="sd">------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">ABC</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.decorators.attribute_chain_decorators</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">self_attribute_chain_not_none</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.decorators.data_check_decorators</span> <span class="kn">import</span> <span class="n">requires_property</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.language_processor</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LanguageProcessor</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.samples.samples_manager</span> <span class="kn">import</span> <span class="n">SamplesManager</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_analysis_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SentimentAnalysisConfig</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">src.utils.list_utils</span> <span class="kn">import</span> <span class="n">get_common_elements</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s1">&#39;DataSourceSuite&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Llm">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.llm.Llm">[docs]</a>
+<span class="k">class</span> <span class="nc">Llm</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Llm class.</span>
+
+<span class="sd">    Abstract base class for LLM implementations.</span>
+
+<span class="sd">    This class provides shared functionality for LLM&#39;s and enforces</span>
+<span class="sd">    implementation of critical methods (&#39;_set_suite&#39; and &#39;_add_api_to_config&#39;)</span>
+<span class="sd">    in subclasses such as &#39;ServerlessBloom&#39;.</span>
+
+<span class="sd">    It provides logging functionality through the LoggingMixin.</span>
+
+<span class="sd">    The Llm class and its child classes basically provide two</span>
+<span class="sd">    functionalities: prompt engineering and sentiment retrieval from the</span>
+<span class="sd">    LLM&#39;s API.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    logger : logging.Logger</span>
+<span class="sd">            Logger instance used for logging messages.</span>
+
+<span class="sd">    compatible_languages : List[str]</span>
+<span class="sd">        The languages that both the data suite and the llm understand.</span>
+
+<span class="sd">    config : SentimentAnalysisConfig</span>
+<span class="sd">        Configuration object that holds sentiment analysis settings.</span>
+
+<span class="sd">    languages : List[str]</span>
+<span class="sd">        The list of languages the LLM understands.</span>
+
+<span class="sd">    non_query_cols : List[str]</span>
+<span class="sd">        The list of non-query columns in the dataset.</span>
+
+<span class="sd">    samples_manager : SamplesManager</span>
+<span class="sd">        A SamplesManager instance that is needed to retrieve any samples</span>
+<span class="sd">        from the suite.</span>
+
+<span class="sd">    suite : DataSourceSuite</span>
+<span class="sd">        The suite from which to get the data samples.</span>
+
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    predict_sentiments() -&gt; None:</span>
+<span class="sd">        Retrieves the sentiment predictions for all languages.</span>
+
+<span class="sd">    predict_sentiments_in_language(language: str = &#39;en&#39;) -&gt; None:</span>
+<span class="sd">        Retrieves the sentiment predictions for the specified language.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Llm.__init__">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.llm.Llm.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes the Llm class, setting up essential components for</span>
+<span class="sd">        sentiment analysis and prompt engineering. It initializes internal</span>
+<span class="sd">        properties, configures logging and prepares sentiment analysis</span>
+<span class="sd">        settings specific to the implementation of the LLM.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - The method calls &#39;_add_api_to_config&#39; and</span>
+<span class="sd">          &#39;_add_llm_instance_to_config&#39; to ensure the LLM-specific API details</span>
+<span class="sd">          are added to the configuration and the current class instance is</span>
+<span class="sd">          registered.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Protected variables to store the property values of this class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples_manager</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_non_query_cols</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compatible_languages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+
+        <span class="c1"># Make the sentiment analysis configuration available in this class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SentimentAnalysisConfig</span><span class="p">()</span>
+
+        <span class="c1"># Complete the sentiment analysis configuration with settings that</span>
+        <span class="c1"># depend on the concrete LLM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_api_to_config</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_llm_instance_to_config</span><span class="p">()</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the LLM instance&#39;s name.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Computed property without setter.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">compatible_languages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the languages that both the data suite and the llm understand.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            The list of languages the data suite and the llm understand.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This is a computed property that has no setter method. If the</span>
+<span class="sd">        property is not set when called, it calls the decorated</span>
+<span class="sd">        _set_compatible_languages method to ensure the necessary properties</span>
+<span class="sd">        and attributes are set for computing and setting the</span>
+<span class="sd">        compatible_languages property so that the latter is available next</span>
+<span class="sd">        time it is needed without having to compute it anew.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_compatible_languages</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_compatible_languages</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reset_samples_manager</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compatible_languages</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">non_query_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the list of non-query columns in the dataset.</span>
+
+<span class="sd">        Retrieves the list of non-query columns the data suite offers.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            List of column names of non-query column names.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - The non_query columns are the calumns that do not represent</span>
+<span class="sd">          query or answer columns. They typically contain</span>
+<span class="sd">          - the text samples for which to retrieve the sentiment class</span>
+<span class="sd">          - the targets (= mentions) mentioned in the samples for which to</span>
+<span class="sd">            retrieve the sentiments</span>
+<span class="sd">          - the sentiment annotations (= polarities) for the text samples</span>
+
+<span class="sd">        - This is a computed property without setter.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">NON_QUERY_COLS</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">samples_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">SamplesManager</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a SamplesManager instance needed to retrieve any samples</span>
+<span class="sd">        from the suite.</span>
+<span class="sd">        </span>
+<span class="sd">        Ensures only one SamplesManager instance is created. </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        SamplesManager</span>
+<span class="sd">            The SamplesManager instance.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Computed property without setter.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples_manager</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_samples_manager</span> <span class="o">=</span> <span class="n">SamplesManager</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">compatible_languages</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">non_query_cols</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples_manager</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Abstract Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">languages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the list of languages the LLM understands.</span>
+
+<span class="sd">        Abstract property that needs to be implemented by subclasses.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@languages</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">languages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">languages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the list of languages the LLM understands.</span>
+
+<span class="sd">        Abstract setter method that needs to be implemented by subclasses.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        languages : List[str]</span>
+<span class="sd">            The list of languages.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">suite</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the suite from which to get the data samples.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataSourceSuite</span>
+<span class="sd">            The data suite providing the data samples.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@suite</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">suite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suite</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the data source suite from which to get the data samples.</span>
+
+<span class="sd">        Abstract setter method that needs to be implemented by subclasses.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        suite : DataSourceSuite</span>
+<span class="sd">            The data source suite.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="c1"># endregion --- Abstract Properties</span>
+
+    <span class="c1"># region --- Public Methods ---</span>
+
+<div class="viewcode-block" id="Llm.reset_samples_manager">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.llm.Llm.reset_samples_manager">[docs]</a>
+    <span class="k">def</span> <span class="nf">reset_samples_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets the samples_manager property.</span>
+<span class="sd">        </span>
+<span class="sd">        Resets the samples_manager property so that the SamplesManager needs </span>
+<span class="sd">        to be re-initialized with the new attribute values. </span>
+<span class="sd">        </span>
+<span class="sd">        This reset method is called if attributes are changed that affect </span>
+<span class="sd">        the SamplesManager&#39;s data or behavior.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples_manager</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Llm.predict_sentiments">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.llm.Llm.predict_sentiments">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict_sentiments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the sentiment predictions for all languages.</span>
+
+<span class="sd">        This method retrieves the sentiment predictions for all languages in</span>
+<span class="sd">        the data suite.</span>
+
+<span class="sd">        Iterating through the languages, it calls the</span>
+<span class="sd">        predict_sentiments_in language method to retrieve the</span>
+<span class="sd">        predictions.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - ATTENTION: Before starting a new execution of this method,</span>
+<span class="sd">          with another data_offset than before, ensure you have saved the</span>
+<span class="sd">          checkpoints and the result files from the txt and csv data folders</span>
+<span class="sd">          to another location! Otherwise, the existing checkpoints will</span>
+<span class="sd">          prevent the successful execution of the sentiment prediction.</span>
+
+<span class="sd">        - ATTENTION: Before attempting to run this method, ensure that</span>
+<span class="sd">          prompt engineering was executed first.</span>
+
+<span class="sd">        - If this method fails due to not existing validated queries,</span>
+<span class="sd">          the BatchProcessor will have created a first checkpoint (e.g.</span>
+<span class="sd">          &quot;MadTscSuite_en_balanced_33_batch_checkpoint.txt&quot;) containing a</span>
+<span class="sd">          &quot;1&quot; value in the data/txt folder. This does not have to be removed</span>
+<span class="sd">          before restarting sentiment retrieval as the programm will restart</span>
+<span class="sd">          from the beginning if the first checkpoint is set to 1. Just run</span>
+<span class="sd">          prompt engineering and try to run this method again afterwards.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">language</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compatible_languages</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">predict_sentiments_in_language</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Llm.predict_sentiments_in_language">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.llm.Llm.predict_sentiments_in_language">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict_sentiments_in_language</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;en&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the sentiment predictions for the specified language.</span>
+
+<span class="sd">        This method retrieves the sentiment predictions for the specified</span>
+<span class="sd">        language in the data suite.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">            Language code, e.g. &#39;en&#39;. Defaults to English (&#39;en&#39;).</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - ATTENTION: Before attempting to run this method, ensure that</span>
+<span class="sd">          prompt engineering was executed first.</span>
+
+<span class="sd">        - If this method fails due to not existing validated queries,</span>
+<span class="sd">          the BatchProcessor will have created a first checkpoint (e.g.</span>
+<span class="sd">          &quot;MadTscSuite_en_balanced_33_batch_checkpoint.txt&quot;) containing a</span>
+<span class="sd">          &quot;1&quot; value in the data/txt folder. This does not have to be removed</span>
+<span class="sd">          before restarting sentiment retrieval as the programm will restart</span>
+<span class="sd">          from the beginning if the first checkpoint is set to 1. Just run</span>
+<span class="sd">          prompt engineering and try to run this method again afterwards.</span>
+
+<span class="sd">        - The samples for which the predictions are retrieved are provided</span>
+<span class="sd">          by the SamplesManager, depending on the settings in the</span>
+<span class="sd">          sentiment analysis configuration.</span>
+
+<span class="sd">        - The method does not return anything. The prediction results are</span>
+<span class="sd">          saved in a DataFrame by the QueryColumnProcessor during the</span>
+<span class="sd">          sentiment retrieval with the various processors and serialized as a</span>
+<span class="sd">          CSV file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
+
+        <span class="c1"># Get language-specific samples from the samples_manager, letting the</span>
+        <span class="c1"># manager decide whether balanced or unbalanced samples are needed and</span>
+        <span class="c1"># which samples are taken from all available samples, depending on</span>
+        <span class="c1"># batch size, data offset etc, which are set in the sentiment</span>
+        <span class="c1"># analysis configuration (referenced in this class as self.config).</span>
+
+        <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_manager</span><span class="o">.</span><span class="n">get_samples</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+
+        <span class="n">processor</span> <span class="o">=</span> <span class="n">LanguageProcessor</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">samples</span><span class="p">)</span>
+        <span class="n">processor</span><span class="o">.</span><span class="n">process_language</span><span class="p">()</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="Llm._add_llm_instance_to_config">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.llm.Llm._add_llm_instance_to_config">[docs]</a>
+    <span class="k">def</span> <span class="nf">_add_llm_instance_to_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds this LLM instance to the configuration.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;llm&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Llm._set_compatible_languages">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.llm.Llm._set_compatible_languages">[docs]</a>
+    <span class="nd">@requires_property</span><span class="p">(</span><span class="s2">&quot;languages&quot;</span><span class="p">)</span>
+    <span class="nd">@self_attribute_chain_not_none</span><span class="p">(</span><span class="s1">&#39;suite.languages&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_set_compatible_languages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the compatible_languages property.</span>
+
+<span class="sd">        Sets the compatible_languages property, provided that the</span>
+<span class="sd">        &#39;languages&#39; property is set and the &#39;suite.languages&#39; attribute</span>
+<span class="sd">        chain is correct.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The decorators ensure the needed properties and attributes exist for</span>
+<span class="sd">        computing the compatible_languages property. If the &#39;languages&#39;</span>
+<span class="sd">        property is not set or the &#39;suite.languages&#39; attribute chain is</span>
+<span class="sd">        invalid, a ValueError is raised.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compatible_languages</span> <span class="o">=</span> <span class="n">get_common_elements</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">languages</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">languages</span>
+        <span class="p">)</span></div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+
+    <span class="c1"># --- Abstract Protected Methods ---</span>
+<div class="viewcode-block" id="Llm._add_api_to_config">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.llm.Llm._add_api_to_config">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_add_api_to_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds LLM-specific API settings to the configuration.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

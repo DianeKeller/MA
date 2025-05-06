@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.serialization.pkl_strategy &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.serialization.pkl_strategy</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.serialization.pkl_strategy</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">pkl_strategy.py</span>
+<span class="sd">---------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+
+<span class="kn">from</span> <span class="nn">settings</span> <span class="kn">import</span> <span class="n">SettingCategories</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+<span class="kn">from</span> <span class="nn">src.serialization.file</span> <span class="kn">import</span> <span class="n">File</span>
+<span class="kn">from</span> <span class="nn">src.serialization.serialization_strategy</span> <span class="kn">import</span> <span class="n">SerializationStrategy</span>
+
+
+<div class="viewcode-block" id="PklStrategy">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.pkl_strategy.PklStrategy">[docs]</a>
+<span class="k">class</span> <span class="nc">PklStrategy</span><span class="p">(</span><span class="n">SerializationStrategy</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    PklStrategy.</span>
+
+<span class="sd">    This class is a concrete implementation of the SerializationStrategy</span>
+<span class="sd">    interface for handling PKL (pickle) files. This strategy is used for the</span>
+<span class="sd">    serialization and deserialization of pandas DataFrames to and from the</span>
+<span class="sd">    pickle format.</span>
+
+<span class="sd">    Using the pickle file format to serialize and deserialize large dataframes</span>
+<span class="sd">    offers significantly better performance compared to the csv format. Note</span>
+<span class="sd">    that unlike csv, pickle files are binary and, therefore, cannot be</span>
+<span class="sd">    opened or read with a text editor.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    DATA_STRUCTURE : str</span>
+<span class="sd">        The data structure type this strategy can serialize and</span>
+<span class="sd">        deserialize.</span>
+
+<span class="sd">    FILE_TYPE : str</span>
+<span class="sd">        The file type this strategy uses to serialize and deserialize data.</span>
+<span class="sd">        This string is used in log messages.</span>
+
+<span class="sd">    file : File | None</span>
+<span class="sd">        Inherited from the SerializationStrategy interface. Represents</span>
+<span class="sd">        the pickle file to be serialized or deserialized.</span>
+
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    _add(data: DataFrame | MyDataFrame) -&gt; None:</span>
+<span class="sd">        Saves data to an existing PKL file. If a MyDataFrame object is</span>
+<span class="sd">        given, the dataframe inside the MyDataFrame is added to the PKL file.</span>
+
+<span class="sd">    _load() -&gt; DataFrame:</span>
+<span class="sd">        Deserializes and loads data from a PKL file into a DataFrame. If</span>
+<span class="sd">        the file does not exist, returns None.</span>
+
+<span class="sd">    _save(data: DataFrame | MyDataFrame) -&gt; None:</span>
+<span class="sd">        Serializes and saves a DataFrame to a PKL file. If a MyDataFrame object</span>
+<span class="sd">        is given, the dataframe inside the MyDataFrame is saved.</span>
+
+
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - The path where the pickle file is saved or loaded from is determined by</span>
+<span class="sd">      settings specific to the PKL strategy.</span>
+
+<span class="sd">    - Deserialize pickle files only if you have serialized them yourself or</span>
+<span class="sd">      if they come from a trusted source, as pickle files can contain</span>
+<span class="sd">      executable code that may be malicious.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">DATA_STRUCTURE</span> <span class="o">=</span> <span class="s2">&quot;DataFrame&quot;</span>
+    <span class="n">FILE_TYPE</span> <span class="o">=</span> <span class="s2">&quot;PKL&quot;</span>
+
+<div class="viewcode-block" id="PklStrategy.__init__">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.pkl_strategy.PklStrategy.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">file</span><span class="p">:</span> <span class="n">File</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a new instance of the PklStrategy class.</span>
+
+<span class="sd">        Sets the file path to use, retrieving it from the application settings.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file : File | None</span>
+<span class="sd">            Custom &#39;File&#39; object used for saving or loading data or removing a</span>
+<span class="sd">            file from the file system. The &#39;File&#39; object holds</span>
+<span class="sd">            attributes detailing the name and extension of the file which</span>
+<span class="sd">            is concerned by the intended file operations. If not provided,</span>
+<span class="sd">            operations will require a file to be set later.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_file_path</span><span class="p">(</span><span class="n">SettingCategories</span><span class="o">.</span><span class="n">PKL</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PklStrategy._save">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.pkl_strategy.PklStrategy._save">[docs]</a>
+    <span class="k">def</span> <span class="nf">_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attempts to save the given data to a PKL (pickle) file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : DataFrame | MyDataFrame</span>
+<span class="sd">            The data to be serialized and saved to a PKL file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Ensure that Mypy recognizes that self.file is not None</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">df</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">MyDataFrame</span><span class="p">)</span> <span class="k">else</span> <span class="n">data</span>
+
+        <span class="n">df</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">full_path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PklStrategy._add">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.pkl_strategy.PklStrategy._add">[docs]</a>
+    <span class="k">def</span> <span class="nf">_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attempts to add the given dataframe to an existing file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : DataFrame | MyDataFrame</span>
+<span class="sd">            The DataFrame to be serialized and saved to a file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+
+<div class="viewcode-block" id="PklStrategy._load">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.pkl_strategy.PklStrategy._load">[docs]</a>
+    <span class="k">def</span> <span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attempts to load data from a PKL (pickle) file into a DataFrame.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame | None</span>
+<span class="sd">            The deserialized DataFrame if the file exists; otherwise, None.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Ensure that Mypy recognizes that self.file is not None</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">full_path</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

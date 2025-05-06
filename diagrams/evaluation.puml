@@ -1,0 +1,56 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+!define Abstract abstract class
+
+class Llm {
+  - languages: List<String>
+  - compatible_languages: List<String>
+  - all_languages_evaluation: AllLanguagesEvaluation
+  - samples_manager: SamplesManager
+  - suite: DataSourceSuite
+  - non_query_cols: List<String>
+  + predict_sentiments(): void
+  + evaluate_prompts(): void
+}
+
+class AllLanguagesEvaluation {
+  - overall_metrics: MyDataFrame
+  - aggregated_metrics: DataFrame
+  + add_to_overall_metrics(metrics: MyDataFrame): void
+  + show_overall_rankings(): void
+}
+
+class LanguageResultsProcessor {
+  - language: String
+  - evaluation: PromptEvaluation
+  + process_language(): void
+  + show_best_prompts(): void
+}
+
+class PromptEvaluation {
+  - data: MyDataFrame
+  - metrics: MyDataFrame
+  - best: MyDataFrame
+  - worst: MyDataFrame
+  + compute_all_prompt_metrics(): void
+  + add_prompt_metrics(evaluation: SinglePromptEvaluation): void
+}
+
+class SinglePromptEvaluation {
+  - correct_labels: Labels
+  - predicted_labels: Labels
+  + compute_metrics(): Metrics
+}
+
+class Metrics {
+  - values: Dict<String, Float>
+  + store(metric: String, value: Float): void
+}
+
+Llm --* AllLanguagesEvaluation
+Llm --> LanguageResultsProcessor
+LanguageResultsProcessor --* PromptEvaluation
+PromptEvaluation --* SinglePromptEvaluation
+SinglePromptEvaluation --* Metrics
+@enduml

@@ -1,0 +1,24 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+title LanguageProcessor
+
+start
+:Initialize LanguageProcessor with language and samples;
+partition "process_language" {
+    :Send samples to BatchProcessor;
+    :Process batches;
+    if (LanguageFinishedException raised?) then (Yes)
+      :Log INFO: going to proceed with next language;
+      stop
+    else (No)
+      if (Other exception?) then (Yes)
+        :Log ERROR;
+        :Re-raise the exception;
+        stop
+      else (No)
+        :Log WARNING: finished without LanguageFinishedException ;
+        stop
+      endif
+    endif
+}
+@enduml

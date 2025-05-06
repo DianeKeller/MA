@@ -1,0 +1,88 @@
+@startuml
+
+start
+
+partition "ServerlessBloomWorkflow" {
+
+    :Initialize config:
+            batch_size=99,
+            n_batches=1,
+            chunk_size=15,
+            version='01',
+            data_offset=1,
+            balanced=True,
+            balance=33,
+            n_best_prompts=5,
+            target_n_prompts=150,
+            with_validation=True;
+
+    partition "run_evaluation(strategy_nr, language)" {
+
+        if (language == None?) then (yes)
+            :Update config:
+                version=version,
+                batch_size=99,
+                chunk_size=15,
+                data_offset=101,
+                balanced=True,
+                target_n_prompts=1;
+
+
+        else (no)
+            :Update config:
+                version=version,
+                batch_size=99,
+                chunk_size=15,
+                data_offset=1,
+                balanced=True;
+            partition "EvaluationWorkflow(strategy_nr)" {
+                partition "PromptEvaluation: evaluate_prompts_for_language(language, partial_metrics=['macro'])" {
+                    :Update config: (language == language);
+                    partition "LanguageResultsProcessor.process_language(): process_language" {
+                        :assemble valid chunks in one single chunk;
+                        partition "DeepPromptEvaluation(data, language)" {
+                            :Describe data;
+                            while (More answer columns to process?) is (Yes)
+                                :add prompt metrics;
+                                :add prompt frequencies;
+                            endwhile (No)
+                            :Add ranks;
+                        }
+                        :print metrics sorted by rank;
+                    }
+                }
+            }
+            :Call _language_evaluation(strategy_nr, language);
+        endif
+    }
+
+    :Determine if evaluation is for all languages or specific;
+
+    if (language == None?) then (yes)
+        :Update config: version, batch_size, chunk_size,
+        data_offset=101, balanced=True, target_n_prompts=1;
+        :Call _sentiment_analysis_for_all_languages(strategy_nr);
+        :Aggregate metrics with AllLanguagesEvaluation;
+    else (no)
+        :Update config: version, batch_size, chunk_size,
+        data_offset=1, balanced=True;
+        :Call _language_evaluation(strategy_nr, language);
+        :Evaluate language with EvaluationWorkflow;
+    endif
+}
+
+partition "EvaluationWorkflow" {
+    :Use PromptEvaluation for evaluations;
+}
+
+partition "PromptEvaluation" {
+    :Consolidate results;
+}
+
+partition "AllLanguagesEvaluation" {
+    :Display rankings;
+}
+
+stop
+
+@enduml

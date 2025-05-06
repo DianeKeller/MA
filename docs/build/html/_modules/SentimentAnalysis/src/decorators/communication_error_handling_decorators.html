@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.decorators.communication_error_handling_decorators &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.decorators.communication_error_handling_decorators</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.decorators.communication_error_handling_decorators</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">error_handling_decorators.py</span>
+<span class="sd">----------------------------</span>
+<span class="sd">Version 1.0, updated on 2024-12-17</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">ssl</span> <span class="kn">import</span> <span class="n">SSLError</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">httpcore</span> <span class="kn">import</span> <span class="n">ReadTimeout</span>
+<span class="kn">from</span> <span class="nn">requests.exceptions</span> <span class="kn">import</span> <span class="ne">ConnectionError</span>
+<span class="kn">from</span> <span class="nn">urllib3.exceptions</span> <span class="kn">import</span> <span class="n">ProtocolError</span><span class="p">,</span> <span class="n">NewConnectionError</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.decorators.error_handling_decorators</span> <span class="kn">import</span> <span class="n">handle_error</span>
+<span class="kn">from</span> <span class="nn">src.utils.e_mail</span> <span class="kn">import</span> <span class="n">EMail</span>
+<span class="kn">from</span> <span class="nn">src.utils.time_utils</span> <span class="kn">import</span> <span class="n">current_date_time</span>
+
+<span class="n">MINUTE</span> <span class="o">=</span> <span class="mi">60</span>
+
+
+<div class="viewcode-block" id="handle_query_error">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.communication_error_handling_decorators.handle_query_error">[docs]</a>
+<span class="k">def</span> <span class="nf">handle_query_error</span><span class="p">(</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">Logger</span><span class="p">,</span>
+        <span class="n">err</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span>
+        <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">waiting_time</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    logger : object</span>
+<span class="sd">        The logger object used for logging.</span>
+
+<span class="sd">    err : Exception</span>
+<span class="sd">        The error that occurred.</span>
+
+<span class="sd">    msg : str</span>
+<span class="sd">        The error message to be logged and raised.</span>
+
+<span class="sd">    waiting_time : int</span>
+<span class="sd">        The number of seconds to wait before the program can be resumed.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">err_type</span> <span class="o">=</span> <span class="n">get_error_type_as_string</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="n">err_traceback</span> <span class="o">=</span> <span class="n">get_traceback</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+
+    <span class="c1"># Compose detailed message from provided basic message</span>
+    <span class="n">detailed_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_date_time</span><span class="p">()</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">err_type</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2"> - &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Waiting </span><span class="si">{</span><span class="n">waiting_time</span><span class="si">}</span><span class="s2"> seconds before retrying.&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Traceback: </span><span class="si">{</span><span class="n">err_traceback</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">detailed_msg</span><span class="p">)</span>
+
+    <span class="n">EMail</span><span class="p">()</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">err_type</span><span class="p">,</span> <span class="n">detailed_msg</span><span class="p">)</span>
+    <span class="n">sleep</span><span class="p">(</span><span class="n">waiting_time</span><span class="p">)</span>
+    <span class="n">EMail</span><span class="p">()</span><span class="o">.</span><span class="n">send</span><span class="p">(</span>
+        <span class="s2">&quot;Continuing...&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;Resuming after </span><span class="si">{</span><span class="n">err_type</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="handle_key_error">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.communication_error_handling_decorators.handle_key_error">[docs]</a>
+<span class="k">def</span> <span class="nf">handle_key_error</span><span class="p">(</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">Logger</span><span class="p">,</span>
+        <span class="n">response</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">err</span><span class="p">:</span> <span class="ne">Exception</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles key errors when handling query errors.</span>
+
+<span class="sd">    Handles different kinds of key errors that can be reported in an API&#39;s</span>
+<span class="sd">    response to a query.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    logger : object</span>
+<span class="sd">        The logger object used for logging.</span>
+
+<span class="sd">    response : Dict[str, Any]</span>
+<span class="sd">        The query response reporting the key error.</span>
+
+<span class="sd">    err : Exception</span>
+<span class="sd">        The key error that occurred.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Rate&#39;</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Waiting for rate limit to expire.&quot;</span>
+        <span class="n">handle_query_error</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="mi">63</span> <span class="o">*</span> <span class="n">MINUTE</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;Service Unavailable&#39;</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Service unavailable&quot;</span>
+        <span class="n">handle_query_error</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">MINUTE</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Unexpected KeyError&quot;</span>
+    <span class="n">handle_query_error</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">MINUTE</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_error_type_as_string">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.communication_error_handling_decorators.get_error_type_as_string">[docs]</a>
+<span class="k">def</span> <span class="nf">get_error_type_as_string</span><span class="p">(</span><span class="n">err</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets the error type from the exception formatting it as a string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span></div>
+
+
+
+<div class="viewcode-block" id="get_traceback">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.communication_error_handling_decorators.get_traceback">[docs]</a>
+<span class="k">def</span> <span class="nf">get_traceback</span><span class="p">(</span><span class="n">err</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets the traceback from the exception formatting it as a string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">traceback</span><span class="o">.</span><span class="n">format_exception</span><span class="p">(</span>
+            <span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">),</span> <span class="n">value</span><span class="o">=</span><span class="n">err</span><span class="p">,</span> <span class="n">tb</span><span class="o">=</span><span class="n">err</span><span class="o">.</span><span class="n">__traceback__</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="analyze_connection_error">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.communication_error_handling_decorators.analyze_connection_error">[docs]</a>
+<span class="k">def</span> <span class="nf">analyze_connection_error</span><span class="p">(</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">Logger</span><span class="p">,</span>
+        <span class="n">err</span><span class="p">:</span> <span class="ne">Exception</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inspects the nested exception structure.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    logger : object</span>
+<span class="sd">        The logger object used for logging.</span>
+
+<span class="sd">    err : Exception</span>
+<span class="sd">        The connection error that occurred.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ProtocolError</span><span class="p">):</span>
+        <span class="n">nested_exception</span> <span class="o">=</span> <span class="n">err</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nested_exception</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="ne">ConnectionResetError</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Caught ConnectionResetError within ProtocolError.&quot;</span>
+            <span class="n">handle_query_error</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">MINUTE</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Caught ProtocolError.&quot;</span>
+        <span class="n">handle_query_error</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">MINUTE</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">NewConnectionError</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Caught NewConnectionError.&quot;</span>
+        <span class="n">handle_query_error</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">MINUTE</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">SSLError</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Caught SSLError.&quot;</span>
+        <span class="n">handle_query_error</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">MINUTE</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Caught a general ConnectionError.&quot;</span>
+    <span class="n">handle_query_error</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">MINUTE</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="raise_unknown_exception">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.communication_error_handling_decorators.raise_unknown_exception">[docs]</a>
+<span class="k">def</span> <span class="nf">raise_unknown_exception</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Re-raises an exception with a custom error message and traceback.</span>
+
+<span class="sd">    This method is called when an unexpected exception occurs. It logs the</span>
+<span class="sd">    error message and raises a new exception with the original traceback.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    logger</span>
+
+<span class="sd">    err : Exception</span>
+<span class="sd">        The original exception that was caught.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">err_type</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">err_traceback</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Unexpected error occurred&quot;</span>
+    <span class="n">handle_error</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">err_type</span><span class="p">,</span> <span class="n">err_traceback</span><span class="p">)</span>
+
+    <span class="n">new_exception</span> <span class="o">=</span> <span class="n">err_type</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+    <span class="k">raise</span> <span class="n">new_exception</span><span class="o">.</span><span class="n">with_traceback</span><span class="p">(</span><span class="n">err_traceback</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span></div>
+
+
+
+<div class="viewcode-block" id="query_error_handling">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.communication_error_handling_decorators.query_error_handling">[docs]</a>
+<span class="k">def</span> <span class="nf">query_error_handling</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles errors that occur when a query is sent to an API.</span>
+
+<span class="sd">    Catches the errors, logs them and retries to execute the operation after</span>
+<span class="sd">    some waiting time.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    operation : Callable</span>
+<span class="sd">        The function to be decorated, which sends a query to an API.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Callable</span>
+<span class="sd">        A wrapped function that handles exceptions and retries the query.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+
+        <span class="n">max_retries</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">retry_delay</span> <span class="o">=</span> <span class="mi">60</span>  <span class="c1"># Initial deley in seconds</span>
+
+        <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_retries</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">except</span> <span class="ne">ConnectionError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">analyze_connection_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+                <span class="n">retry_delay</span> <span class="o">*=</span> <span class="mi">2</span>  <span class="c1"># Exponential backoff</span>
+
+            <span class="k">except</span> <span class="n">ProtocolError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;ProtocolError - Attempt </span><span class="si">{</span><span class="n">attempt</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Retrying in </span><span class="si">{</span><span class="n">retry_delay</span><span class="si">}</span><span class="s2"> seconds.&quot;</span>
+                <span class="p">)</span>
+                <span class="n">handle_query_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">retry_delay</span><span class="p">)</span>
+                <span class="n">retry_delay</span> <span class="o">*=</span> <span class="mi">2</span>  <span class="c1"># Exponential backoff</span>
+
+            <span class="k">except</span> <span class="n">ReadTimeout</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;ReadTimeOutError - Attempt </span><span class="si">{</span><span class="n">attempt</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Retrying in </span><span class="si">{</span><span class="n">retry_delay</span><span class="si">}</span><span class="s2"> seconds.&quot;</span>
+                <span class="p">)</span>
+                <span class="n">handle_query_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">retry_delay</span><span class="p">)</span>
+                <span class="n">retry_delay</span> <span class="o">*=</span> <span class="mi">2</span>  <span class="c1"># Exponential backoff</span>
+
+            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;JSONDecodeError - Attempt </span><span class="si">{</span><span class="n">attempt</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Retrying in </span><span class="si">{</span><span class="n">retry_delay</span><span class="si">}</span><span class="s2"> seconds.&quot;</span>
+                <span class="p">)</span>
+                <span class="n">handle_query_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">retry_delay</span><span class="p">)</span>
+                <span class="n">retry_delay</span> <span class="o">*=</span> <span class="mi">2</span>  <span class="c1"># Exponential backoff</span>
+
+            <span class="k">except</span> <span class="n">SSLError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;SSLError - Attempt </span><span class="si">{</span><span class="n">attempt</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Retrying in </span><span class="si">{</span><span class="n">retry_delay</span><span class="si">}</span><span class="s2"> seconds.&quot;</span>
+                <span class="p">)</span>
+                <span class="n">handle_query_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">retry_delay</span><span class="p">)</span>
+                <span class="n">retry_delay</span> <span class="o">*=</span> <span class="mi">2</span>  <span class="c1"># exponential backoff</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
+                <span class="n">err_type</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">err_traceback</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;FATAL: Unexpected error during communication: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">detailed_msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_date_time</span><span class="p">()</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">err_type</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2"> - &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">err_traceback</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">EMail</span><span class="p">()</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err_type</span><span class="p">),</span> <span class="n">detailed_msg</span><span class="p">)</span>
+
+                <span class="n">raise_unknown_exception</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ReadTimeout</span><span class="p">(</span><span class="s2">&quot;Maximum retries reached.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+
+<div class="viewcode-block" id="communication_error_handling">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.communication_error_handling_decorators.communication_error_handling">[docs]</a>
+<span class="k">def</span> <span class="nf">communication_error_handling</span><span class="p">(</span><span class="n">operation</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles communication-related errors with automatic retries and backoff.</span>
+
+<span class="sd">    Handles communication-related errors that occur when sending requests</span>
+<span class="sd">    to external APIs.</span>
+
+<span class="sd">    The decorator wraps the given operation and handles specific</span>
+<span class="sd">    communication-related errors, logging appropriate messages and retrying</span>
+<span class="sd">    the operation with exponential backoff.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+
+        <span class="n">max_retries</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">retry_delay</span> <span class="o">=</span> <span class="mi">60</span>  <span class="c1"># Initial deley in seconds</span>
+
+        <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_retries</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+
+            <span class="n">err_msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Attempt </span><span class="si">{</span><span class="n">attempt</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2">. Retrying in &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">retry_delay</span><span class="si">}</span><span class="s2"> seconds.&quot;</span>
+            <span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="n">ReadTimeout</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;ReadTimeOutError - </span><span class="si">{</span><span class="n">err_msg</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">handle_query_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">retry_delay</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">ConnectionError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Connection error while communicating with the API. - &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">err_msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">handle_query_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">retry_delay</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">Timeout</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;The request to the API timed out. - </span><span class="si">{</span><span class="n">err_msg</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">handle_query_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">retry_delay</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unexpected request-related error: - </span><span class="si">{</span><span class="n">err_msg</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">handle_query_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">retry_delay</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
+                <span class="n">err_type</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">err_traceback</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;FATAL: Unexpected error during communication: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">detailed_msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_date_time</span><span class="p">()</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">err_type</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2"> - &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">err_traceback</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">EMail</span><span class="p">()</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err_type</span><span class="p">),</span> <span class="n">detailed_msg</span><span class="p">)</span>
+
+                <span class="n">handle_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">err_type</span><span class="p">,</span> <span class="n">err_traceback</span><span class="p">)</span>
+
+            <span class="c1"># Exponential backoff</span>
+            <span class="n">retry_delay</span> <span class="o">*=</span> <span class="mi">2</span>
+
+        <span class="k">raise</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ReadTimeout</span><span class="p">(</span><span class="s2">&quot;Maximum retries reached.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.data_sources.data_source_strategy &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.data_sources.data_source_strategy</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.data_sources.data_source_strategy</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">data_source_strategy.py</span>
+<span class="sd">-----------------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.data_sources.data_source_subset_stats</span> <span class="kn">import</span> <span class="n">DataSourceSubsetStats</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s1">&#39;DataSourceStrategy&#39;</span><span class="p">)</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s1">&#39;DataCollection&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DataSourceStrategy">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_strategy.DataSourceStrategy">[docs]</a>
+<span class="k">class</span> <span class="nc">DataSourceStrategy</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract base class for data source strategies.</span>
+
+<span class="sd">    Serves as a blueprint for concrete data source strategies. Defines</span>
+<span class="sd">    properties and methods for the management and the manipulation of data</span>
+<span class="sd">    collections that the concrete data source strategies must implement.</span>
+
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    logger : Logger</span>
+<span class="sd">        The logger instance used for logging within the data source strategy</span>
+<span class="sd">        subclasses.</span>
+
+
+<span class="sd">    Abstract Attributes</span>
+<span class="sd">    -------------------</span>
+<span class="sd">    data : D</span>
+<span class="sd">        The data in the current strategy.</span>
+
+<span class="sd">    base_description : str</span>
+<span class="sd">        The base description of the data in its current strategy.</span>
+
+<span class="sd">    language : str</span>
+<span class="sd">        The language of the data.</span>
+
+<span class="sd">    alphabet : List[str]</span>
+<span class="sd">        The alphabet used in the data.</span>
+
+
+<span class="sd">    Abstract Methods</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    add_columns() -&gt; None:</span>
+<span class="sd">        Adds new computed columns to the data collection.</span>
+
+<span class="sd">    add_text_length_column() -&gt; None:</span>
+<span class="sd">        Adds a text length column to the data.</span>
+
+<span class="sd">    add_word_count_column(tokenization_strategy_name=&#39;&#39;) -&gt; None:</span>
+<span class="sd">        Adds a word count column to the data.</span>
+
+<span class="sd">    create_subset_stats_instance()  -&gt; DataSourceSubsetStats:</span>
+<span class="sd">        Creates an instance of a SubsetStats class for the current strategy.</span>
+
+<span class="sd">    extract_columns(subset_name_extension: str, col_names: List[str]) -&gt; T:</span>
+<span class="sd">        Extracts a subset of the data containing only the specified columns.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DataSourceStrategy.__init__">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_strategy.DataSourceStrategy.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes common attributes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">D</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the data in the current strategy.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        D</span>
+<span class="sd">            The data. Its concrete type depends on the type of DataCollection</span>
+<span class="sd">            the current strategy uses to store the data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">base_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the base description of the data in its current strategy.</span>
+
+<span class="sd">        The base description is the basic description for any data stored in an</span>
+<span class="sd">        instance of a class that implements the DataCollection class. It is</span>
+<span class="sd">        passed from the current MMS strategy to the MmsStrategy base class</span>
+<span class="sd">        at the moment of initialization. It includes information about:</span>
+
+<span class="sd">        - the type of the data,</span>
+<span class="sd">        - the name of the data,</span>
+<span class="sd">        - the number of rows and columns,</span>
+<span class="sd">        - the column names,</span>
+<span class="sd">        - the names and values of the single-value columns dropped.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The base description of the data in its current strategy.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The base description is originally the content of the __str__ method in</span>
+<span class="sd">        the DataCollection class, but it may have been overridden by the</span>
+<span class="sd">        inheriting classes. For example, the MyDatasetDict class adds to it</span>
+<span class="sd">        information about the number and the names of the splits contained</span>
+<span class="sd">        in the class&#39;s DatasetDict data structure before it passes the base</span>
+<span class="sd">        description on to the MmsStrategy base class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">language</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the language of the data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The language code of the data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@language</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">language</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the language of the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">alphabet</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the alphabet used in the data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            The alphabet used in the data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">alphabet</span>
+
+    <span class="c1"># endregion --- properties</span>
+
+    <span class="c1"># region --- Abstract Methods</span>
+
+<div class="viewcode-block" id="DataSourceStrategy.add_columns">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_strategy.DataSourceStrategy.add_columns">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">add_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds new computed columns to the data collection.</span>
+
+<span class="sd">        Adds new computed columns such as a text length column, a word count</span>
+<span class="sd">        column, and a sentence count column.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The modified data is not returned. Instead, the data in the class</span>
+<span class="sd">        instance is modified in place.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="DataSourceStrategy.add_text_length_column">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_strategy.DataSourceStrategy.add_text_length_column">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">add_text_length_column</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a text length column to the data.</span>
+
+<span class="sd">        Adds a column to the data that stores the length of the text</span>
+<span class="sd">        from the &#39;text&#39; column.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The data is modified in place and is not returned from this</span>
+<span class="sd">        method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="DataSourceStrategy.add_word_count_column">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_strategy.DataSourceStrategy.add_word_count_column">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">add_word_count_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenization_strategy_name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a word count column to the data.</span>
+
+<span class="sd">        Adds a column to the data that stores the number of words</span>
+<span class="sd">        contained in the &#39;text&#39; column.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tokenization_strategy_name : str</span>
+<span class="sd">            The identifying first part of the name of the word tokenization</span>
+<span class="sd">            strategy to use, e.g. &quot;NoPunctuation&quot; for the</span>
+<span class="sd">            NoPunctuationStrategy. Defaults to an empty string.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - If no tokenization strategy name is provided, the word tokenizer</span>
+<span class="sd">          will use the default word tokenization strategy specified in the</span>
+<span class="sd">          TokenizationMixin class.</span>
+
+<span class="sd">        - The data is modified in place and is not returned from this</span>
+<span class="sd">          method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="DataSourceStrategy.create_subset_stats_instance">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_strategy.DataSourceStrategy.create_subset_stats_instance">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">create_subset_stats_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataSourceSubsetStats</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates an instance of a SubsetStats class for the current strategy.</span>
+
+<span class="sd">        Creates an instance of a concrete implementation of the SubsetStats</span>
+<span class="sd">        class for the current strategy.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataSourceSubsetStats</span>
+<span class="sd">            An instance of the SubsetStats class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="DataSourceStrategy.extract_columns">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_strategy.DataSourceStrategy.extract_columns">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">extract_columns</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
+            <span class="n">subset_name_extension</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">col_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts a subset of the data containing only the specified columns.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subset_name_extension : str</span>
+<span class="sd">            The string by which the data&#39;s name will be extended to form the</span>
+<span class="sd">            subset&#39;s name.</span>
+
+<span class="sd">        col_names : List[str]</span>
+<span class="sd">            The names of the columns to include in the subset.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        T</span>
+<span class="sd">            A new DataSourceStrategy instance containing the extracted</span>
+<span class="sd">            subset.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="DataSourceStrategy._extract_subset">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_strategy.DataSourceStrategy._extract_subset">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_extract_subset</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">subset_name_extension</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">col_value</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts a subset of the data filtered by a given column value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subset_name_extension : str</span>
+<span class="sd">            The string by which the data&#39;s name will be extended to form the</span>
+<span class="sd">            subset&#39;s name.</span>
+
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the column in which to seek for the specified value.</span>
+
+<span class="sd">        col_value : Any</span>
+<span class="sd">            The value for which to seek in the specified column</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        T</span>
+<span class="sd">            A new DataSourceStrategy instance containing the extracted</span>
+<span class="sd">            subset.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Abstract Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

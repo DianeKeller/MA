@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.stats.visualization.diagram &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.stats.visualization.diagram</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.stats.visualization.diagram</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">diagram.py</span>
+<span class="sd">---------------------</span>
+<span class="sd">Version 1.0, updated on 2024-12-28</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_analysis_config</span> <span class="kn">import</span> \
+    <span class="n">SentimentAnalysisConfig</span>
+<span class="kn">from</span> <span class="nn">src.stats.visualization.command_line_strategy</span> <span class="kn">import</span> <span class="n">CommandLineStrategy</span>
+<span class="kn">from</span> <span class="nn">src.stats.visualization.plotter</span> <span class="kn">import</span> <span class="n">Plotter</span>
+<span class="kn">from</span> <span class="nn">src.utils.time_utils</span> <span class="kn">import</span> <span class="n">beep</span>
+
+
+<div class="viewcode-block" id="Diagram">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram">[docs]</a>
+<span class="k">class</span> <span class="nc">Diagram</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class provides diagram drawing methods for the visualization of</span>
+<span class="sd">    statistics.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This class uses a DO_BEEP constant which is set at the beginning of</span>
+<span class="sd">    the class. It is used to decide whether to play a sound or not when the</span>
+<span class="sd">    drawing of a diagram is finished. As the statistical analysis and the</span>
+<span class="sd">    drawing of diagrams is time-consuming, the user may wish to be</span>
+<span class="sd">    acoustically alerted when the analysis is done. Most probably, you may</span>
+<span class="sd">    want to set DO_BEEP to</span>
+<span class="sd">    - False when running the programm via Jupyter Notebook</span>
+<span class="sd">    - True when using a Python IDE or a command line.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">DO_BEEP</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">COLOR_1</span> <span class="o">=</span> <span class="s1">&#39;blue&#39;</span>
+    <span class="n">COLOR_2</span> <span class="o">=</span> <span class="s1">&#39;orange&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotter</span><span class="p">:</span> <span class="n">Plotter</span> <span class="o">=</span> <span class="n">Plotter</span><span class="p">(</span><span class="n">CommandLineStrategy</span><span class="p">())):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span> <span class="o">=</span> <span class="n">plotter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SentimentAnalysisConfig</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Diagram.diagram_beep">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.diagram_beep">[docs]</a>
+    <span class="k">def</span> <span class="nf">diagram_beep</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decide whether to play a sound and act accordingly.</span>
+
+<span class="sd">        Play a sound depending on the DO_BEEP setting at the beginning of the</span>
+<span class="sd">        file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DO_BEEP</span><span class="p">:</span>
+            <span class="n">beep</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Diagram.bar_plot">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.bar_plot">[docs]</a>
+    <span class="k">def</span> <span class="nf">bar_plot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">array</span><span class="p">,</span>
+            <span class="n">y_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">legend</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Visualizes the array content in a bar plot.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        array</span>
+<span class="sd">            The array to be visualized.</span>
+
+<span class="sd">        y_label : str</span>
+<span class="sd">            The label for the y-axis.</span>
+
+<span class="sd">        legend : str</span>
+<span class="sd">            The label for the legend.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">diagram_beep</span><span class="p">()</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">array</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">legend</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">y_label</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Words&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Diagram.line_plot">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.line_plot">[docs]</a>
+    <span class="k">def</span> <span class="nf">line_plot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">y_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">x_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">thresholds</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">invert_y_axis</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plots a line diagram for the given DataFrame.</span>
+
+<span class="sd">        If thresholds are provided, threshold lines are added with labels on</span>
+<span class="sd">        the secondary y-axis qualifying the range of values above the threshold</span>
+<span class="sd">        up to the next threshold.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : DataFrame</span>
+<span class="sd">            A DataFrame containing the data to plot.</span>
+
+<span class="sd">        title : str</span>
+<span class="sd">            Title of the diagram.</span>
+
+<span class="sd">        y_label : str</span>
+<span class="sd">            Label for the y-axis.</span>
+
+<span class="sd">        x_label : str</span>
+<span class="sd">            Label for the x-axis.</span>
+
+<span class="sd">        thresholds : Dict[str, float]</span>
+<span class="sd">            Dictionary where the keys are the labels for the area above the</span>
+<span class="sd">            given threshold, and the values are the threshold values.</span>
+
+<span class="sd">        invert_y_axis : bool</span>
+<span class="sd">            Whether the y-axis is to be inverted. Defaults to False.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">column</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">x_label</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">y_label</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">thresholds</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_thresholds</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">invert_y_axis</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+
+        <span class="c1"># Rotate x labels if there are too many labels</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticks</span><span class="p">())</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+                               <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">15</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticks</span><span class="p">())</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+                               <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span>
+                <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;outside right upper&#39;</span><span class="p">,</span>
+                <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span>
+                <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;outside right upper&#39;</span><span class="p">,</span>
+                <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.98</span><span class="p">,</span> <span class="mf">0.87</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Adjust layout</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">])</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+
+        <span class="c1"># Show the plot</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Diagram.add_thresholds">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.add_thresholds">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_thresholds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax1</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+
+        <span class="c1"># Ensure the secondary y-axis ticks and labels are set correctly</span>
+        <span class="n">threshold_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">thresholds</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">threshold_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">thresholds</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="c1"># Plot threshold lines on the primary axis and create corresponding</span>
+        <span class="c1"># labels on the secondary axis</span>
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">thresholds</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+
+        <span class="c1"># Set the tick positions and labels for the secondary y-axis</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">threshold_values</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">label</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">threshold_keys</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ax1</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">())</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Hide tick marks</span></div>
+
+
+<div class="viewcode-block" id="Diagram.box_plot">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.box_plot">[docs]</a>
+    <span class="k">def</span> <span class="nf">box_plot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">y_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">x_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">invert_y_axis</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="p">(</span><span class="n">ax</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+        <span class="n">df</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+        <span class="c1"># Setting the title and labels</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">y_label</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">x_label</span><span class="p">)</span>
+
+        <span class="c1"># Rotating the x-axis labels</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+                           <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">invert_y_axis</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+
+        <span class="c1"># Displaying the plot</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="Diagram.heatmap_from_df">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.heatmap_from_df">[docs]</a>
+    <span class="k">def</span> <span class="nf">heatmap_from_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">correlation_data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">correlation_data</span><span class="p">)</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">correlation_data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+        <span class="n">height</span> <span class="o">=</span> <span class="n">lines</span> <span class="o">/</span> <span class="mf">1.3</span> <span class="k">if</span> <span class="n">lines</span> <span class="o">&gt;=</span> <span class="mi">12</span> <span class="k">else</span> <span class="mi">6</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="n">cols</span> <span class="o">/</span> <span class="mf">1.3</span> <span class="k">if</span> <span class="n">cols</span> <span class="o">&gt;=</span> <span class="mi">12</span> <span class="k">else</span> <span class="mi">6</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">))</span>
+
+        <span class="c1"># With vmin and vmax, ensure that the range of the color scale</span>
+        <span class="c1"># reflects the range of possible values, not the range of actual</span>
+        <span class="c1"># values.</span>
+        <span class="c1"># sns.heatmap(correlation_data.to_frame(), annot=True,</span>
+        <span class="c1">#            cmap=&#39;coolwarm&#39;, vmin=-1, vmax=1)</span>
+        <span class="n">correlation_data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="n">textwrap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span>
+                                  <span class="n">correlation_data</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+
+        <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">correlation_data</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;coolwarm&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># Make y-tick labels horizontal</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+        <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Correlation of Prompt Parts with Rank - v</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">version</span><span class="p">)</span>
+
+        <span class="c1"># Displaying the plot</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Diagram.heatmap">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.heatmap">[docs]</a>
+    <span class="k">def</span> <span class="nf">heatmap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">correlation_data</span><span class="p">:</span> <span class="n">Series</span><span class="p">):</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">correlation_data</span><span class="p">)</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="n">lines</span> <span class="o">/</span> <span class="mf">1.3</span> <span class="k">if</span> <span class="n">lines</span> <span class="o">&gt;=</span> <span class="mi">12</span> <span class="k">else</span> <span class="mi">6</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="n">height</span><span class="p">))</span>
+
+        <span class="c1"># With vmin and vmax, ensure that the range of the color scale</span>
+        <span class="c1"># reflects the range of possible values, not the range of actual</span>
+        <span class="c1"># values.</span>
+        <span class="c1"># sns.heatmap(correlation_data.to_frame(), annot=True,</span>
+        <span class="c1">#            cmap=&#39;coolwarm&#39;, vmin=-1, vmax=1)</span>
+        <span class="n">correlation_data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="n">textwrap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span>
+                                  <span class="n">correlation_data</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+
+        <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">correlation_data</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(),</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;coolwarm&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># Make y-tick labels horizontal</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+        <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Correlation of Prompt Parts with Rank - v</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">version</span><span class="p">)</span>
+
+        <span class="c1"># Displaying the plot</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Diagram.calculate_zipf_values">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.calculate_zipf_values">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">calculate_zipf_values</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate target values according to Zipf&#39;s law.</span>
+
+<span class="sd">        This function calculates target values according to Zipf&#39;s law. It</span>
+<span class="sd">        takes a DataFrame as input, calculates the Zipf values based on the</span>
+<span class="sd">        frequencies in the DataFrame, and returns a new DataFrame containing</span>
+<span class="sd">        the calculated Zipf values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : DataFrame</span>
+<span class="sd">            The DataFrame containing the frequencies.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        zipf_values_df : DataFrame</span>
+<span class="sd">            The DataFrame containing the target values.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        According to Zipf&#39;s law, the frequency with wich a word is used is</span>
+<span class="sd">        inversely proportional to its rank. The most frequent word therefore</span>
+<span class="sd">        has a frequency of x/1, the second most frequent word a frequency of</span>
+<span class="sd">        x/2, the third most frequent word a frequency of x/3 and so on.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">zipf_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+            <span class="n">zipf_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">/</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">zipf_values_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">zipf_values</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Zipf&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">zipf_values_df</span></div>
+
+
+<div class="viewcode-block" id="Diagram.prepare_frequency_dataframe">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.prepare_frequency_dataframe">[docs]</a>
+    <span class="k">def</span> <span class="nf">prepare_frequency_dataframe</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+
+        <span class="c1"># If the DataFrame has only one row and the counted elements are</span>
+        <span class="c1"># given in the columns, transpose the DataFrame and rename the</span>
+        <span class="c1"># single column using the provided column name.</span>
+        <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">df</span>
+
+        <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="Diagram.zipf_frequency_diagram">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.zipf_frequency_diagram">[docs]</a>
+    <span class="k">def</span> <span class="nf">zipf_frequency_diagram</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">n_rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">items_type</span><span class="p">,</span>
+            <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a zipf frequency diagram.</span>
+
+<span class="sd">        This function generates a zipf frequency diagram based on the given</span>
+<span class="sd">        DataFrame and parameters. It selects the specified number of rows from</span>
+<span class="sd">        the given column in the DataFrame, plots a bar graph, calculates Zipf</span>
+<span class="sd">        values, plots the Zipf values on the same graph, and adds labels and</span>
+<span class="sd">        title to the graph. Finally, it prints the graph and applies tight</span>
+<span class="sd">        layout to the plot.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : DataFrame</span>
+<span class="sd">            The DataFrame containing the data.</span>
+
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the column in the DataFrame containing the frequencies</span>
+<span class="sd">            for the frequency diagram.</span>
+
+<span class="sd">        n_rows : int</span>
+<span class="sd">            The number of rows to select from the specified column.</span>
+
+<span class="sd">        items_type : str</span>
+<span class="sd">            The type of items in the column.</span>
+
+<span class="sd">        title : str</span>
+<span class="sd">            The title of the frequency diagram.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_frequency_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">col_name</span><span class="p">)</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">][:</span><span class="n">n_rows</span><span class="p">]</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">()</span>
+
+        <span class="n">zipf_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_zipf_values</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="n">zipf_values</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+            <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span>
+            <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;light&#39;</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;medium&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">items_type</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Diagram.all_multiple_frequencies_by_prompt_diagrams">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.all_multiple_frequencies_by_prompt_diagrams">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_multiple_frequencies_by_prompt_diagrams</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">freqs_by_prompt</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">],</span>
+            <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combines all multiple frequencies by prompt diagrams.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        freqs_by_prompt: List[DataFrame]</span>
+<span class="sd">            The list of frequency DataFrames to include as subplots.</span>
+
+<span class="sd">        title : str</span>
+<span class="sd">            The title of the entire diagram.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n_subplots</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">freqs_by_prompt</span><span class="p">)</span>
+        <span class="n">n_diagram_cols</span> <span class="o">=</span> <span class="mi">4</span>
+
+        <span class="c1"># Ceiling division to get the number of rows</span>
+        <span class="n">n_diagram_rows</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="o">-</span><span class="n">n_subplots</span> <span class="o">//</span> <span class="n">n_diagram_cols</span><span class="p">)</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+            <span class="n">n_diagram_rows</span><span class="p">,</span>
+            <span class="n">n_diagram_cols</span><span class="p">,</span>
+            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">n_diagram_rows</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">freqs_by_prompt</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">multiple_frequencies_by_prompt_subplot</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">,</span>
+                <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="sa">f</span><span class="s2">&quot;Prompt </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Remove any unused axes</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_subplots</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)):</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">delaxes</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
+        <span class="c1"># Adjusting the layout to make room for the suptitle</span>
+        <span class="c1"># using rect=[...]:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.96</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Diagram.multiple_frequencies_by_prompt_subplot">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.multiple_frequencies_by_prompt_subplot">[docs]</a>
+    <span class="k">def</span> <span class="nf">multiple_frequencies_by_prompt_subplot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">,</span>
+            <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># Plot the DataFrame</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+        <span class="c1"># Customize the plot</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Categories&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Language&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Diagram.multiple_frequencies_by_prompt_diagram">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.multiple_frequencies_by_prompt_diagram">[docs]</a>
+    <span class="k">def</span> <span class="nf">multiple_frequencies_by_prompt_diagram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">):</span>
+        <span class="c1"># Plot the DataFrame</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+        <span class="c1"># Customize the plot</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Frequency Comparison&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Categories&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Language&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+        <span class="c1"># Show the plot</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Diagram.simple_frequency_diagram">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.simple_frequency_diagram">[docs]</a>
+    <span class="k">def</span> <span class="nf">simple_frequency_diagram</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">n_rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a frequency diagram for a specified column in a DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : DataFrame</span>
+<span class="sd">            The DataFrame containing the data.</span>
+
+<span class="sd">        col_name : str</span>
+<span class="sd">            The column in the DataFrame containing the frequencies for the</span>
+<span class="sd">            frequency diagram.</span>
+
+<span class="sd">        n_rows : int</span>
+<span class="sd">            The number of rows to select from the specified column.</span>
+
+<span class="sd">        title : str</span>
+<span class="sd">            The title of the frequency diagram.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_frequency_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">col_name</span><span class="p">)</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">][:</span><span class="n">n_rows</span><span class="p">]</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">()</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+            <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span>
+            <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;light&#39;</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;medium&#39;</span>
+        <span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+        <span class="c1"># Adding frequency values over the bars</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">patches</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+                <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get_height</span><span class="p">())),</span>
+                <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">p</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">get_height</span><span class="p">()),</span>
+                <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+                <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                <span class="n">textcoords</span><span class="o">=</span><span class="s1">&#39;offset points&#39;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Adjust the y-axis to add some padding</span>
+        <span class="n">y_max</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.1</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">y_max</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Diagram.all_pairwise_frequency_comparison_diagrams">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.all_pairwise_frequency_comparison_diagrams">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_pairwise_frequency_comparison_diagrams</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">true_col</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">n_rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combines all pairwise frequency comparison diagrams.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df</span>
+<span class="sd">        true_col</span>
+<span class="sd">        n_rows</span>
+<span class="sd">        title</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># In the provided original DataFrame, the predicted columns are rows</span>
+        <span class="n">predicted_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">n_subplots</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">predicted_cols</span><span class="p">)</span>
+
+        <span class="n">n_diagram_cols</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">n_diagram_rows</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">n_subplots</span> <span class="o">//</span> <span class="n">n_diagram_cols</span><span class="p">)</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+            <span class="n">n_subplots</span><span class="p">,</span>
+            <span class="n">n_diagram_cols</span><span class="p">,</span>
+            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span> <span class="o">*</span> <span class="n">n_diagram_rows</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">predicted_cols</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pairwise_frequency_comparison_subplot</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">,</span>
+                <span class="n">true_col</span><span class="p">,</span>
+                <span class="n">col</span><span class="p">,</span>
+                <span class="n">n_rows</span><span class="p">,</span>
+                <span class="n">col</span><span class="p">,</span>
+                <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Remove any unused axes</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_subplots</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)):</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">delaxes</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
+        <span class="c1"># Adjusting the layout to make room for the suptitle</span>
+        <span class="c1"># using rect=[...]:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.96</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Diagram.pairwise_frequency_comparison_subplot">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.pairwise_frequency_comparison_subplot">[docs]</a>
+    <span class="k">def</span> <span class="nf">pairwise_frequency_comparison_subplot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">true_col</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">predicted_col</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">n_rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a frequency comparison subplot for true and predicted values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : DataFrame</span>
+<span class="sd">            The DataFrame containing the data.</span>
+
+<span class="sd">        true_col : str</span>
+<span class="sd">            The column in the DataFrame containing the true frequencies.</span>
+
+<span class="sd">        predicted_col : str</span>
+<span class="sd">            The column in the DataFrame containing the predicted frequencies.</span>
+
+<span class="sd">        n_rows : int</span>
+<span class="sd">            The number of rows to select from the specified columns.</span>
+
+<span class="sd">        title : str</span>
+<span class="sd">            The title of the frequency comparison subplot.</span>
+
+<span class="sd">        ax : plt.Axes</span>
+<span class="sd">            The axes on which to plot the subplot.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df_true</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">true_col</span><span class="p">][:</span><span class="n">n_rows</span><span class="p">]</span>
+        <span class="n">df_predicted</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">predicted_col</span><span class="p">][:</span><span class="n">n_rows</span><span class="p">]</span>
+
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">df_true</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">COLOR_1</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+                              <span class="n">align</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+        <span class="n">df_predicted</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">COLOR_2</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+                              <span class="n">align</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Predicted&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_values_to_bars</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">ax</span><span class="o">.</span><span class="n">patches</span><span class="p">[:</span><span class="n">n_rows</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">COLOR_1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_values_to_bars</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">ax</span><span class="o">.</span><span class="n">patches</span><span class="p">[</span><span class="n">n_rows</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">COLOR_2</span><span class="p">)</span>
+
+        <span class="c1"># Adjust the y-axis to add some padding</span>
+        <span class="n">y_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">df_true</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">df_predicted</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">*</span> <span class="mf">1.1</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">y_max</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_add_values_to_bars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">data_row</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
+        <span class="c1"># Adding frequency values over the bars for true values</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">data_row</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+                <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get_height</span><span class="p">())),</span>
+                <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">p</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">get_height</span><span class="p">()),</span>
+                <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+                <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                <span class="n">textcoords</span><span class="o">=</span><span class="s1">&#39;offset points&#39;</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">color</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="Diagram.pairwise_frequency_comparison_diagram">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.pairwise_frequency_comparison_diagram">[docs]</a>
+    <span class="k">def</span> <span class="nf">pairwise_frequency_comparison_diagram</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">true_col</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">predicted_col</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">n_rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a frequency comparison diagram for true and predicted values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : DataFrame</span>
+<span class="sd">            The DataFrame containing the data.</span>
+
+<span class="sd">        true_col : str</span>
+<span class="sd">            The column in the DataFrame containing the true frequencies.</span>
+
+<span class="sd">        predicted_col : str</span>
+<span class="sd">            The column in the DataFrame containing the predicted frequencies.</span>
+
+<span class="sd">        n_rows : int</span>
+<span class="sd">            The number of rows to select from the specified columns.</span>
+
+<span class="sd">        title : str</span>
+<span class="sd">            The title of the frequency comparison diagram.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df_true</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">true_col</span><span class="p">][:</span><span class="n">n_rows</span><span class="p">]</span>
+        <span class="n">df_predicted</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">predicted_col</span><span class="p">][:</span><span class="n">n_rows</span><span class="p">]</span>
+
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">df_true</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">COLOR_1</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+                              <span class="n">align</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;True&#39;</span><span class="p">)</span>
+        <span class="n">df_predicted</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">COLOR_2</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+                              <span class="n">align</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Predicted&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+            <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span>
+            <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;light&#39;</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;medium&#39;</span>
+        <span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_values_to_bars</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">ax</span><span class="o">.</span><span class="n">patches</span><span class="p">[:</span><span class="n">n_rows</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">COLOR_1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_values_to_bars</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">ax</span><span class="o">.</span><span class="n">patches</span><span class="p">[</span><span class="n">n_rows</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">COLOR_2</span><span class="p">)</span>
+
+        <span class="c1"># Adjust the y-axis to add some padding</span>
+        <span class="n">y_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">df_true</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">df_predicted</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">*</span> <span class="mf">1.1</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">y_max</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Diagram.plot_side_by_side">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.stats.visualization.html#SentimentAnalysis.src.stats.visualization.diagram.Diagram.plot_side_by_side">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_side_by_side</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">plot1</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
+            <span class="n">plot2</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
+            <span class="n">title1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">title2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">attr</span><span class="o">=</span><span class="s1">&#39;Comparison&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plots two diagrams side-by-side.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        plot1</span>
+<span class="sd">            A function that takes a matplotlib axis and plots the</span>
+<span class="sd">            first diagram.</span>
+
+<span class="sd">        plot2</span>
+<span class="sd">            A function that takes a matplotlib axis and plots the</span>
+<span class="sd">            second diagram.</span>
+
+<span class="sd">        title1 : str</span>
+<span class="sd">            Title for the first diagram.</span>
+
+<span class="sd">        title2 : str</span>
+<span class="sd">            Title for the second diagram.</span>
+
+<span class="sd">        attr : str</span>
+<span class="sd">            Attribute for comparison, used as a subtitle. Default is</span>
+<span class="sd">            &#39;Comparison&#39;.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+        <span class="c1"># First diagram:</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title1</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+
+        <span class="n">plot1</span><span class="p">(</span><span class="n">ax1</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">))</span>
+
+        <span class="c1"># Second diagram:</span>
+        <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title2</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+
+        <span class="n">plot2</span><span class="p">(</span><span class="n">ax2</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

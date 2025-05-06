@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.serialization.data_serialization_mixin &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.serialization.data_serialization_mixin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.serialization.data_serialization_mixin</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">data_serialization_mixin.py</span>
+<span class="sd">---------------------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">This module provides a mixin class for data serialization, offering methods</span>
+<span class="sd">to load, save, fetch and manage data with flexible authentication strategies.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">no_type_check</span>
+
+<span class="kn">from</span> <span class="nn">src.authentication.authentication_strategy</span> <span class="kn">import</span> <span class="n">AuthenticationStrategy</span>
+<span class="kn">from</span> <span class="nn">src.authentication.authenticator</span> <span class="kn">import</span> <span class="n">Authenticator</span>
+<span class="kn">from</span> <span class="nn">src.authentication.no_authentication_strategy</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">NoAuthenticationStrategy</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.decorators.attribute_chain_decorators</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">self_attribute_chain_not_none</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.decorators.data_check_decorators</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">output_not_none_or_empty</span><span class="p">,</span>
+    <span class="n">requires_property</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.serialization.serialization_factory</span> <span class="kn">import</span> <span class="n">get_serializer</span>
+<span class="kn">from</span> <span class="nn">src.serialization.serialization_strategy</span> <span class="kn">import</span> <span class="n">SerializationStrategy</span>
+<span class="kn">from</span> <span class="nn">src.serialization.serializer</span> <span class="kn">import</span> <span class="n">Serializer</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DataSerializationMixin">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.data_serialization_mixin.DataSerializationMixin">[docs]</a>
+<span class="k">class</span> <span class="nc">DataSerializationMixin</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    DataSerializationMixin class.</span>
+
+<span class="sd">    This mixin provides serialization capabilities for data. It provides</span>
+<span class="sd">    methods to load, save and fetch data from various sources.</span>
+
+<span class="sd">    It also serves as the context in a strategy pattern, allowing you to</span>
+<span class="sd">    dynamically choose an authentication strategy at runtime for accessing</span>
+<span class="sd">    specified online data sources.</span>
+
+<span class="sd">    The mixin works with any authentication strategy that implements the</span>
+<span class="sd">    AuthenticationStrategy interface, giving access to the authentication</span>
+<span class="sd">    functionality of the given authentication strategy.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    auth_strategy : AuthenticationStrategy</span>
+<span class="sd">        The authentication strategy used to access the data.</span>
+
+<span class="sd">    source : str</span>
+<span class="sd">        The source from which the data can be fetched, typically a URL.</span>
+
+<span class="sd">    file_type : str</span>
+<span class="sd">        The type of file used for storing the data, e.g., &#39;csv&#39;, &#39;json&#39;, &#39;txt&#39;.</span>
+
+<span class="sd">    file_name : str</span>
+<span class="sd">        The name of the data file, excluding the file extension.</span>
+
+<span class="sd">    sub_dir : str</span>
+<span class="sd">        The subdirectory where the data file is stored.</span>
+
+<span class="sd">    original_file_name : str</span>
+<span class="sd">        The original file name to use for fetching data, defaulting to the</span>
+<span class="sd">        value of file_name if not explicitly set.</span>
+
+<span class="sd">    serializer : Serializer</span>
+<span class="sd">        The serializer instance used for data serialization and</span>
+<span class="sd">        deserialization.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    add_or_save() -&gt; None:</span>
+<span class="sd">        Saves the data locally, adding it to an existing file or saving it</span>
+<span class="sd">        as a new file.</span>
+
+<span class="sd">    authenticate() -&gt; None:</span>
+<span class="sd">        Authenticates the user with the given authentication strategy when</span>
+<span class="sd">        fetching data from the online source.</span>
+
+<span class="sd">    can_load() -&gt; bool:</span>
+<span class="sd">        Checks if the data can be loaded from the local storage.</span>
+
+<span class="sd">    delete() -&gt; None:</span>
+<span class="sd">        Deletes the data file from the local storage.</span>
+
+<span class="sd">    fetch() -&gt; None:</span>
+<span class="sd">        Fetches the data from the original online source, using the selected</span>
+<span class="sd">        authentication strategy.</span>
+
+<span class="sd">    load() -&gt; None:</span>
+<span class="sd">        Loads the data from the local storage, raising a ValueError if the</span>
+<span class="sd">        loading fails.</span>
+
+<span class="sd">    load_if_possible() -&gt; None:</span>
+<span class="sd">        Loads the data from the local storage if available, without</span>
+<span class="sd">        attempting to fetch or save it.</span>
+
+<span class="sd">    load_or_fetch_and_save() -&gt; None:</span>
+<span class="sd">        Tries to load the data from the local storage. If the data is not</span>
+<span class="sd">        found locally, fetches it from its online source and saves it locally.</span>
+
+<span class="sd">    save() -&gt; None:</span>
+<span class="sd">        Saves the data locally.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Cache for storing loaded data {file_path: (data, last_modified_time)}</span>
+    <span class="n">_cached_data</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">auth_strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">AuthenticationStrategy</span> <span class="o">|</span> <span class="n">NoAuthenticationStrategy</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the authentication strategy used to access the data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_auth_strategy&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;Authentication strategy is not set.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_auth_strategy&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@auth_strategy</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">auth_strategy</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">value</span><span class="p">:</span> <span class="n">AuthenticationStrategy</span> <span class="o">|</span> <span class="n">NoAuthenticationStrategy</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the authentication strategy used to access the data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Use setattr to set the attribute dynamically</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_auth_strategy&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the source of the data.</span>
+
+<span class="sd">        The source is an external link to the data, e.g. an Url from which</span>
+<span class="sd">        the data can be downloaded.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Use getattr to get the attribute dynamically;</span>
+        <span class="c1"># return None if it doesn&#39;t exist</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_source&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="nd">@source</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the source of the data.</span>
+
+<span class="sd">        The source should be an external link to the data, e.g. an Url from</span>
+<span class="sd">        which the data can be downloaded.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Use setattr to set the attribute dynamically</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_source&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">file_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file type of the data.</span>
+
+<span class="sd">        The file type is a string describing the format of the data, e.g.</span>
+<span class="sd">        &#39;csv&#39;, &#39;json&#39;, &#39;txt&#39;.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_file_type&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="nd">@file_type</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">file_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the file type of the data.</span>
+
+<span class="sd">        The file type should be a string describing the format of the data,</span>
+<span class="sd">        e.g. &#39;csv&#39;, &#39;json&#39;, &#39;txt&#39;.</span>
+
+<span class="sd">        Sets the serializer accordingly.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_file_type&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_serializer&#39;</span><span class="p">,</span> <span class="n">get_serializer</span><span class="p">(</span>
+            <span class="n">value</span><span class="p">,</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_file_name&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+        <span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the file name of the data.</span>
+
+<span class="sd">        The file name is a string describing the name of the data file</span>
+<span class="sd">        without the file extension.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_file_name&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="nd">@file_name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the file name of the data.</span>
+
+<span class="sd">        The file name should be a string representing the name of the data file</span>
+<span class="sd">        without the file extension.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_file_name&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="c1"># Reset the serializer so that it needs to get the updated file name</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_serializer&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sub_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the subdirectory for the data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_sub_dir&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="nd">@sub_dir</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">sub_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the subdirectory of the data.</span>
+
+<span class="sd">        The file name should be a string representing the name of the data file</span>
+<span class="sd">        without the file extension.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_sub_dir&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="c1"># Reset the serializer so that it needs to get the updated file name</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_serializer&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">original_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the original file name of the data.</span>
+
+<span class="sd">        Returns the file name which is to be used for fetching the data. If</span>
+<span class="sd">        no special original file name is set, the normal file name is used.</span>
+
+<span class="sd">        The file name is a string describing the name of the data file</span>
+<span class="sd">        without the file extension.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;get_original_file_name&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_original_file_name</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Serializer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides lazy initialization for the serializer instance to use for</span>
+<span class="sd">        serialization.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+                <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_serializer&#39;</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_serializer&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                    <span class="p">(</span>
+                        <span class="s2">&quot;File_type and file_name must be set before accessing &quot;</span>
+                        <span class="s2">&quot;the serializer.&quot;</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="n">serializer</span> <span class="o">=</span> <span class="n">get_serializer</span><span class="p">(</span>
+                <span class="n">file_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">,</span>
+                <span class="n">file_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_dir</span><span class="p">:</span>
+                <span class="n">serializer</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+                    <span class="n">serializer</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sub_dir</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Use setattr to set the attribute dynamically</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_serializer&#39;</span><span class="p">,</span> <span class="n">serializer</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_serializer&#39;</span><span class="p">)</span>
+
+    <span class="nd">@serializer</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="n">SerializationStrategy</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the serializer.</span>
+
+<span class="sd">        This setter normally is not needed since the serializer is computed</span>
+<span class="sd">        from the file_type and file_name. It is only used for testing</span>
+<span class="sd">        purposes, when a mock or temporary file path is needed.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        strategy : SerializationStrategy</span>
+<span class="sd">            The serialization strategy to be used by the serializer.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">Serializer</span><span class="p">(</span><span class="n">strategy</span><span class="p">)</span>
+
+        <span class="c1"># Use setattr to set the attribute dynamically</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_serializer&#39;</span><span class="p">,</span> <span class="n">serializer</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">authenticator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Authenticator</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides lazy initialization for the authenticator instance to use for</span>
+<span class="sd">        authentication.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span>
+                <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_authenticator&#39;</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_authenticator&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">authenticator</span> <span class="o">=</span> <span class="n">Authenticator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">auth_strategy</span><span class="p">)</span>
+            <span class="c1"># Use setattr to set the attribute dynamically</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_authenticator&#39;</span><span class="p">,</span> <span class="n">authenticator</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_authenticator&#39;</span><span class="p">)</span>
+
+    <span class="nd">@authenticator</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">authenticator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="n">AuthenticationStrategy</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the authenticator.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        strategy : AuthenticationStrategy</span>
+<span class="sd">            The authentication strategy to be used by the authenticator.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">authenticator</span> <span class="o">=</span> <span class="n">Authenticator</span><span class="p">(</span><span class="n">strategy</span><span class="p">)</span>
+
+        <span class="c1"># Use setattr to set the attribute dynamically</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_authenticator&#39;</span><span class="p">,</span> <span class="n">authenticator</span><span class="p">)</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="DataSerializationMixin.authenticate">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.data_serialization_mixin.DataSerializationMixin.authenticate">[docs]</a>
+    <span class="k">def</span> <span class="nf">authenticate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Authenticates with the authentication strategy.</span>
+
+<span class="sd">        Authenticates with the authentication strategy if it is an instance</span>
+<span class="sd">        of AuthenticationStrategy.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the authentication strategy is not set.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        ------</span>
+<span class="sd">        If the authentication strategy is an instance of</span>
+<span class="sd">        NoAuthenticationStrategy, no authentication is performed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">authenticator</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DataSerializationMixin.save">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.data_serialization_mixin.DataSerializationMixin.save">[docs]</a>
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves the data locally and invalidates the cache.</span>
+
+<span class="sd">        Saves the data locally and invalidates the cache to ensure new data</span>
+<span class="sd">        is reloaded from disk.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the file path is not set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="c1"># Invalidate the cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_invalidate_cache</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DataSerializationMixin.delete">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.data_serialization_mixin.DataSerializationMixin.delete">[docs]</a>
+    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deletes the data file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DataSerializationMixin.add_or_save">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.data_serialization_mixin.DataSerializationMixin.add_or_save">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_or_save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves the data locally.</span>
+
+<span class="sd">        Saves the data locally, adding it to an existing file or saving it</span>
+<span class="sd">        as a new file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">add_or_save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataSerializationMixin.can_load">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.data_serialization_mixin.DataSerializationMixin.can_load">[docs]</a>
+    <span class="k">def</span> <span class="nf">can_load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the data can be loaded from the local storage location.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the data can be loaded, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">does_path_exist</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DataSerializationMixin.load">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.data_serialization_mixin.DataSerializationMixin.load">[docs]</a>
+    <span class="nd">@self_attribute_chain_not_none</span><span class="p">(</span><span class="s1">&#39;serializer.file.full_path&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads the data from the cache or the local storage.</span>
+
+<span class="sd">        Loads the data from the local storage if not already loaded and</span>
+<span class="sd">        still valid.</span>
+
+<span class="sd">        The loaded data is stored in the data structure of the object</span>
+<span class="sd">        this mixin is attached to using the object&#39;s &#39;data&#39; setter.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the data could not be loaded from cache or the local storage.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        ------</span>
+<span class="sd">        - As a precondition, the self_attribute_chain_not_none decorator is</span>
+<span class="sd">          used to ensure that the serializer provides a file path for the</span>
+<span class="sd">          load process.</span>
+
+<span class="sd">        - The _load() method is used to allow for the output_not_none_or_empty</span>
+<span class="sd">          decorator to check the data exists before assigning it to self.data.</span>
+
+<span class="sd">        - The loading process will result in a data structure defined by</span>
+<span class="sd">          the serialization strategy. As the data needs to be wrapped in the</span>
+<span class="sd">          object this mixin is attached to, it is up to the &#39;data&#39; setter of</span>
+<span class="sd">          the object to convert the data to the correct type.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_from_cache</span><span class="p">():</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Else: File has been modified, load from the original source</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;Failed to load data!&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Cache the newly loaded data</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">full_path</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_data</span><span class="p">[</span><span class="n">file_path</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DataSerializationMixin.fetch">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.data_serialization_mixin.DataSerializationMixin.fetch">[docs]</a>
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@requires_property</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;auth_strategy&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fetch data from the original source.</span>
+
+<span class="sd">        This method uses the methods of the authentication strategy to</span>
+<span class="sd">        authenticate the user and fetch the data from the original source.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the source is not set in this class.</span>
+
+<span class="sd">        Exception</span>
+<span class="sd">            If any other exception occurs when trying to fetch and save data</span>
+<span class="sd">            from the original source.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        ------</span>
+<span class="sd">        The fetched data is not returned but stored in the data structure of</span>
+<span class="sd">        the object this mixin is attached to.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Different authentication methods depending on the source</span>
+            <span class="c1"># Authentication is only required for instances of</span>
+            <span class="c1"># AuthenticationStrategy.</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">auth_strategy</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">authenticate</span><span class="p">()</span>
+
+            <span class="c1"># Different load methods depending on the source</span>
+            <span class="c1"># Using the data setter of the class this mixin is mixed in to</span>
+            <span class="c1"># ensure the data has the correct data type</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">authenticator</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+                <span class="n">file_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">original_file_name</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
+                <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                    <span class="s2">&quot;Loading from </span><span class="si">%s</span><span class="s2"> was not successful.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span>
+                <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+
+            <span class="n">err_type</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">err_traceback</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unexpected error trying to fetch </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Raise a new exception of the same type with enhanced message</span>
+            <span class="c1"># Ensure the original traceback is preserved</span>
+
+            <span class="n">new_exception</span> <span class="o">=</span> <span class="n">err_type</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+            <span class="k">raise</span> <span class="n">new_exception</span><span class="o">.</span><span class="n">with_traceback</span><span class="p">(</span><span class="n">err_traceback</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span></div>
+
+
+<div class="viewcode-block" id="DataSerializationMixin.load_or_fetch_and_save">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.data_serialization_mixin.DataSerializationMixin.load_or_fetch_and_save">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_or_fetch_and_save</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads the data from their local storage location.</span>
+
+<span class="sd">        If the data is not found locally, this method will call the</span>
+<span class="sd">        &#39;fetch&#39; method to fetch the data from its online source and save it</span>
+<span class="sd">        locally.</span>
+
+<span class="sd">        The loaded data will be stored in the data structure of the object</span>
+<span class="sd">        this mixin is attached to.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_load</span><span class="p">():</span>
+            <span class="n">DataSerializationMixin</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DataSerializationMixin.load_if_possible">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.data_serialization_mixin.DataSerializationMixin.load_if_possible">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_if_possible</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads the data from their local storage location.</span>
+
+<span class="sd">        If the data is not found locally, this method will do nothing,</span>
+<span class="sd">        leaving it to the caller to decide how to proceed further.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        ------</span>
+<span class="sd">        The loaded data is not returned but stored in the data structure of</span>
+<span class="sd">        the object this mixin is attached to.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_load</span><span class="p">():</span>
+            <span class="n">DataSerializationMixin</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="DataSerializationMixin._invalidate_cache">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.data_serialization_mixin.DataSerializationMixin._invalidate_cache">[docs]</a>
+    <span class="nd">@self_attribute_chain_not_none</span><span class="p">(</span><span class="s1">&#39;serializer.file.full_path&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_invalidate_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Invalidates the cache to ensure new data is reloaded from disk.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">full_path</span>
+
+        <span class="k">if</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_data</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_data</span><span class="p">[</span><span class="n">file_path</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Cache invalidated for </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2"> after saving.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;info&quot;</span>
+            <span class="p">)</span></div>
+
+
+    <span class="nd">@output_not_none_or_empty</span><span class="p">(</span><span class="s2">&quot;Cannot load data&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+<div class="viewcode-block" id="DataSerializationMixin._load_from_cache">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.data_serialization_mixin.DataSerializationMixin._load_from_cache">[docs]</a>
+    <span class="k">def</span> <span class="nf">_load_from_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load existing data from the cache if it is still valid.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the data was loaded from the cache, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">full_path</span>
+
+        <span class="c1"># Check if the data has already been loaded and is still valid.</span>
+        <span class="k">if</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_data</span><span class="p">:</span>
+            <span class="n">cached_data</span><span class="p">,</span> <span class="n">last_load_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_data</span><span class="p">[</span><span class="n">file_path</span><span class="p">]</span>
+            <span class="n">file_modified_time</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span>
+                <span class="n">file_path</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span>
+                <span class="n">file_path</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+
+            <span class="c1"># Check if the data is still valid</span>
+            <span class="k">if</span> <span class="n">file_modified_time</span> <span class="o">==</span> <span class="n">last_load_time</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">cached_data</span>  <span class="c1"># Use cached data</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Using cached data for </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">,</span> <span class="s2">&quot;Using cached data&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

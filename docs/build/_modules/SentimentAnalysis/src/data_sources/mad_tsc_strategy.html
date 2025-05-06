@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.data_sources.mad_tsc_strategy &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.data_sources.mad_tsc_strategy</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.data_sources.mad_tsc_strategy</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">mad_tsc_strategy.py</span>
+<span class="sd">-------------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">no_type_check</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+
+<span class="kn">from</span> <span class="nn">src.authentication.local_strategy</span> <span class="kn">import</span> <span class="n">LocalStrategy</span>
+<span class="kn">from</span> <span class="nn">src.data_sources.data_source_strategy</span> <span class="kn">import</span> <span class="n">DataSourceStrategy</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">D</span>
+<span class="kn">from</span> <span class="nn">src.data_sources.mad_tsc_fact_sheet_mixin</span> <span class="kn">import</span> <span class="n">MadTscFactSheetMixin</span>
+<span class="kn">from</span> <span class="nn">src.data_sources.mad_tsc_subset_stats</span> <span class="kn">import</span> <span class="n">MadTscSubsetStats</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_data</span> <span class="kn">import</span> <span class="n">MyData</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_dataframe_factory</span> <span class="kn">import</span> <span class="n">MyDataFrameFactory</span>
+<span class="kn">from</span> <span class="nn">src.decorators.data_check_decorators</span> <span class="kn">import</span> <span class="n">requires_property</span>
+<span class="kn">from</span> <span class="nn">src.decorators.data_decorators</span> <span class="kn">import</span> <span class="n">requires_data</span>
+<span class="kn">from</span> <span class="nn">src.decorators.execution_time_decorator</span> <span class="kn">import</span> <span class="n">execution_time</span>
+<span class="kn">from</span> <span class="nn">src.decorators.type_check_decorators</span> <span class="kn">import</span> <span class="n">enforce_input_types</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">src.utils.print_utils</span> <span class="kn">import</span> <span class="n">DOUBLE_LINE</span><span class="p">,</span> <span class="n">SEPARATOR</span>
+
+
+<div class="viewcode-block" id="MadTscStrategy">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy">[docs]</a>
+<span class="k">class</span> <span class="nc">MadTscStrategy</span><span class="p">(</span>
+    <span class="n">MyData</span><span class="p">,</span>
+    <span class="n">DataSourceStrategy</span><span class="p">,</span>
+    <span class="n">MadTscFactSheetMixin</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    MadTscStrategy class.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    WORD_TOKENIZATION_STRATEGY : str</span>
+<span class="sd">        The default strategy for word tokenization.</span>
+
+<span class="sd">    SENTENCE_TOKENIZATION_STRATEGY : str</span>
+<span class="sd">        The default strategy for sentence tokenization.</span>
+
+<span class="sd">    TEXT_COLUMN_NAME : str</span>
+<span class="sd">        The name of the column containing the text data. Overrides the</span>
+<span class="sd">        constant in the MyData class.</span>
+
+<span class="sd">    SPLIT_COLUMN_NAME : str</span>
+<span class="sd">        The name of the column that indicates the data split</span>
+<span class="sd">        (e.g., train/test).</span>
+
+<span class="sd">    GID_COLUMN_NAME : str</span>
+<span class="sd">        The name of the column containing the primary GID.</span>
+
+<span class="sd">    TARGETS_COLUMN_NAME : str</span>
+<span class="sd">        The name of the column containing the targets.</span>
+
+<span class="sd">    TEXT_DUPLICATES_COUNT_COLUMN_NAME : str</span>
+<span class="sd">        The name of the column for storing the count of text duplicates.</span>
+
+<span class="sd">    TARGET_COUNT_COLUMN_NAME : str</span>
+<span class="sd">        The name of the column for storing the count of targets in a row.</span>
+
+<span class="sd">    FROM_COLUMN_NAME : str</span>
+<span class="sd">        The name of the column for storing the &#39;from&#39; field of the target.</span>
+
+<span class="sd">    TO_COLUMN_NAME : str</span>
+<span class="sd">        The name of the column for storing the &#39;to&#39; field of the target.</span>
+
+<span class="sd">    MENTION_COLUMN_NAME : str</span>
+<span class="sd">        The name of the column for storing the &#39;mention&#39; field of the target.</span>
+
+<span class="sd">    NUMERICAL_SENTIMENT_POLARITY_COLUMN_NAME : str</span>
+<span class="sd">        The name of the column for storing the numerical sentiment polarity.</span>
+
+<span class="sd">    POSITIVE : int</span>
+<span class="sd">        The constant value representing positive sentiment.</span>
+
+<span class="sd">    NEGATIVE : int</span>
+<span class="sd">        The constant value representing negative sentiment.</span>
+
+<span class="sd">    NEUTRAL : int</span>
+<span class="sd">        The constant value representing neutral sentiment.</span>
+
+<span class="sd">    name : str</span>
+<span class="sd">        The name of the strategy.</span>
+
+<span class="sd">    split_type : str</span>
+<span class="sd">        The type of split the data in the current strategy represents</span>
+<span class="sd">        (e.g., train, test).</span>
+
+<span class="sd">    data : D | None</span>
+<span class="sd">        The data of the strategy.</span>
+
+<span class="sd">    base_description : str</span>
+<span class="sd">        The base description of the data in the current strategy.</span>
+
+<span class="sd">    language : str</span>
+<span class="sd">        The language code of the data.</span>
+
+<span class="sd">    n_rows_with_multiple_targets : int</span>
+<span class="sd">        The number of rows with multiple targets. Computed property without</span>
+<span class="sd">        setter.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    add_columns() -&gt; None:</span>
+<span class="sd">        Adds new computed columns to the data collection.</span>
+
+<span class="sd">    add_text_length_column() -&gt; None:</span>
+<span class="sd">        Adds a text length column to the DataFrame.</span>
+
+<span class="sd">    add_word_count_column(tokenization_strategy_name: str = &#39;&#39;) -&gt; None:</span>
+<span class="sd">        Adds a word count column to the DataFrame.</span>
+
+<span class="sd">    are_cols_identical(</span>
+<span class="sd">            col_name: str, other: MadTscStrategy, other_col_name: str) -&gt; bool:</span>
+<span class="sd">        Checks if columns in the current data and another subset are identical.</span>
+
+<span class="sd">    create(subsets: List[MadTscStrategy]) -&gt; None:</span>
+<span class="sd">        Creates the data in the current strategy by joining the subsets.</span>
+
+<span class="sd">    create_subset_stats_instance() -&gt; MadTscSubsetStats:</span>
+<span class="sd">        Creates an instance of MadTscSubsetStats for the current strategy.</span>
+
+<span class="sd">    extract_columns(subset_name_extension: str, col_names: List[str])</span>
+<span class="sd">            -&gt; MadTscStrategy:</span>
+<span class="sd">        Extracts a subset of the data containing only the specified columns.</span>
+
+<span class="sd">    filter_by_split(split_type: str) -&gt; MadTscStrategy:</span>
+<span class="sd">        Filters the data by the specified split type.</span>
+
+<span class="sd">    get_original_file_name() -&gt; str:</span>
+<span class="sd">        Gets the original file name of the data.</span>
+
+<span class="sd">    join(subset: MadTscStrategy) -&gt; None:</span>
+<span class="sd">        Joins the data columns in the subset with the current data.</span>
+
+<span class="sd">    load() -&gt; None:</span>
+<span class="sd">        Loads the data from its local storage location.</span>
+
+<span class="sd">    preprocess() -&gt; None:</span>
+<span class="sd">        Preprocesses the data in the current strategy.</span>
+
+<span class="sd">    set_index(col_name: str) -&gt; None:</span>
+<span class="sd">        Sets the index of the data in the current strategy.</span>
+
+<span class="sd">    to_string() -&gt; str:</span>
+<span class="sd">        Provides a formatted string representation of the data in the current</span>
+<span class="sd">        strategy.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">WORD_TOKENIZATION_STRATEGY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;NoPunctuation&#39;</span>
+    <span class="n">SENTENCE_TOKENIZATION_STRATEGY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;RegexWithColons&#39;</span>
+
+    <span class="c1"># Name of the column containing the text data</span>
+    <span class="c1"># Overrides the constant definition in the MyData class</span>
+    <span class="n">TEXT_COLUMN_NAME</span> <span class="o">=</span> <span class="s2">&quot;sentence_normalized&quot;</span>
+    <span class="n">SPLIT_COLUMN_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;original_file&#39;</span>
+
+    <span class="c1"># Other existing column names</span>
+    <span class="n">GID_COLUMN_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;primary_gid&#39;</span>
+    <span class="n">TARGETS_COLUMN_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;targets&#39;</span>
+
+    <span class="c1"># New column names</span>
+    <span class="n">TEXT_DUPLICATES_COUNT_COLUMN_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;n_duplicates&#39;</span>
+    <span class="n">TARGET_COUNT_COLUMN_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;n_targets&#39;</span>
+    <span class="n">FROM_COLUMN_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;from&#39;</span>
+    <span class="n">TO_COLUMN_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;to&#39;</span>
+    <span class="n">MENTION_COLUMN_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mention&#39;</span>
+    <span class="n">NUMERICAL_SENTIMENT_POLARITY_COLUMN_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;polarity&#39;</span>
+
+    <span class="c1"># Sentiment polarity values</span>
+    <span class="n">POSITIVE</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">NEGATIVE</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">NEUTRAL</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
+
+<div class="viewcode-block" id="MadTscStrategy.__init__">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">D</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">base_description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes a new instance of the MadTscStrategy class with the</span>
+<span class="sd">        provided parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            The name of the MAD-TSC strategy. Defaults to an empty string.</span>
+
+<span class="sd">        data : D</span>
+<span class="sd">            The data of the strategy. Defaults to None.</span>
+
+<span class="sd">        source : str</span>
+<span class="sd">            The source path of the strategy. Defaults to an empty string.</span>
+
+<span class="sd">        base_description : str</span>
+<span class="sd">            The base description of the data in the current strategy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">DataSourceStrategy</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">MyData</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_split_type</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__base_description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">base_description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="c1"># Set the authentication strategy for fetching the original data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auth_strategy</span><span class="p">:</span> <span class="n">LocalStrategy</span> <span class="o">=</span> <span class="n">LocalStrategy</span><span class="p">(</span><span class="s1">&#39;jsonl&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Set the file type and file name for saving and loading the</span>
+        <span class="c1"># previously processed data.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span> <span class="o">=</span> <span class="s1">&#39;pkl&#39;</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">split_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the split type the data in the current strategy represents.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_type</span>
+
+    <span class="nd">@split_type</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">split_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the split type.</span>
+
+<span class="sd">        Sets the type of split that the data in the current strategy</span>
+<span class="sd">        represents, e.g. &#39;train&#39;, &#39;val&#39; or &#39;test&#39;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        split_type : str</span>
+<span class="sd">            The split type to set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_split_type</span> <span class="o">=</span> <span class="n">split_type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">D</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the data in the current strategy.</span>
+
+<span class="sd">        Gets the data from the MyData parent.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        D</span>
+<span class="sd">            The data in the current strategy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
+
+    <span class="nd">@data</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">D</span> <span class="o">|</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the data.</span>
+
+<span class="sd">        Sets the data in this class&#39;s parent &quot;MyData&quot; class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : D | DataFrame | None</span>
+<span class="sd">            The data to set.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        ------</span>
+<span class="sd">        Uses the &#39;_set_data&#39; method to enable the use of the</span>
+<span class="sd">        enforce_input_types decorator.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">base_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the base description of the data in its current strategy.</span>
+
+<span class="sd">        The base description is the basic description for any data stored in an</span>
+<span class="sd">        instance of a class that implements the DataCollection class. It is</span>
+<span class="sd">        passed from the current MadTsc strategy to the MadTscStrategy base</span>
+<span class="sd">        class at the moment of initialization. It includes information about:</span>
+
+<span class="sd">        - the type of the data,</span>
+<span class="sd">        - the name of the data,</span>
+<span class="sd">        - the number of rows and columns,</span>
+<span class="sd">        - the column names,</span>
+<span class="sd">        - the names and values of the single-value columns dropped.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The base description of the data in its current strategy.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The base description is originally the content of the __str__ method in</span>
+<span class="sd">        the DataCollection class, but it may have been overridden by the</span>
+<span class="sd">        inheriting classes. For example, the MyDatasetDict class adds to it</span>
+<span class="sd">        information about the number and the names of the splits contained</span>
+<span class="sd">        in the class&#39;s DatasetDict data structure before it passes the base</span>
+<span class="sd">        description on to the MmsStrategy base class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__base_description</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">language</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the language of the data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The language code of the data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__language</span>
+
+    <span class="nd">@language</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">language</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the language and the source of the data.</span>
+
+<span class="sd">        As the original JSONL files are stored in language-specific folders</span>
+<span class="sd">        named after the language code, the source is set to the language</span>
+<span class="sd">        code when the language is set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__language</span> <span class="o">=</span> <span class="n">language</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_source</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MadTscStrategy.set_source">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.set_source">[docs]</a>
+    <span class="nd">@requires_property</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">set_source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the source of the data.</span>
+
+<span class="sd">        As the original files are stored in language-dependent subdirectories</span>
+<span class="sd">        of a local directory, the source is composed of the local directory</span>
+<span class="sd">        and the subdirectory corresponding to the language of the</span>
+<span class="sd">        current strategy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ORIG_DIR</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_rows_with_multiple_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the number of rows with multiple targets.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The number of rows with multiple targets.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rows_with_multiple_targets</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="MadTscStrategy.get_original_file_name">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.get_original_file_name">[docs]</a>
+    <span class="nd">@requires_property</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_original_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the original file name of the data.</span>
+
+<span class="sd">        Gets the name of the original file from which to fetch the data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The original file name of the data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy.load">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.load">[docs]</a>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads the data from its local storage location into the DatasetDict.</span>
+
+<span class="sd">        Uses the load_if_possible method provided by the DataSerializationMixin</span>
+<span class="sd">        in the MyData parent class to load the data.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The loaded data is not returned but stored in the &quot;data&quot; property.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_if_possible</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy.create">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.create">[docs]</a>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subsets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">MadTscStrategy</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the data in the current strategy.</span>
+
+<span class="sd">        Creates the data in the current strategy by joining the subsets loaded</span>
+<span class="sd">        from the original files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subsets : List[T]</span>
+<span class="sd">            The subsets of the data to be joined.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - For each subset, the original file name is stored in the</span>
+<span class="sd">          &#39;original_file&#39; column, providing additional information, if needed,</span>
+<span class="sd">          regarding</span>
+
+<span class="sd">              - the topic of the samples (e.g., &#39;&#39;london&#39;, &#39;rio&#39;)</span>
+<span class="sd">              - the news outlet from which the samples were collected (e.g.,</span>
+<span class="sd">                &#39;bbc&#39;, &#39;globo&#39;)</span>
+
+<span class="sd">        - The &#39;original&#39; file names are the file names used in this project</span>
+<span class="sd">          to store and use the original data files. They differ from the file</span>
+<span class="sd">          names of the original files downloaded from their online sources.</span>
+<span class="sd">          They were re-named for more clarity and convenience in this project.</span>
+<span class="sd">          Here is the list of file names as used in this project compared to</span>
+<span class="sd">          the online sources:</span>
+
+<span class="sd">        - The unchanged files from the online sources are stored in the ZIP</span>
+<span class="sd">          files in the &#39;original_files&#39; subfolders of the xls dataset</span>
+<span class="sd">          directories.</span>
+
+<span class="sd">        - The created data is stored in the &#39;data&#39; attribute of the current</span>
+<span class="sd">          strategy. It is up to the caller to save the composed data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">subset</span> <span class="ow">in</span> <span class="n">subsets</span><span class="p">:</span>
+
+            <span class="c1"># Fetch the data from the original files:</span>
+            <span class="n">subset</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+
+            <span class="c1"># Subset.data is guaranteed to be a MyDataFrame or None because</span>
+            <span class="c1"># it was set using its setter. The use_data() method guarantees</span>
+            <span class="c1"># the data is not None.</span>
+            <span class="n">my_df</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">use_data</span><span class="p">()</span>
+
+            <span class="c1"># Add a column with the original file name to keep the</span>
+            <span class="c1"># information it provides:</span>
+            <span class="n">my_df</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                <span class="s1">&#39;add_column&#39;</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">subset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">col_name</span><span class="o">=</span><span class="s1">&#39;original_file&#39;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Join the data of the different files in one data subset</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">my_df</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">do_with_row</span><span class="p">(</span><span class="s1">&#39;add_rows&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy.join">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.join">[docs]</a>
+    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subset</span><span class="p">:</span> <span class="n">MadTscStrategy</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Joins the data columns in the subset with the current data.</span>
+
+<span class="sd">        Joins each of the the data columns in the subset with the current data</span>
+<span class="sd">        provided that the data column&#39;s values are not identical with those of</span>
+<span class="sd">        the corresponding column from the first subset that was used</span>
+<span class="sd">        as the base of the combined subset (i.e., the &#39;_de&#39; subset).</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subset : T</span>
+<span class="sd">            The subset to be joined.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">subset</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">col_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_cols_identical</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}</span><span class="s1">_de&#39;</span><span class="p">,</span>
+                <span class="n">subset</span><span class="p">,</span>
+                <span class="n">col_name</span>
+            <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                    <span class="s1">&#39;add_column&#39;</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">subset</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">],</span>
+                    <span class="n">col_name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">subset</span><span class="o">.</span><span class="n">language</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy.are_cols_identical">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.are_cols_identical">[docs]</a>
+    <span class="k">def</span> <span class="nf">are_cols_identical</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">other</span><span class="p">:</span> <span class="n">MadTscStrategy</span><span class="p">,</span>
+            <span class="n">other_col_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if columns in the current data and another subset are identical.</span>
+
+<span class="sd">        Checks if the specified columns in the current data and another subset</span>
+<span class="sd">        are identical.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the column in the current data.</span>
+
+<span class="sd">        other : MadTscStrategy</span>
+<span class="sd">            The other strategy to compare with.</span>
+
+<span class="sd">        other_col_name : str</span>
+<span class="sd">            The name of the column in the other strategy.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the columns are identical, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+            <span class="s2">&quot;are_cols_identical&quot;</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">other</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">my_df</span><span class="p">,</span>
+            <span class="n">other_col_name</span><span class="o">=</span><span class="n">other_col_name</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy.create_subset_stats_instance">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.create_subset_stats_instance">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_subset_stats_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MadTscSubsetStats</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates an instance of MadTscSubsetStats for the current strategy.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MadTscSubsetStats</span>
+<span class="sd">            An instance of the MadTscSubsetStats class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">MadTscSubsetStats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy.preprocess">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.preprocess">[docs]</a>
+    <span class="k">def</span> <span class="nf">preprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Preprocesses the data in the current strategy.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The modified data is not returned. Instead, the data in the class</span>
+<span class="sd">        instance is modified in place.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Adding target count column to the data...&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_no_duplicate_gids</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">GID_COLUMN_NAME</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_text_duplicates_count_column</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extract_target_details</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy.set_index">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.set_index">[docs]</a>
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@requires_data</span>
+    <span class="k">def</span> <span class="nf">set_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the index of the data in the current strategy.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the column to be used as index.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The modified data is not returned. Instead, the data in the class</span>
+<span class="sd">        instance is modified in place.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index_column</span> <span class="o">=</span> <span class="n">col_name</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy.add_columns">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.add_columns">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds new computed columns to the data collection.</span>
+
+<span class="sd">        Adds new computed columns such as a text length column, and a word</span>
+<span class="sd">        count column.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The modified data is not returned. Instead, the data in the class</span>
+<span class="sd">        instance is modified in place.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Add columns with text length and word count</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Adding text length column to the data...&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_text_length_column</span><span class="p">()</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Adding sentence count column to the data...&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_sentence_count_column</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SENTENCE_TOKENIZATION_STRATEGY</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Adding word count column to the data...&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_word_count_column</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">WORD_TOKENIZATION_STRATEGY</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy.add_text_length_column">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.add_text_length_column">[docs]</a>
+    <span class="nd">@execution_time</span>
+    <span class="k">def</span> <span class="nf">add_text_length_column</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a text length column to the DataFrame.</span>
+
+<span class="sd">        Adds a column to the DataFrame that stores the length of the text</span>
+<span class="sd">        from the &#39;text&#39; column.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The DataFrame is modified in place and is not returned from this</span>
+<span class="sd">        method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">MyData</span><span class="o">.</span><span class="n">add_text_length_column</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy.add_word_count_column">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.add_word_count_column">[docs]</a>
+    <span class="nd">@execution_time</span>
+    <span class="k">def</span> <span class="nf">add_word_count_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenization_strategy_name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a word count column to the DataFrame.</span>
+
+<span class="sd">        Adds a column to the DataFrame that stores the number of words</span>
+<span class="sd">        contained in the &#39;text&#39; column.</span>
+
+<span class="sd">        This method delegates the task of implementing the parent&#39;s</span>
+<span class="sd">        corresponding abstract method to the specific data structure</span>
+<span class="sd">        (&#39;MyData&#39;) this class is implementing.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tokenization_strategy_name : str</span>
+<span class="sd">            The identifying first part of the name of the word tokenization</span>
+<span class="sd">            strategy to use, e.g. &quot;NoPunctuation&quot; for the</span>
+<span class="sd">            NoPunctuationStrategy. Defaults to an empty string.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - If no tokenization strategy name is provided, the word tokenizer</span>
+<span class="sd">          will use the default word tokenization strategy specified in the</span>
+<span class="sd">          TokenizationMixin class.</span>
+
+<span class="sd">        - The DataFrame is modified in place and is not returned from this</span>
+<span class="sd">          method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">MyData</span><span class="o">.</span><span class="n">add_word_count_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenization_strategy_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy.extract_columns">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.extract_columns">[docs]</a>
+    <span class="k">def</span> <span class="nf">extract_columns</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">subset_name_extension</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">col_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MadTscStrategy</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts a subset of the data containing only the specified columns.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subset_name_extension : str</span>
+<span class="sd">            The string by which the data&#39;s name will be extended to form the</span>
+<span class="sd">            subset&#39;s name.</span>
+
+<span class="sd">        col_names : List[str]</span>
+<span class="sd">            The names of the columns to include in the subset.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MadTscStrategy</span>
+<span class="sd">            A Subset of the same type as the current strategy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">subset_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}{</span><span class="n">subset_name_extension</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">MadTscStrategy</span><span class="p">(</span>
+            <span class="n">subset_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_mydata_columns</span><span class="p">(</span><span class="n">col_names</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy.filter_by_split">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.filter_by_split">[docs]</a>
+    <span class="k">def</span> <span class="nf">filter_by_split</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">split_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filters the data by the specified split type.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        split_type : str</span>
+<span class="sd">            The name of the split type to filter by.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        T</span>
+<span class="sd">            The extracted subset of the data as another instance of the same</span>
+<span class="sd">            class as the current class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">subset_name_extension</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">split_type</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPLIT_COLUMN_NAME</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">col_names</span><span class="p">:</span>
+            <span class="n">split_col_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPLIT_COLUMN_NAME</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">split_col_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPLIT_COLUMN_NAME</span> <span class="o">+</span> <span class="s1">&#39;_de&#39;</span>
+
+        <span class="c1"># Dynamically create an instance of the same class</span>
+        <span class="n">subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_subset</span><span class="p">(</span>
+            <span class="n">subset_name_extension</span><span class="p">,</span>
+            <span class="n">split_col_name</span><span class="p">,</span>
+            <span class="n">split_type</span>
+        <span class="p">)</span>
+
+        <span class="n">subset</span><span class="o">.</span><span class="n">split_type</span> <span class="o">=</span> <span class="n">split_type</span>
+
+        <span class="k">return</span> <span class="n">subset</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy.to_string">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy.to_string">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides a formatted string representation of the data in the current</span>
+<span class="sd">        MMS strategy.</span>
+
+<span class="sd">        Expands the base description by MMS specific details like the name</span>
+<span class="sd">        and source of the data collection, the author(s) of the collection</span>
+<span class="sd">        and the citation of the associated scientific paper. If the MMS data</span>
+<span class="sd">        is not yet initialized, the description includes statistical insights</span>
+<span class="sd">        such as the numbers and names of the domains, languages and original</span>
+<span class="sd">        datasets contained in the data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">           A string representation of the data in the current MMS strategy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">DESCRIPTION</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SEPARATOR</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Language: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">) </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DOUBLE_LINE</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="si">}</span><span class="s2"> </span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SEPARATOR</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="MadTscStrategy._set_data">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy._set_data">[docs]</a>
+    <span class="nd">@enforce_input_types</span>
+    <span class="k">def</span> <span class="nf">_set_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">D</span> <span class="o">|</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the data property enforcing the data is of type D.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : D | DataFrame | None</span>
+<span class="sd">            The data to set.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - Sets the value of the _data variable provided by the &#39;MyData&#39;</span>
+<span class="sd">          parent&#39;s parent class, &#39;DataCollection&#39;.</span>
+
+<span class="sd">        - Uses the &#39;enforce_input_types&#39; decorator to ensure that the input</span>
+<span class="sd">          data is of type D, DataFrame or None. If it is a simple</span>
+<span class="sd">          pandas DataFrame, it is wrapped in a MyDataFrame, so that _data is</span>
+<span class="sd">          guaranteed to be of type MyDataFrame or None.</span>
+
+<span class="sd">        - The input data comes in a simple pandas DataFrame format when</span>
+<span class="sd">          loaded from a file using the PKL serialization strategy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy._get_rows_with_multiple_targets">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy._get_rows_with_multiple_targets">[docs]</a>
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@requires_data</span>
+    <span class="k">def</span> <span class="nf">_get_rows_with_multiple_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets rows with multiple targets.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            A DataFrame containing the rows with multiple targets.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">TARGET_COUNT_COLUMN_NAME</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span></div>
+
+
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@requires_data</span>
+    <span class="k">def</span> <span class="nf">_get_duplicate_gids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">GID_COLUMN_NAME</span><span class="p">]</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
+
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@requires_data</span>
+    <span class="k">def</span> <span class="nf">_get_duplicate_texts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TEXT_COLUMN_NAME</span><span class="p">]</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="MadTscStrategy._ensure_no_multiple_targets">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy._ensure_no_multiple_targets">[docs]</a>
+    <span class="k">def</span> <span class="nf">_ensure_no_multiple_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ensures that there is only one target per row.</span>
+
+<span class="sd">        Creates a temporary column that counts the numbers of targets</span>
+<span class="sd">        in the &#39;targets&#39; column. Uses the n_rows_with_multiple_targets property</span>
+<span class="sd">        to check for rows with multiple targets. If there are any, a ValueError</span>
+<span class="sd">        is raised.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_target_count_column</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_rows_with_multiple_targets</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                                    <span class="s1">&#39;Found rows with multiple targets: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">n_rows_with_multiple_targets</span>
+                                    <span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy._extract_subset">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy._extract_subset">[docs]</a>
+    <span class="k">def</span> <span class="nf">_extract_subset</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">subset_name_extension</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">col_value</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MadTscStrategy</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts a subset of the data filtered by a given column value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subset_name_extension : str</span>
+<span class="sd">            The string by which the data&#39;s name will be extended to form the</span>
+<span class="sd">            subset&#39;s name.</span>
+
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the column in which to seek for the specified value.</span>
+
+<span class="sd">        col_value : Any</span>
+<span class="sd">            The value for which to seek in the specified column</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MadTscStrategy</span>
+<span class="sd">            A new MadTscStrategy instance containing the extracted subset.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method implements the corresponding abstract method in the</span>
+<span class="sd">        DataSourceStrategy interface.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">subset_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}{</span><span class="n">subset_name_extension</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">MadTscStrategy</span><span class="p">(</span>
+            <span class="n">subset_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_rows_by_col_value</span><span class="p">(</span><span class="n">col_name</span><span class="p">,</span> <span class="n">col_value</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy._add_target_count_column">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy._add_target_count_column">[docs]</a>
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@requires_data</span>
+    <span class="k">def</span> <span class="nf">_add_target_count_column</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a target count column to the DataFrame.</span>
+
+<span class="sd">        Adds a column to the DataFrame that stores the number of targets</span>
+<span class="sd">        contained in the &#39;targets&#39; column.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - The DataFrame is modified in place and is not returned from this</span>
+<span class="sd">          method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">TARGET_COUNT_COLUMN_NAME</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">TARGETS_COLUMN_NAME</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy._add_target_detail_columns">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy._add_target_detail_columns">[docs]</a>
+    <span class="k">def</span> <span class="nf">_add_target_detail_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds columns for categories extracted from the targets column.</span>
+
+<span class="sd">        Adds separate columns to the DataFrame extracting the values from</span>
+<span class="sd">        the targets column.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - The DataFrame is modified in place and is not returned from this</span>
+<span class="sd">          method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_target_detail_column</span><span class="p">(</span><span class="s1">&#39;from&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">FROM_COLUMN_NAME</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_target_detail_column</span><span class="p">(</span><span class="s1">&#39;to&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TO_COLUMN_NAME</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_target_detail_column</span><span class="p">(</span>
+            <span class="s1">&#39;mention&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MENTION_COLUMN_NAME</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_target_detail_column</span><span class="p">(</span>
+            <span class="s1">&#39;polarity&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NUMERICAL_SENTIMENT_POLARITY_COLUMN_NAME</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy._add_target_detail_column">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy._add_target_detail_column">[docs]</a>
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@requires_data</span>
+    <span class="k">def</span> <span class="nf">_add_target_detail_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a target detail column for the specified category.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        category : str</span>
+<span class="sd">            The name of the category to add the target detail column for.</span>
+
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the target detail column to add.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">TARGETS_COLUMN_NAME</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy._add_text_duplicates_count_column">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy._add_text_duplicates_count_column">[docs]</a>
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@requires_data</span>
+    <span class="k">def</span> <span class="nf">_add_text_duplicates_count_column</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a text duplicates count column to the DataFrame.</span>
+
+<span class="sd">        Adds a column to the DataFrame that stores the number of times the</span>
+<span class="sd">        text in the &#39;text&#39; column appears. Duplicate text has multiple</span>
+<span class="sd">        targets, each treated in a separate row. Therefore, the number of</span>
+<span class="sd">        duplicates corresponds to the number of targets identified in the text.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - The DataFrame is modified in place and is not returned from this</span>
+<span class="sd">          method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">TEXT_DUPLICATES_COUNT_COLUMN_NAME</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TEXT_COLUMN_NAME</span><span class="p">)[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">TEXT_COLUMN_NAME</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="s1">&#39;count&#39;</span><span class="p">)</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy._ensure_no_duplicate_gids">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy._ensure_no_duplicate_gids">[docs]</a>
+    <span class="k">def</span> <span class="nf">_ensure_no_duplicate_gids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ensures that there are no duplicate GIDs in the data.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If there are duplicate GIDs in the data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">duplicates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_duplicate_gids</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">duplicates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> GID duplicates found: </span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">duplicates</span><span class="p">),</span> <span class="n">duplicates</span><span class="p">)</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy._extract_target_details">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy._extract_target_details">[docs]</a>
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@requires_data</span>
+    <span class="k">def</span> <span class="nf">_extract_target_details</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts target details from the targets column into separate columns.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_no_multiple_targets</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_target_detail_columns</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+            <span class="s1">&#39;drop_column&#39;</span><span class="p">,</span> <span class="n">col_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">TARGETS_COLUMN_NAME</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscStrategy._set_source">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy._set_source">[docs]</a>
+    <span class="nd">@requires_property</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_set_source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the source of the data.</span>
+
+<span class="sd">        As the original files are stored in language-dependent subdirectories</span>
+<span class="sd">        of a local directory, the source is composed of the local directory</span>
+<span class="sd">        and the subdirectory corresponding to the language of the</span>
+<span class="sd">        current strategy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ORIG_DIR</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

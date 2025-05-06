@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.decorators.type_check_decorators &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.decorators.type_check_decorators</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.decorators.type_check_decorators</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">type_check_decorators.py</span>
+<span class="sd">------------------------</span>
+<span class="sd">Version 1.0, updated on 2024-12-02</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">get_type_hints</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">get_origin</span><span class="p">,</span> \
+    <span class="n">Union</span><span class="p">,</span> <span class="n">get_args</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">ForwardRef</span>
+
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+
+<span class="kn">from</span> <span class="nn">src.data_structures.data_collection</span> <span class="kn">import</span> <span class="n">DataCollection</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+
+<span class="n">D</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s1">&#39;DataCollection&#39;</span><span class="p">)</span>
+
+<span class="n">namespace</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;DataCollection&#39;</span><span class="p">:</span> <span class="n">DataCollection</span><span class="p">,</span>
+    <span class="s1">&#39;MyDataFrame&#39;</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">,</span>
+    <span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="n">D</span><span class="p">,</span>
+    <span class="s1">&#39;DataFrame&#39;</span><span class="p">:</span> <span class="n">DataFrame</span>
+<span class="p">}</span>
+
+
+<span class="c1"># region --- Public Functions</span>
+
+<div class="viewcode-block" id="enforce_input_types">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators.enforce_input_types">[docs]</a>
+<span class="k">def</span> <span class="nf">enforce_input_types</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ensures that the input parameters actually have the correct data types.</span>
+
+<span class="sd">    Ensures that the input parameters actually have the type specified in</span>
+<span class="sd">    the type hints.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+        <span class="c1"># Merge function arguments with the provided type hints</span>
+        <span class="n">all_args</span> <span class="o">=</span> <span class="n">_merge_args_with_hints</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,)</span> <span class="o">+</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">_validate_args_types</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">all_args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+
+<div class="viewcode-block" id="enforce_output_types">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators.enforce_output_types">[docs]</a>
+<span class="k">def</span> <span class="nf">enforce_output_types</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enforces the correct type of the return value.</span>
+
+<span class="sd">    Ensures that the return value actually has the type specified in the</span>
+<span class="sd">    corresponding type hint.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">_validate_return_type</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+
+<div class="viewcode-block" id="resolve_typevar_bound">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators.resolve_typevar_bound">[docs]</a>
+<span class="k">def</span> <span class="nf">resolve_typevar_bound</span><span class="p">(</span><span class="n">type_var</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Resolves a TypeVar bound, handling forward references if necessary.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">bound</span> <span class="o">=</span> <span class="n">type_var</span><span class="o">.</span><span class="n">__bound__</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bound</span><span class="p">,</span> <span class="n">ForwardRef</span><span class="p">):</span>
+        <span class="c1"># Define a dummy function with &#39;bound&#39; as the parameter annotation</span>
+        <span class="k">def</span> <span class="nf">dummy_func</span><span class="p">():</span> <span class="k">pass</span>
+
+        <span class="c1"># Resolve the forward reference using get_type_hints on the dummy</span>
+        <span class="c1"># function</span>
+        <span class="n">bound</span> <span class="o">=</span> <span class="n">get_type_hints</span><span class="p">(</span><span class="n">dummy_func</span><span class="p">,</span> <span class="n">globalns</span><span class="o">=</span><span class="n">namespace</span><span class="p">)[</span><span class="s1">&#39;param&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">bound</span></div>
+
+
+
+<div class="viewcode-block" id="log_error">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators.log_error">[docs]</a>
+<span class="k">def</span> <span class="nf">log_error</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Logs an error message.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Placeholder for logging functionality</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>  <span class="c1"># Replace with actual logging method</span></div>
+
+
+
+<span class="c1"># region --- Public Functions</span>
+
+<span class="c1"># region --- Protected Functions</span>
+
+<div class="viewcode-block" id="_get_operation_name">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators._get_operation_name">[docs]</a>
+<span class="k">def</span> <span class="nf">_get_operation_name</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieves the qualified name of an operation if available.</span>
+
+<span class="sd">    Otherwise, returns its basic name.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="s2">&quot;__qualname__&quot;</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_merge_args_with_hints">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators._merge_args_with_hints">[docs]</a>
+<span class="k">def</span> <span class="nf">_merge_args_with_hints</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Merges args and kwargs into a single dictionary with respect to the</span>
+<span class="sd">    operation&#39;s signature.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">signature</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+    <span class="n">bound_args</span> <span class="o">=</span> <span class="n">signature</span><span class="o">.</span><span class="n">bind_partial</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">bound_args</span><span class="o">.</span><span class="n">apply_defaults</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">bound_args</span><span class="o">.</span><span class="n">arguments</span></div>
+
+
+
+<div class="viewcode-block" id="_validate_args_types">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators._validate_args_types">[docs]</a>
+<span class="k">def</span> <span class="nf">_validate_args_types</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">all_args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validates types of all arguments based on the type hints.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">hints</span> <span class="o">=</span> <span class="n">get_type_hints</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">globalns</span><span class="o">=</span><span class="n">namespace</span><span class="p">,</span> <span class="n">localns</span><span class="o">=</span><span class="n">namespace</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span> <span class="ow">in</span> <span class="n">all_args</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">arg_name</span> <span class="ow">in</span> <span class="n">hints</span><span class="p">:</span>
+            <span class="n">expected_type</span> <span class="o">=</span> <span class="n">hints</span><span class="p">[</span><span class="n">arg_name</span><span class="p">]</span>
+            <span class="n">_check_arg_type</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_validate_return_type">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators._validate_return_type">[docs]</a>
+<span class="k">def</span> <span class="nf">_validate_return_type</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validates the type of the return value based on the type hints.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">hints</span> <span class="o">=</span> <span class="n">get_type_hints</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">globalns</span><span class="o">=</span><span class="n">namespace</span><span class="p">,</span> <span class="n">localns</span><span class="o">=</span><span class="n">namespace</span><span class="p">)</span>
+    <span class="n">return_type_hint</span> <span class="o">=</span> <span class="n">hints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;return&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">return_type_hint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_check_return_type</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">return_type_hint</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_check_arg_type">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators._check_arg_type">[docs]</a>
+<span class="k">def</span> <span class="nf">_check_arg_type</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the argument matches the expected type, including generics.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Handle special cases for None</span>
+    <span class="k">if</span> <span class="n">_is_none_type</span><span class="p">(</span><span class="n">expected_type</span><span class="p">):</span>
+        <span class="n">_check_none_type</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Handle Unions</span>
+    <span class="k">if</span> <span class="n">_is_union_type</span><span class="p">(</span><span class="n">expected_type</span><span class="p">):</span>
+        <span class="n">_check_union_type</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Handle generic types like List[int], Dict[str, str]</span>
+    <span class="k">if</span> <span class="n">_is_generic_type</span><span class="p">(</span><span class="n">expected_type</span><span class="p">):</span>
+        <span class="n">_check_generic_type</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Handle TypeVars with bounds</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expected_type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">):</span>
+        <span class="n">_check_typevar_bound</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Handle regular types</span>
+    <span class="n">_check_regular_type</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Sub-functions for type-checking logic</span>
+<span class="k">def</span> <span class="nf">_is_none_type</span><span class="p">(</span><span class="n">expected_type</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">expected_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">expected_type</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_check_none_type</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">arg_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_raise_type_error</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_is_union_type</span><span class="p">(</span><span class="n">expected_type</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">get_origin</span><span class="p">(</span><span class="n">expected_type</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Union</span>
+
+
+<div class="viewcode-block" id="_check_union_type">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators._check_union_type">[docs]</a>
+<span class="k">def</span> <span class="nf">_check_union_type</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if a value matches any of the types in a Union.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">get_args</span><span class="p">(</span><span class="n">expected_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">):</span>
+            <span class="n">bound</span> <span class="o">=</span> <span class="n">_resolve_typevar_bound</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">recursive_guard</span><span class="o">=</span><span class="nb">frozenset</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">bound</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_value</span><span class="p">,</span> <span class="n">bound</span><span class="p">):</span>
+                <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_value</span><span class="p">,</span>
+                        <span class="n">t</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">)</span> <span class="k">else</span> <span class="nb">object</span><span class="p">):</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">break</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+        <span class="n">_raise_type_error</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_is_instance_of_union">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators._is_instance_of_union">[docs]</a>
+<span class="k">def</span> <span class="nf">_is_instance_of_union</span><span class="p">(</span><span class="n">arg_value</span><span class="p">,</span> <span class="n">union_member_type</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper to check if a value matches one of the types in a Union.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">origin</span> <span class="o">=</span> <span class="n">get_origin</span><span class="p">(</span><span class="n">union_member_type</span><span class="p">)</span>
+
+    <span class="c1"># Handle TypeVars (e.g., ~D)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">union_member_type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">):</span>
+        <span class="n">bound</span> <span class="o">=</span> <span class="n">_resolve_typevar_bound</span><span class="p">(</span>
+            <span class="n">union_member_type</span><span class="p">,</span> <span class="n">recursive_guard</span><span class="o">=</span><span class="nb">frozenset</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="c1"># If the bound is None or invalid, treat it as matching all types</span>
+        <span class="k">if</span> <span class="n">bound</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="c1"># Ensure the bound is a valid type before using isinstance</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bound</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_value</span><span class="p">,</span> <span class="n">bound</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># Invalid TypeVar bound</span>
+
+    <span class="c1"># Handle generic origins</span>
+    <span class="k">if</span> <span class="n">origin</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_value</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">_is_instance_of_union</span><span class="p">(</span><span class="n">arg_value</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span>
+            <span class="n">get_args</span><span class="p">(</span><span class="n">union_member_type</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Fallback for regular types</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_value</span><span class="p">,</span> <span class="n">union_member_type</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="c1"># If isinstance fails, treat as incompatible</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_is_generic_type</span><span class="p">(</span><span class="n">expected_type</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">get_origin</span><span class="p">(</span><span class="n">expected_type</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">_check_generic_type</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
+    <span class="n">origin</span> <span class="o">=</span> <span class="n">get_origin</span><span class="p">(</span><span class="n">expected_type</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">(</span><span class="n">expected_type</span><span class="p">)</span>
+
+    <span class="c1"># Check if the value matches the generic base type</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_value</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="n">_raise_type_error</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">)</span>
+
+    <span class="c1"># Further check the type arguments for generic containers</span>
+    <span class="k">if</span> <span class="n">origin</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="n">_check_list_or_tuple_items</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">origin</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">_check_dict_items</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_check_list_or_tuple_items</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">item_type</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">arg_value</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">item_type</span><span class="p">):</span>
+            <span class="n">_raise_type_error</span><span class="p">(</span>
+                <span class="n">operation</span><span class="p">,</span>
+                <span class="n">arg_name</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;list[</span><span class="si">{</span><span class="n">item_type</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">,</span>
+                <span class="n">arg_value</span>
+            <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_check_dict_items</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="n">key_type</span><span class="p">,</span> <span class="n">value_type</span> <span class="o">=</span> <span class="n">args</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">arg_value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">key_type</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">value_type</span><span class="p">):</span>
+            <span class="n">_raise_type_error</span><span class="p">(</span>
+                <span class="n">operation</span><span class="p">,</span>
+                <span class="n">arg_name</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;dict[</span><span class="si">{</span><span class="n">key_type</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">value_type</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">,</span>
+                <span class="n">arg_value</span>
+            <span class="p">)</span>
+
+
+<div class="viewcode-block" id="_check_typevar_bound">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators._check_typevar_bound">[docs]</a>
+<span class="k">def</span> <span class="nf">_check_typevar_bound</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">type_var</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if a value matches the bound of a TypeVar.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">bound</span> <span class="o">=</span> <span class="n">_resolve_typevar_bound</span><span class="p">(</span><span class="n">type_var</span><span class="p">,</span> <span class="n">recursive_guard</span><span class="o">=</span><span class="nb">frozenset</span><span class="p">())</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">bound</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_value</span><span class="p">,</span> <span class="n">bound</span><span class="p">)):</span>
+        <span class="n">_raise_type_error</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">type_var</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_resolve_typevar_bound">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators._resolve_typevar_bound">[docs]</a>
+<span class="k">def</span> <span class="nf">_resolve_typevar_bound</span><span class="p">(</span><span class="n">type_var</span><span class="p">,</span> <span class="n">recursive_guard</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Resolves the bound for a TypeVar, if present.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">recursive_guard</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">recursive_guard</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()</span>
+
+    <span class="n">bound</span> <span class="o">=</span> <span class="n">type_var</span><span class="o">.</span><span class="n">__bound__</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bound</span><span class="p">,</span> <span class="n">ForwardRef</span><span class="p">):</span>  <span class="c1"># If the bound is a forward reference</span>
+        <span class="c1"># Resolve the forward reference using the namespace and recursive_guard</span>
+        <span class="n">bound</span> <span class="o">=</span> <span class="n">bound</span><span class="o">.</span><span class="n">_evaluate</span><span class="p">(</span>
+            <span class="n">globalns</span><span class="o">=</span><span class="n">namespace</span><span class="p">,</span>
+            <span class="n">localns</span><span class="o">=</span><span class="n">namespace</span><span class="p">,</span>
+            <span class="n">recursive_guard</span><span class="o">=</span><span class="n">recursive_guard</span> <span class="o">|</span> <span class="nb">frozenset</span><span class="p">({</span><span class="n">type_var</span><span class="o">.</span><span class="vm">__name__</span><span class="p">}),</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Default to object if no bound</span>
+    <span class="k">return</span> <span class="n">bound</span> <span class="k">if</span> <span class="n">bound</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">object</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_check_regular_type</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_value</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
+        <span class="n">_raise_type_error</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="_raise_type_error">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators._raise_type_error">[docs]</a>
+<span class="k">def</span> <span class="nf">_raise_type_error</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">,</span>
+                      <span class="n">arg_value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raises a TypeError with a descriptive message.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">op_name</span> <span class="o">=</span> <span class="n">_get_operation_name</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">_construct_type_error_message</span><span class="p">(</span><span class="n">op_name</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">,</span>
+                                        <span class="n">arg_value</span><span class="p">)</span>
+    <span class="n">log_error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_construct_type_error_message">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators._construct_type_error_message">[docs]</a>
+<span class="k">def</span> <span class="nf">_construct_type_error_message</span><span class="p">(</span><span class="n">op_name</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">,</span> <span class="n">arg_value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructs an error message for type mismatch.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected data type in &#39;</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">&#39;. &#39;</span><span class="si">{</span><span class="n">arg_name</span><span class="si">}</span><span class="s2">&#39; must be &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">expected_type</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">arg_value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> instead.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_check_return_type">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.decorators.html#SentimentAnalysis.src.decorators.type_check_decorators._check_return_type">[docs]</a>
+<span class="k">def</span> <span class="nf">_check_return_type</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the return value matches the expected type.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If the return value does not match the expected type.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
+        <span class="n">op_name</span> <span class="o">=</span> <span class="n">_get_operation_name</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected return type of &#39;</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">&#39;. Must be&quot;</span>
+               <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">expected_type</span><span class="si">}</span><span class="s2">, &quot;</span>
+               <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> instead.&quot;</span><span class="p">)</span>
+        <span class="n">log_error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>  <span class="c1"># Assume this function logs and raises the error</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<span class="c1"># endregion --- Protected Functions</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

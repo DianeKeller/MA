@@ -1,0 +1,50 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+title ChunkProcessor
+
+start
+:Initialize ChunkProcessor with language and batch samples;
+
+partition "process_chunks" {
+    while (More chunks available?) is (Yes)
+        if (skip_chunker is True?) then (Yes)
+            :Set skip_chunker to False;
+            note right
+              Skip current chunk generation.
+            end note
+        else (No)
+            :Generate chunk;
+            if (BatchFinishedException raised?)  then (Yes)
+                :Re-raise BatchFinishedException;
+                stop
+            endif
+        endif
+
+        if (Chunk is None?) then (Yes)
+            :No more chunks to process;
+            break
+
+        else (No)
+
+            partition "process_chunk" {
+                :Fetch or create chunk samples;
+                :Save chunk samples;
+                :Send chunk samples to QueryColumnProcessor;
+                :Process query columns;
+                if (ChunkFinishedException raised?) then (Yes)
+                    :Set skip_chunker to True;
+                    :Recompute chunk_nr;
+                elseif (Other exception?) then (Yes)
+                    :Log ERROR;
+                    :Re-raise the exception;
+                    stop
+                endif
+            }
+        endif
+    endwhile (No)
+
+    :return chunk_samples;
+    stop
+}
+
+@enduml

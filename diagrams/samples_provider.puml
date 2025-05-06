@@ -1,0 +1,55 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+' Abstract class definition
+abstract class SamplesProvider {
+    - samples_manager
+    +get_samples(): Dict[str, MyDataFrame]
+}
+
+class SamplesManager {
+    - suite: DataSourceSuite
+    - languages: List[str]
+    - cols: List[str]
+    - balanced_samples: Dict[str, MyDataFrame]
+    - unbalanced_samples: Dict[str, MyDataFrame]
+
+    +get_samples(language: str): MyDataFrame
+    +get_suite_languages(): List[str]
+    - _set_balanced_samples(): void
+    - _set_unbalanced_samples(): void
+    - _set_default_languages()
+}
+
+class BalancedSamplesProvider {
+    - balanced_samples: Dict[str, MyDataFrame]
+    +get_samples(): Dict[str, MyDataFrame]
+    - _load_balanced_samples(): bool
+    - _load_balanced_samples_for_language(language: str): MyDataFrame
+    - _create_balanced_samples(): Dict[str, MyDataFrame]
+    - _get_reference_samples(language: str): MyDataFrame
+    - _get_other_balanced_samples(reference_samples: MyDataFrame, language: str): MyDataFrame
+    - _reduce_to_max_n_rows(my_df: MyDataFrame, max_n_rows: int): MyDataFrame
+    - _filter_by_sentiment(my_df: MyDataFrame, sentiment: str): MyDataFrame
+    - _shuffle(my_df: MyDataFrame): MyDataFrame
+    - _compose_dataset_name_for language(language: str): str
+
+
+}
+
+class UnbalancedSamplesProvider {
+    +get_samples(): Dict[str, MyDataFrame]
+    - _get_unbalanced_samples_for_language(language: str): MyDataFrame
+    - _get_sentiment_df(subset: DataSourceStrategy): DataFrame
+}
+
+' Inheritance relationship
+BalancedSamplesProvider --|> SamplesProvider
+UnbalancedSamplesProvider --|> SamplesProvider
+
+' Composition relationships
+SamplesManager *-- BalancedSamplesProvider
+SamplesManager *-- UnbalancedSamplesProvider
+
+
+@enduml

@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.samples package &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9bcbadda"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SentimentAnalysis.src.serialization package" href="SentimentAnalysis.src.serialization.html" />
+    <link rel="prev" title="SentimentAnalysis.src.sentiment_analysis.retrieval package" href="SentimentAnalysis.src.sentiment_analysis.retrieval.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">SentimentAnalysis</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="SentimentAnalysis.html">SentimentAnalysis package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="SentimentAnalysis.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="SentimentAnalysis.src.html">SentimentAnalysis.src package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.action">SentimentAnalysis.action module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.constants">SentimentAnalysis.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#sentimentanalysis-logger-module">SentimentAnalysis.logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.main">SentimentAnalysis.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.settings">SentimentAnalysis.settings module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.setup">SentimentAnalysis.setup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.type_aliases">SentimentAnalysis.type_aliases module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.view_log">SentimentAnalysis.view_log module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">SentimentAnalysis</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.html">SentimentAnalysis package</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.src.html">SentimentAnalysis.src package</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.src.sentiment_analysis.html">SentimentAnalysis.src.sentiment_analysis package</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.samples package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/SentimentAnalysis.src.sentiment_analysis.samples.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sentimentanalysis-src-sentiment-analysis-samples-package">
+<h1>SentimentAnalysis.src.sentiment_analysis.samples package<a class="headerlink" href="#sentimentanalysis-src-sentiment-analysis-samples-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider">
+<span id="sentimentanalysis-src-sentiment-analysis-samples-balanced-samples-provider-module"></span><h2>SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider module<a class="headerlink" href="#module-SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider" title="Link to this heading"></a></h2>
+<section id="balanced-samples-provider-py">
+<h3>balanced_samples_provider.py<a class="headerlink" href="#balanced-samples-provider-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2025-01-11</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.</span></span><span class="sig-name descname"><span class="pre">BalancedSamplesProvider</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager" title="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager"><span class="pre">SamplesManager</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/balanced_samples_provider.html#BalancedSamplesProvider"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SamplesProvider</span></code></p>
+<p>BalancedSamplesProvider class.</p>
+<p>This class manages the balancing of samples to ensure uniform sentiment
+distribution across samples.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider.balanced_samples">
+<span class="sig-name descname"><span class="pre">balanced_samples</span></span><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider.balanced_samples" title="Link to this definition"></a></dt>
+<dd><p>The balanced samples for all languages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, <a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">src.data_structures.my_data_frame.MyDataFrame</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider.get_samples">
+<span class="sig-name descname"><span class="pre">get_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/balanced_samples_provider.html#BalancedSamplesProvider.get_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider.get_samples" title="Link to this definition"></a></dt>
+<dd><blockquote>
+<div><p>-&gt; Dict[str, src.data_structures.my_data_frame.MyDataFrame]:</p>
+</div></blockquote>
+<p>Retrieves and returns samples for sentiment analysis.</p>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-632cd76cd66a6cf6f9c20c07105357ea47d8f1f2.png" alt="Inheritance diagram of SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider" usemap="#inheritance0ebb468371" class="inheritance graphviz" /></div>
+<map id="inheritance0ebb468371" name="inheritance0ebb468371">
+<area shape="rect" id="node2" href="#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider" target="_top" title="BalancedSamplesProvider class." alt="" coords="336,31,525,56"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager" title="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager"><span class="pre">SamplesManager</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/balanced_samples_provider.html#BalancedSamplesProvider.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider.__init__" title="Link to this definition"></a></dt>
+<dd><p>Constructor.</p>
+<p>Initializes a new BalancedSamplesProvider instance with a
+SamplesManager instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>samples_manager</strong> (<a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager" title="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager"><em>SamplesManager</em></a>) – The SamplesManager instance that called the
+BalancedSamplesProvider to delegate the retrieval of balanced
+samples.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._compose_dataset_name_for_language">
+<span class="sig-name descname"><span class="pre">_compose_dataset_name_for_language</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/balanced_samples_provider.html#BalancedSamplesProvider._compose_dataset_name_for_language"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._compose_dataset_name_for_language" title="Link to this definition"></a></dt>
+<dd><p>Returns a name for a language-specific balanced dataset.</p>
+<p>Returns a name for the language-specific balanced dataset that is
+beeing loaded or created.</p>
+<p>Composes the name from the suite’s name, the language and the number
+of the balanced samples per language.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>language</strong> (<em>str</em>) – The language of the language-specific dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._create_balanced_samples">
+<span class="sig-name descname"><span class="pre">_create_balanced_samples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/balanced_samples_provider.html#BalancedSamplesProvider._create_balanced_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._create_balanced_samples" title="Link to this definition"></a></dt>
+<dd><p>Retrieves or creates balanced samples datasets for all languages.</p>
+<p>Retrieves balanced samples for the first language as the
+reference, and then computes corresponding balanced samples for other
+languages using this reference.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary with the balanced samples for all languages,
+where the keys are the languages and the values are MyDataFrame
+objects with the balanced samples for the corresponding languages.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, <a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a>]</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Uses ‘_get_reference_samples’ and ‘_get_other_balanced_samples’ to
+create or retrieve balanced datasets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._filter_by_sentiment">
+<span class="sig-name descname"><span class="pre">_filter_by_sentiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentiment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/balanced_samples_provider.html#BalancedSamplesProvider._filter_by_sentiment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._filter_by_sentiment" title="Link to this definition"></a></dt>
+<dd><p>Extracts the rows with the given sentiment from all samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>my_df</strong> (<a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><em>MyDataFrame</em></a>) – A MyDataFrame with all sentiment-labeled samples.</p></li>
+<li><p><strong>sentiment</strong> (<em>str</em>) – Sentiment by which to filter the MyDataFrame.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The extracted sentiment-specific samples, in random order.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._get_other_balanced_samples">
+<span class="sig-name descname"><span class="pre">_get_other_balanced_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/balanced_samples_provider.html#BalancedSamplesProvider._get_other_balanced_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._get_other_balanced_samples" title="Link to this definition"></a></dt>
+<dd><p>Creates a balanced sample MyDataFrame based on an existing MyDataFrame.</p>
+<p>Given a reference MyDataFrame in one language, another MyDataFrame
+ist extracted from a data subset in another language, basing the
+choice of rows on the indices of the reference MyDataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>reference_samples</strong> (<a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><em>MyDataFrame</em></a>) – The reference sample MyDataFrame to base the balance on.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A balanced sample DataFrame with the same distribution as the
+reference.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._get_reference_samples">
+<span class="sig-name descname"><span class="pre">_get_reference_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/balanced_samples_provider.html#BalancedSamplesProvider._get_reference_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._get_reference_samples" title="Link to this definition"></a></dt>
+<dd><p>Creates a balanced sample MyDataFrame to use as reference samples.</p>
+<p>Creates a balanced sample MyDataFrame with the specified number of
+samples per sentiment category to use as reference samples
+for the rest of the languages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>language</strong> (<em>str</em>) – The language to get the reference samples from.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The collection of reference samples in the given language.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._load_balanced_samples">
+<span class="sig-name descname"><span class="pre">_load_balanced_samples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/balanced_samples_provider.html#BalancedSamplesProvider._load_balanced_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._load_balanced_samples" title="Link to this definition"></a></dt>
+<dd><p>Loads the balanced datasets for all languages if available.</p>
+<p>Loads balanced datasets that have been saved to disk previously.</p>
+<p class="rubric">Notes</p>
+<p>To avoid the possibility of mixing language datasets with
+different sample ids, loading is done for all languages concerned or
+for none. If, for one language, no balanced samples can be found,
+the loading is considered to have failed altogether and all files
+will have to be re-created.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._load_balanced_samples_for_language">
+<span class="sig-name descname"><span class="pre">_load_balanced_samples_for_language</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/balanced_samples_provider.html#BalancedSamplesProvider._load_balanced_samples_for_language"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._load_balanced_samples_for_language" title="Link to this definition"></a></dt>
+<dd><p>Loads a balanced dataset for the specified language if available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>language</strong> (<em>str</em>) – The language for which the dataset should be loaded.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The balanced dataset loaded from disk.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If no data was found on disk, the Dataframe inside the
+returned MyDataFrame object is empty. The caller should check if the
+MyDataFrame contains data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._reduce_to_max_n_rows">
+<span class="sig-name descname"><span class="pre">_reduce_to_max_n_rows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_n_rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/balanced_samples_provider.html#BalancedSamplesProvider._reduce_to_max_n_rows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._reduce_to_max_n_rows" title="Link to this definition"></a></dt>
+<dd><p>Reduces the MyDataFrame to a specified maximum number of rows.</p>
+<p>Reduces the DataFrame in the MyDataFrame to a specified maximum
+number of rows.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>my_df</strong> (<a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><em>MyDataFrame</em></a>) – MyDataFrame containing the DataFrame to reduce.</p></li>
+<li><p><strong>max_n_rows</strong> (<em>int</em>) – Maximum number of rows to retain.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The MyDataFrame with reduced DataFrame.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._shuffle">
+<span class="sig-name descname"><span class="pre">_shuffle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/balanced_samples_provider.html#BalancedSamplesProvider._shuffle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._shuffle" title="Link to this definition"></a></dt>
+<dd><p>Randomly shuffles the rows in the DataFrame in the MyDataFrame object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>my_df</strong> (<a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><em>MyDataFrame</em></a>) – MyDataFrame with the DataFrame to shuffle.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The MyDataFrame with the shuffled DataFrame.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id0">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">balanced_samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd><p>Returns the balanced samples for all languages.</p>
+<p>Returns the balanced samples for all languages that the LLM and the
+data suite have in comman.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The balanced samples, where the key is the language and the
+value is a MyDataFrame object that contains a DataFrame with the
+balanced samples for the language.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, <a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">get_samples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/balanced_samples_provider.html#BalancedSamplesProvider.get_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the balanced samples for all languages.</p>
+<p>Retrieves the balanced samples for all languages that the LLM and the
+data suite have in comman, either by loading previously saved data
+from disk or by creating balanced samples anew from the subsets of
+the active data source suite.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The unbalanced samples, where the key is the language and the
+value is a MyDataFrame object that contains a DataFrame with the
+unbalanced samples for the language.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, <a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.sentiment_analysis.samples.samples_manager">
+<span id="sentimentanalysis-src-sentiment-analysis-samples-samples-manager-module"></span><h2>SentimentAnalysis.src.sentiment_analysis.samples.samples_manager module<a class="headerlink" href="#module-SentimentAnalysis.src.sentiment_analysis.samples.samples_manager" title="Link to this heading"></a></h2>
+<section id="samples-manager-py">
+<h3>samples_manager.py<a class="headerlink" href="#samples-manager-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-14</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.</span></span><span class="sig-name descname"><span class="pre">SamplesManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">languages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/samples_manager.html#SamplesManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LoggingMixin</span></code></p>
+<p>SamplesManager class.</p>
+<div class="graphviz"><img src="_images/inheritance-7969dde0ec9a8966c39f92b28b12894e0341d309.png" alt="Inheritance diagram of SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager" usemap="#inheritance6166a3fa8d" class="inheritance graphviz" /></div>
+<map id="inheritance6166a3fa8d" name="inheritance6166a3fa8d">
+<area shape="rect" id="node2" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager" target="_top" title="SamplesManager class." alt="" coords="157,5,292,31"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">languages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/samples_manager.html#SamplesManager.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.__init__" title="Link to this definition"></a></dt>
+<dd><p>Constructor.</p>
+<p>Initializes the SamplesManager class with the specified parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>suite</strong> (<a class="reference internal" href="SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite" title="SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite"><em>DataSourceSuite</em></a>) – Data source suite that provides the samples.</p></li>
+<li><p><strong>languages</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of languages for which the samples are to be retrieved.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The languages specified when the class is initialized do not
+necessarily correspond to all the languages in the data source suite
+from which the samples are to be retrieved. Instead, they can be a
+subset of the suite’s languages, depending on the languages the LLM
+supports.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager._set_balanced_samples">
+<span class="sig-name descname"><span class="pre">_set_balanced_samples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/samples_manager.html#SamplesManager._set_balanced_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager._set_balanced_samples" title="Link to this definition"></a></dt>
+<dd><p>Sets the balanced_samples property.</p>
+<p>Sets the balanced_samples property with the balanced samples of
+all languages.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager._set_default_languages">
+<span class="sig-name descname"><span class="pre">_set_default_languages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/samples_manager.html#SamplesManager._set_default_languages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager._set_default_languages" title="Link to this definition"></a></dt>
+<dd><p>Sets the languages of the samples to the languages of the suite.</p>
+<p>This method provides a fallback in case the list of languages
+provided at initialization of the SamplesManager is empty.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager._set_unbalanced_samples">
+<span class="sig-name descname"><span class="pre">_set_unbalanced_samples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/samples_manager.html#SamplesManager._set_unbalanced_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager._set_unbalanced_samples" title="Link to this definition"></a></dt>
+<dd><p>Sets the unbalanced_samples property.</p>
+<p>Sets the unbalanced_samples property with the complete unbalanced
+samples of all languages, but removing unwanted rows and columns
+from the original data subset according to the data offset given in
+the sentiment analysis configuration.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.balanced_samples">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">balanced_samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.balanced_samples" title="Link to this definition"></a></dt>
+<dd><p>Returns the balanced samples for all languages.</p>
+<p>Returns the balanced samples for all languages that the LLM and the
+data suite have in comman.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The balanced samples, where the key is the language and the
+value is the balanced samples for the language.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, <a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.cols">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cols</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.cols" title="Link to this definition"></a></dt>
+<dd><p>Returns the non-query column names in the dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.get_samples">
+<span class="sig-name descname"><span class="pre">get_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/samples_manager.html#SamplesManager.get_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.get_samples" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the samples for the specified language.</p>
+<p>Retrieves the samples for the specified language, depending on the
+settings in the sentiment analysis configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>language</strong> (<em>str</em>) – The language for which to retrieve the required samples.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The samples for the specified language, selected according to
+the settings in the sentiment analysis configuration.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.get_suite_languages">
+<span class="sig-name descname"><span class="pre">get_suite_languages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/samples_manager.html#SamplesManager.get_suite_languages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.get_suite_languages" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the languages of the data source suite.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of language codes containing the languages of the suite.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.languages">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">languages</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.languages" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the languages of the data to manage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of language codes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.provenience">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">provenience</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.provenience" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the LLM’s name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The LLM’s name.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Computed property without setter.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.suite">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">suite</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">T</span></em><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.suite" title="Link to this definition"></a></dt>
+<dd><p>Returns the suite from which to retrieve the samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The suite from which to retrieve the samples.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite" title="SentimentAnalysis.src.data_sources.data_source_suite.DataSourceSuite">DataSourceSuite</a></p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException"><strong>CriticalException</strong></a> – If the suite is not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.suite_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">suite_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.suite_name" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the suite’s name from the suite’s class name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The suite’s name.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Computed property without setter.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.unbalanced_samples">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unbalanced_samples</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager.unbalanced_samples" title="Link to this definition"></a></dt>
+<dd><p>Returns the unbalanced samples for all languages.</p>
+<p>Returns the unbalanced samples for all languages that the LLM and the
+data suite have in comman.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The unbalanced samples, where the key is the language and the
+value is the unbalanced samples for the language.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, <a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.sentiment_analysis.samples.samples_provider">
+<span id="sentimentanalysis-src-sentiment-analysis-samples-samples-provider-module"></span><h2>SentimentAnalysis.src.sentiment_analysis.samples.samples_provider module<a class="headerlink" href="#module-SentimentAnalysis.src.sentiment_analysis.samples.samples_provider" title="Link to this heading"></a></h2>
+<section id="samples-provider-py">
+<h3>samples_provider.py<a class="headerlink" href="#samples-provider-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2025-05-01</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_provider.SamplesProvider">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.samples.samples_provider.</span></span><span class="sig-name descname"><span class="pre">SamplesProvider</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager" title="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager"><span class="pre">SamplesManager</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/samples_provider.html#SamplesProvider"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_provider.SamplesProvider" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">LoggingMixin</span></code></p>
+<p>SamplesProvider class.</p>
+<p>This is the base class for the BalancedSamplesProvider and the
+UnbalancedSamplesProvider classes. It provides logging functionality and
+defines the methods both classes must implement.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_provider.SamplesProvider.logger">
+<span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_provider.SamplesProvider.logger" title="Link to this definition"></a></dt>
+<dd><p>The logger instance used for logging within the samples provider
+subclasses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Logger</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.samples_provider.SamplesProvider.get_samples">
+<span class="sig-name descname"><span class="pre">get_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/samples_provider.html#SamplesProvider.get_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_provider.SamplesProvider.get_samples" title="Link to this definition"></a></dt>
+<dd><blockquote>
+<div><p>-&gt; Dict[str, src.data_structures.my_data_frame.MyDataFrame]:</p>
+</div></blockquote>
+<p>Retrieves and returns samples for sentiment analysis.</p>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-3f1d5b76d9b29f233b6c213ce4cd34f68e8b8a6c.png" alt="Inheritance diagram of SentimentAnalysis.src.sentiment_analysis.samples.samples_provider.SamplesProvider" usemap="#inheritance7ec4e12c17" class="inheritance graphviz" /></div>
+<map id="inheritance7ec4e12c17" name="inheritance7ec4e12c17">
+<area shape="rect" id="node3" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_provider.SamplesProvider" target="_top" title="SamplesProvider class." alt="" coords="157,31,288,56"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="id2">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_samples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/samples_provider.html#SamplesProvider.get_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<dd><p>Retrieves and returns samples for sentiment analysis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A Dictionary where the keys are the languages and the values
+are the samples for the respective languages.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, <a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a>]</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – If the subclass does not implement this abstract method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider">
+<span id="sentimentanalysis-src-sentiment-analysis-samples-unbalanced-samples-provider-module"></span><h2>SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider module<a class="headerlink" href="#module-SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider" title="Link to this heading"></a></h2>
+<section id="unbalanced-samples-provider-py">
+<h3>unbalanced_samples_provider.py<a class="headerlink" href="#unbalanced-samples-provider-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2025-01-08</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider.UnbalancedSamplesProvider">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider.</span></span><span class="sig-name descname"><span class="pre">UnbalancedSamplesProvider</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager" title="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager"><span class="pre">SamplesManager</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/unbalanced_samples_provider.html#UnbalancedSamplesProvider"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider.UnbalancedSamplesProvider" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SamplesProvider</span></code></p>
+<p>UnbalancedSamplesProvider class.</p>
+<p>This class manages and provides unbalanced samples from the subsets of the
+data suite that is set in the SamplesManager class.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider.UnbalancedSamplesProvider.get_samples">
+<span class="sig-name descname"><span class="pre">get_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/unbalanced_samples_provider.html#UnbalancedSamplesProvider.get_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider.UnbalancedSamplesProvider.get_samples" title="Link to this definition"></a></dt>
+<dd><blockquote>
+<div><p>-&gt; Dict[str, src.data_structures.my_data_frame.MyDataFrame]:</p>
+</div></blockquote>
+<p>Retrieves and returns samples for sentiment analysis.</p>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-bfd4f74fe3eceb64cdecd744617580c663d1d921.png" alt="Inheritance diagram of SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider.UnbalancedSamplesProvider" usemap="#inheritance958f961369" class="inheritance graphviz" /></div>
+<map id="inheritance958f961369" name="inheritance958f961369">
+<area shape="rect" id="node4" href="#SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider.UnbalancedSamplesProvider" target="_top" title="UnbalancedSamplesProvider class." alt="" coords="336,31,543,56"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider.UnbalancedSamplesProvider.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager" title="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager"><span class="pre">SamplesManager</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/unbalanced_samples_provider.html#UnbalancedSamplesProvider.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider.UnbalancedSamplesProvider.__init__" title="Link to this definition"></a></dt>
+<dd><p>Constructor.</p>
+<p>Initializes a new UnbalancedSamplesProvider instance with a
+SamplesManager instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>samples_manager</strong> (<a class="reference internal" href="#SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager" title="SentimentAnalysis.src.sentiment_analysis.samples.samples_manager.SamplesManager"><em>SamplesManager</em></a>) – The SamplesManager instance that called the
+BalancedSamplesProvider to delegate the retrieval of unbalanced
+samples.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider.UnbalancedSamplesProvider._get_sentiment_df">
+<span class="sig-name descname"><span class="pre">_get_sentiment_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/unbalanced_samples_provider.html#UnbalancedSamplesProvider._get_sentiment_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider.UnbalancedSamplesProvider._get_sentiment_df" title="Link to this definition"></a></dt>
+<dd><p>Returns the sentiment-relevant columns from the given subset.</p>
+<p>Returns a DataFrame containing the sentiment-relevant columns from the
+given subset of the MAD-TSC suite.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>subset</strong> (<a class="reference internal" href="SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy" title="SentimentAnalysis.src.data_sources.mad_tsc_strategy.MadTscStrategy"><em>MadTscStrategy</em></a>) – A language subset of the MAD-TSC suite.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A pandas DataFrame containing the columns ‘sentence_normalized’,
+‘mention’, and ‘polarity’ from the given subset.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider.UnbalancedSamplesProvider._get_unbalanced_samples_for_language">
+<span class="sig-name descname"><span class="pre">_get_unbalanced_samples_for_language</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/unbalanced_samples_provider.html#UnbalancedSamplesProvider._get_unbalanced_samples_for_language"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.sentiment_analysis.samples.unbalanced_samples_provider.UnbalancedSamplesProvider._get_unbalanced_samples_for_language" title="Link to this definition"></a></dt>
+<dd><p>Retrieves unbalanced samples for the specified language.</p>
+<p>Retrieves unbalanced samples for the specified language from the
+corresponing subset in the data source suite that is set by the
+SamplesManager.</p>
+<p>Throws away unneeded rows at the beginning of the dataset and any
+unneeded columns.</p>
+<p>Otherwise, does not restrict the number of samples because the
+unbalanced samples serve as the basis for creating balanced datasets
+of any size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>language</strong> (<em>str</em>) – The language for which the unbalanced samples are to be retrieved.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A MyDataFrame object containing a DataFrame with unbalanced
+samples in the given language.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The returned DataFrame includes all available samples without applying
+balancing logic.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">get_samples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame"><span class="pre">MyDataFrame</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/sentiment_analysis/samples/unbalanced_samples_provider.html#UnbalancedSamplesProvider.get_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
+<dd><p>Returns the unbalanced samples for all languages.</p>
+<p>Returns the unbalanced samples for all languages that the LLM and the
+data suite have in comman.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The unbalanced samples, where the key is the language and the
+value is a MyDataFrame object that contains a DataFrame with the
+unbalanced samples for the language.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, <a class="reference internal" href="SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame" title="SentimentAnalysis.src.data_structures.my_data_frame.MyDataFrame">MyDataFrame</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.sentiment_analysis.samples">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-SentimentAnalysis.src.sentiment_analysis.samples" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="SentimentAnalysis.src.sentiment_analysis.retrieval.html" class="btn btn-neutral float-left" title="SentimentAnalysis.src.sentiment_analysis.retrieval package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SentimentAnalysis.src.serialization.html" class="btn btn-neutral float-right" title="SentimentAnalysis.src.serialization package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

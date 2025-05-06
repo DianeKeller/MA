@@ -1,0 +1,65 @@
+@startuml
+allowmixing
+title Architecture of the Sentiment Analysis Program
+
+package "sentiment_analysis" {
+  class ServerlessBloomWorkflow
+  package "prompt_engineering"
+  package "retrieval"
+  package "evaluation"
+  package "samples"
+
+  ServerlessBloomWorkflow --> "prompt_engineering"
+  ServerlessBloomWorkflow --> "retrieval"
+  ServerlessBloomWorkflow --> "evaluation"
+  ServerlessBloomWorkflow --> "samples"
+}
+
+class Main
+Main --> ServerlessBloomWorkflow
+
+package "data_sources" {
+}
+
+package "authentication" {
+}
+
+package "data_structures" {
+}
+
+package "serialization" {
+}
+
+package "nlp" {
+  package tokenization
+  package results
+}
+
+package "stats" {
+  package visualization
+}
+
+package "utils" {
+}
+
+package "decorators" {
+}
+
+' Gemeinsamer Verbindungspunkt
+node "external packages"
+
+"prompt_engineering" --> "external packages"
+"retrieval" --> "external packages"
+"evaluation" --> "external packages"
+"samples" --> "external packages"
+
+"external packages" --> "data_sources"
+"external packages" --> "authentication"
+"external packages" --> "data_structures"
+"external packages" --> "serialization"
+"external packages" --> "nlp"
+"external packages" --> "stats"
+"external packages" --> "utils"
+"external packages" --> "decorators"
+
+@enduml

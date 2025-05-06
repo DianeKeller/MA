@@ -1,0 +1,91 @@
+@startuml
+'https://plantuml.com/class-diagram
+title Serialization Strategy
+
+' Abstract Strategy
+abstract class SerializationStrategy {
+    +DATA_STRUCTURE: str
+    +FILE_TYPE: str
+    +file: File | None
+    +add(data: Serializable): void
+    +load(): Serializable | None
+    +save(data: Serializable): void
+    +delete(): void
+    #{abstract} _add(data: Serializable): void
+    #{abstract} _load(): Serializable | None
+    #{abstract} _save(data: Serializable): void
+}
+
+' Concrete Strategies
+class CsvStrategy {
+    +DATA_STRUCTURE: str
+    +FILE_TYPE: str
+    #_add(data: DataFrame): void
+    #_load(): DataFrame | None
+    #_save(data: DataFrame): void
+}
+
+class JsonStrategy {
+    +DATA_STRUCTURE: str
+    +FILE_TYPE: str
+    #_add(data: Dict): void
+    #_load(): DataFrame | str | Dict | List[List[Any]] | None:
+    #_save(data: Dict): void
+}
+
+class JsonlStrategy {
+    +DATA_STRUCTURE: str
+    +FILE_TYPE: str
+    #_add(data: Serializable): void
+    #_load(): DataFrame | str | Dict | List[List[Any]] | None
+    #_save(data: Serializable): void
+}
+
+class PklStrategy {
+    +DATA_STRUCTURE: str
+    +FILE_TYPE: str
+    #_add(data: DataFrame): void
+    #_load(): DataFrame | None
+    #_save(data: DataFrame): void
+}
+
+class TxtStrategy {
+    +DATA_STRUCTURE: str
+    +FILE_TYPE: str
+    #_add(data: str): void
+    #_load(): str | None
+    #_save(data: str): void
+}
+
+' Context Class
+class Serializer {
+
+    +strategy: SerializationStrategy
+    +file: File | None
+    +does_path_exist(): bool
+    +save(data: Serializable): void
+    +load(): Serializable | None
+    +add_or_save(data: Serializable): void
+    +delete(): void
+    +{static} default_strategy(): SerializationStrategy
+    #_enforce_directory_path_exists()
+}
+
+' Factory Method
+class SerializationFactory {
+    +get_serializer(file_type: str, file_name: str): Serializer
+}
+
+' Relationships
+SerializationStrategy <|-- CsvStrategy
+SerializationStrategy <|-- JsonStrategy
+SerializationStrategy <|-- JsonlStrategy
+SerializationStrategy <|-- PklStrategy
+SerializationStrategy <|-- TxtStrategy
+
+Serializer --> SerializationStrategy: "uses"
+
+SerializationFactory --> Serializer: "creates"
+
+
+@enduml

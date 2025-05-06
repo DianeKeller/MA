@@ -1,0 +1,182 @@
+<mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" background="none" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <mxCell id="node9" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_sources.data_source_stats_mixin.DataSourceStatsMixin&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; stats: &lt;br/&gt; _subsets: &lt;br/&gt; COL_DTYPES: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; stats(self): &lt;br/&gt; stats(self, stats: MyDataFrame): &lt;br/&gt; transposed_stats(self): &lt;br/&gt; transposed_stats(self, t_stats: MyDataFrame): &lt;br/&gt; get_stats(self, category: str = &amp;#39;&amp;#39;): &lt;br/&gt; compute_all_stats(self): &lt;br/&gt; _compute_stats(self, compute_method: callable): &lt;br/&gt; _compute_col_stats(self, col_name: str = &amp;#39;&amp;#39;): &lt;br/&gt; _transpose_stats_copy(self): &lt;br/&gt; _assign_dtypes(self, stats: MyDataFrame): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-1902" y="148" width="451" height="362" as="geometry" />
+    </mxCell>
+    <mxCell id="node7" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_sources.data_source_strategy.DataSourceStrategy&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; logger: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(self): &lt;br/&gt; data(self): &lt;br/&gt; base_description(self): &lt;br/&gt; language(self): &lt;br/&gt; language(self, language: str): &lt;br/&gt; add_columns(self): &lt;br/&gt; add_text_length_column(self): &lt;br/&gt; add_word_count_column(self, tokenization_strategy_name=&amp;#39;&amp;#39;): &lt;br/&gt; create_subset_stats_instance(self: T): &lt;br/&gt; extract_columns(             self: T,             subset_name_extension: str,             col_names: List[str]     ): &lt;br/&gt; _extract_subset(             self,             subset_name_extension: str,             col_name: str,             col_value: Any     ): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-2603" y="857" width="416" height="337" as="geometry" />
+    </mxCell>
+    <mxCell id="node10" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_sources.data_source_subset_stats.DataSourceSubsetStats&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; _length_col_name: &lt;br/&gt; subset_df: &lt;br/&gt; length_col_name: &lt;br/&gt; _word_count_col_name: &lt;br/&gt; logger: &lt;br/&gt; word_count_col_name: &lt;br/&gt; _polarity_col_name: &lt;br/&gt; subset_stats: &lt;br/&gt; _subset: &lt;br/&gt; subset: &lt;br/&gt; _subset_stats: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(self, subset: T): &lt;br/&gt; subset(self): &lt;br/&gt; subset(             self,             subset: T     ): &lt;br/&gt; subset_stats(self): &lt;br/&gt; subset_stats(self, stats: MyDataFrame): &lt;br/&gt; word_stats(self): &lt;br/&gt; length_stats(self): &lt;br/&gt; sentiment_stats(self): &lt;br/&gt; polarity_col_name(self): &lt;br/&gt; polarity_col_name(self, col_name: str): &lt;br/&gt; word_count_col_name(self): &lt;br/&gt; word_count_col_name(self, col_name: str): &lt;br/&gt; length_col_name(self): &lt;br/&gt; length_col_name(self, col_name: str): &lt;br/&gt; compute_col_stats(self, col_name: str = &amp;#39;&amp;#39;): &lt;br/&gt; compute_all_subset_stats(self): &lt;br/&gt; _add_to_subset_stats(self, other_stats: MyDataFrame): &lt;br/&gt; _compute_col_stats(             self,             col_name: str,             label: str     ): &lt;br/&gt; _compute_categorical_col_stats(             self,             col_name: str,             label: str     ): &lt;br/&gt; _compute_sentiment_col_stats(self, col_name: str, label: str): &lt;br/&gt; _get_stats_field(self, row_name: str, col_name: str): &lt;br/&gt; _initialize_subset_stats(self, col_name: str = &amp;#39;&amp;#39;): &lt;br/&gt; _remove_double_n_elements(self, stats_dict: StatsType): &lt;br/&gt; _set_column_names(self): &lt;br/&gt; _add_subset_specific_stats(self): &lt;br/&gt; _add_sentiment_frequencies(             self,             freqs: Counter,             col_stats: StatsType     ): &lt;br/&gt; _add_sentiment_percentages(             self,             freqs: Counter,             col_stats: StatsType     ): &lt;br/&gt; _initialize_subset_stats_with_subset_specific_column(             self,             col_name: str     ): &lt;br/&gt; _set_subset_specific_column_names(self): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-1262" y="148" width="505" height="1037" as="geometry" />
+    </mxCell>
+    <mxCell id="node11" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_sources.data_source_suite.DataSourceSuite&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; combined_subsets: &lt;br/&gt; _strategies: &lt;br/&gt; _combined_subsets: &lt;br/&gt; logger: &lt;br/&gt; _subsets: &lt;br/&gt; STRATEGY_STR: &lt;br/&gt; SUBSET_STR: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(self): &lt;br/&gt; suite_name(self): &lt;br/&gt; subset_names(self): &lt;br/&gt; strategy_names(self): &lt;br/&gt; combined_subsets(self): &lt;br/&gt; combined_subsets(self, combined_subset: T): &lt;br/&gt; get_strategy(self, strategy_name: str): &lt;br/&gt; use_strategy(self, strategy_name): &lt;br/&gt; get_subset(self, subset_name: str): &lt;br/&gt; use_subset(self, subset_name: str): &lt;br/&gt; combine_subsets(self, subset_names: List[str] | None = None): &lt;br/&gt; load_subset(             self,             strategy_name: str,     ): &lt;br/&gt; to_string(self): &lt;br/&gt; _enforce_load(self, strategy_name: str): &lt;br/&gt; _initialize_strategies(self): &lt;br/&gt; _compose_from_original_files(             self,             subset: T,             strategy_name: str     ): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-1732" y="844" width="392" height="612" as="geometry" />
+    </mxCell>
+    <mxCell id="node12" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_sources.data_source_workflow.DataSourceWorkflow&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; data_suite: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(self, data_suite: T): &lt;br/&gt; suite(self): &lt;br/&gt; execute(self): &lt;br/&gt; load_subsets(self, subsets: List[str] | None = None): &lt;br/&gt; get_statistics(self): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-4296" y="26" width="435" height="187" as="geometry" />
+    </mxCell>
+    <mxCell id="node5" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_sources.mad_tsc_fact_sheet_mixin.MadTscFactSheetMixin&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; PLATFORM: &lt;br/&gt; URL: &lt;br/&gt; AUTHOR: &lt;br/&gt; TITLE: &lt;br/&gt; IN: &lt;br/&gt; YEAR: &lt;br/&gt; PAGES: &lt;br/&gt; PUBLICATION_URL: &lt;br/&gt; DESCRIPTION: &lt;br/&gt; ORIG_DIR: &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-2324" y="1433" width="468" height="284" as="geometry" />
+    </mxCell>
+    <mxCell id="node1" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_sources.mad_tsc_strategy.MadTscStrategy&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __language: &lt;br/&gt; _data: &lt;br/&gt; _split_type: &lt;br/&gt; _name: &lt;br/&gt; data: &lt;br/&gt; __base_description: &lt;br/&gt; file_name: &lt;br/&gt; file_type: &lt;br/&gt; auth_strategy: &lt;br/&gt; source: &lt;br/&gt; WORD_TOKENIZATION_STRATEGY: &lt;br/&gt; SENTENCE_TOKENIZATION_STRATEGY: &lt;br/&gt; TEXT_COLUMN_NAME: &lt;br/&gt; SPLIT_COLUMN_NAME: &lt;br/&gt; GID_COLUMN_NAME: &lt;br/&gt; TARGETS_COLUMN_NAME: &lt;br/&gt; TEXT_DUPLICATES_COUNT_COLUMN_NAME: &lt;br/&gt; TARGET_COUNT_COLUMN_NAME: &lt;br/&gt; FROM_COLUMN_NAME: &lt;br/&gt; TO_COLUMN_NAME: &lt;br/&gt; MENTION_COLUMN_NAME: &lt;br/&gt; NUMERICAL_SENTIMENT_POLARITY_COLUMN_NAME: &lt;br/&gt; POSITIVE: &lt;br/&gt; NEGATIVE: &lt;br/&gt; NEUTRAL: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(             self,             name: str = &amp;#39;&amp;#39;,             data: D | None = None,             source: str = &amp;#39;&amp;#39;,             base_description: str = &amp;#39;&amp;#39;     ): &lt;br/&gt; name(self): &lt;br/&gt; name(self, name: str): &lt;br/&gt; split_type(self): &lt;br/&gt; split_type(self, split_type: str): &lt;br/&gt; data(self): &lt;br/&gt; data(self, data: D | DataFrame | None): &lt;br/&gt; base_description(self): &lt;br/&gt; language(self): &lt;br/&gt; language(self, language: str): &lt;br/&gt; n_rows_with_multiple_targets(self): &lt;br/&gt; get_original_file_name(self): &lt;br/&gt; load(self): &lt;br/&gt; create(self, subsets: List[MadTscStrategy]): &lt;br/&gt; join(self, subset: MadTscStrategy): &lt;br/&gt; are_cols_identical(             self,             col_name: str,             other: MadTscStrategy,             other_col_name: str     ): &lt;br/&gt; create_subset_stats_instance(self): &lt;br/&gt; preprocess(self): &lt;br/&gt; set_index(self, col_name: str): &lt;br/&gt; add_columns(self): &lt;br/&gt; add_text_length_column(self): &lt;br/&gt; add_word_count_column(self, tokenization_strategy_name=&amp;#39;&amp;#39;): &lt;br/&gt; extract_columns(             self,             subset_name_extension: str,             col_names: List[str]     ): &lt;br/&gt; filter_by_split(self: T, split_type: str): &lt;br/&gt; to_string(self): &lt;br/&gt; _set_data(self, data: D | DataFrame | None): &lt;br/&gt; _get_rows_with_multiple_targets(self): &lt;br/&gt; _get_duplicate_gids(self): &lt;br/&gt; _get_duplicate_texts(self): &lt;br/&gt; _ensure_no_multiple_targets(self): &lt;br/&gt; _extract_subset(             self,             subset_name_extension: str,             col_name: str,             col_value: Any     ): &lt;br/&gt; _add_target_count_column(self): &lt;br/&gt; _add_target_detail_columns(self): &lt;br/&gt; _add_target_detail_column(self, category: str, col_name: str): &lt;br/&gt; _add_text_duplicates_count_column(self): &lt;br/&gt; _ensure_no_duplicate_gids(self): &lt;br/&gt; _extract_target_details(self): &lt;br/&gt; _set_source(self): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-2588" y="1861" width="387" height="1610" as="geometry" />
+    </mxCell>
+    <mxCell id="node14" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_sources.mad_tsc_subset_stats.MadTscSubsetStats&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; sentence_count_col_name: &lt;br/&gt; polarity_col_name: &lt;br/&gt; mention_col_name: &lt;br/&gt; subset_stats: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(             self,             subset: MadTscStrategy     ): &lt;br/&gt; sentence_stats(self): &lt;br/&gt; mention_stats(self): &lt;br/&gt; _set_subset_specific_column_names(self): &lt;br/&gt; _add_subset_specific_stats(self): &lt;br/&gt; _add_sentiment_frequencies(             self,             freqs: Counter,             col_stats: StatsType     ): &lt;br/&gt; _add_sentiment_percentages(             self,             freqs: Counter,             col_stats: StatsType     ): &lt;br/&gt; _initialize_subset_stats_with_subset_specific_column(             self,             col_name: str = &amp;#39;&amp;#39;     ): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-1234" y="1851" width="448" height="335" as="geometry" />
+    </mxCell>
+    <mxCell id="node13" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_sources.mad_tsc_suite.MadTscSuite&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; _splits: &lt;br/&gt; _files_in_subsets: &lt;br/&gt; _languages: &lt;br/&gt; SUITE_NAME: &lt;br/&gt; SUITE_PREFIX: &lt;br/&gt; STRATEGY_STR: &lt;br/&gt; SUBSET_STR: &lt;br/&gt; SPLIT_TRAIN: &lt;br/&gt; SPLIT_TEST: &lt;br/&gt; SPLIT_VAL: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(self): &lt;br/&gt; languages(self): &lt;br/&gt; splits(self): &lt;br/&gt; get_sentiment_distributions(             self,             language: str = &amp;#39;en&amp;#39;,             batch_size: int = 100     ): &lt;br/&gt; show_compare_cols(             self,             col_name: str,             additional_col_name: str = &amp;#39;&amp;#39;     ): &lt;br/&gt; are_cols_identical(             subset: T,             other: T,             col_name: str     ): &lt;br/&gt; get_comparison_column(             self,             subset: T,             other: T,             col_name: str     ): &lt;br/&gt; choose_subset(self, language: str): &lt;br/&gt; to_string(self): &lt;br/&gt; _initialize_strategies(self): &lt;br/&gt; _compose_file_name(self, language: str): &lt;br/&gt; _compose_strategy_name(self, language: str): &lt;br/&gt; _create_strategy(             file_name: str,             language: str     ): &lt;br/&gt; _compose_from_original_files(             self,             subset: T,             strategy_name: str     ): &lt;br/&gt; compare_cols(             self,             col_name,             subset_names: List[str] | None = None     ): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-1965" y="1861" width="323" height="660" as="geometry" />
+    </mxCell>
+    <mxCell id="node8" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_sources.mad_tsc_workflow.MadTscWorkflow&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; _mentions_and_polarities: &lt;br/&gt; chosen_subset: &lt;br/&gt; _chosen_subset: &lt;br/&gt; _mentions_comparison: &lt;br/&gt; _n_sentences_comparison: &lt;br/&gt; POLARITY_COL_NAME: &lt;br/&gt; MENTION_COL_NAME: &lt;br/&gt; N_SENTENCES_COL_NAME: &lt;br/&gt; TEXT_COL_NAME: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(self): &lt;br/&gt; chosen_subset(self): &lt;br/&gt; chosen_subset(self, value: MadTscStrategy): &lt;br/&gt; stats(self): &lt;br/&gt; mentions(self): &lt;br/&gt; mentions_comparison(self): &lt;br/&gt; mentions_and_polarities(self): &lt;br/&gt; mentions_and_polarities(self, value: MyDataFrame): &lt;br/&gt; n_sentences_comparison(self): &lt;br/&gt; combine_subsets(self): &lt;br/&gt; combined_feature(self, feature: str): &lt;br/&gt; combined_split_feature(self, split: str, feature: str): &lt;br/&gt; compute_statistics(self): &lt;br/&gt; compare_n_sentences(self): &lt;br/&gt; compare_mentions(self): &lt;br/&gt; compare_polarities(self): &lt;br/&gt; choose_subset(self, language: str = &amp;#39;en&amp;#39;): &lt;br/&gt; mentions_freq_diagram(self, min_freq: int = 2, max_n: int = 30): &lt;br/&gt; execute(self): &lt;br/&gt; analyze_content(self): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-4270" y="326" width="382" height="760" as="geometry" />
+    </mxCell>
+    <mxCell id="node6" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_structures.data_collection.DataCollection&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; _data: &lt;br/&gt; _name: &lt;br/&gt; data: &lt;br/&gt; name: &lt;br/&gt; _single_value_cols: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(             self,             data: T | None,             name: str = &amp;#39;&amp;#39;     ): &lt;br/&gt; name(self): &lt;br/&gt; name(self, name: str): &lt;br/&gt; data(self): &lt;br/&gt; data(self, data: T): &lt;br/&gt; single_value_cols(self): &lt;br/&gt; single_value_cols(self, cols: dict[str, Any]): &lt;br/&gt; n_single_value_cols(self): &lt;br/&gt; n_rows(self): &lt;br/&gt; n_cols(self): &lt;br/&gt; col_names(self): &lt;br/&gt; filter_rows_by_col_value(self: T, col_name: str, col_value: Any): &lt;br/&gt; min_filter(self: T, col_name: str, min_value: Any): &lt;br/&gt; max_filter(self: T, col_name: str, max_value: Any): &lt;br/&gt; find_single_value_cols(self): &lt;br/&gt; drop_single_value_cols(self): &lt;br/&gt; has_no_data(self, verbose: bool = True): &lt;br/&gt; has_data(self): &lt;br/&gt; to_string(self): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-2809" y="12" width="359" height="635" as="geometry" />
+    </mxCell>
+    <mxCell id="node2" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;data_structures.my_data.MyData&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; data: &lt;br/&gt; logger: &lt;br/&gt; source: &lt;br/&gt; single_value_cols: &lt;br/&gt; TEXT_COLUMN_NAME: &lt;br/&gt; LENGTH_COLUMN_NAME: &lt;br/&gt; SENTENCE_COUNT_COLUMN_NAME: &lt;br/&gt; WORD_COUNT_COLUMN_NAME: &lt;br/&gt; DATA_STR: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(             self,             data: MyDataFrame | None = None,             name: str = &amp;#39;&amp;#39;,             source: str = &amp;#39;&amp;#39;     ): &lt;br/&gt; my_df(self): &lt;br/&gt; my_df(self, my_df: MyDataFrame): &lt;br/&gt; n_rows(self): &lt;br/&gt; n_cols(self): &lt;br/&gt; col_names(self): &lt;br/&gt; get_col(self, col_name: str): &lt;br/&gt; min_filter(self, col_name: str, min_value: Any): &lt;br/&gt; max_filter(self, col_name: str, max_value: Any): &lt;br/&gt; filter_rows_by_col_value(             self,             col_name: str,             col_value: Any,             op: Callable[[Any, Any], bool] = operator.eq     ): &lt;br/&gt; extract_mydata_columns(             self,             col_names: List[str],     ): &lt;br/&gt; get_unique_values(self, col_name: str): &lt;br/&gt; find_single_value_cols(self): &lt;br/&gt; drop_single_value_cols(self): &lt;br/&gt; add_text_length_column(self): &lt;br/&gt; add_sentiment_value_column(             self,             sentiment_map: dict,             source_col: str,             target_col: str     ): &lt;br/&gt; add_sentence_count_column(self, tokenization_strategy_name: str = &amp;#39;&amp;#39;): &lt;br/&gt; add_word_count_column(self, tokenization_strategy_name=&amp;#39;&amp;#39;): &lt;br/&gt; use_data(self): &lt;br/&gt; has_no_data(self, verbose: bool = True): &lt;br/&gt; _get_my_df(self): &lt;br/&gt; _get_n_rows(self): &lt;br/&gt; _get_n_cols(self): &lt;br/&gt; _get_col_names(self): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-3282" y="857" width="387" height="860" as="geometry" />
+    </mxCell>
+    <mxCell id="node4" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;logging_mixin.LoggingMixin&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; logger: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; log(cls, message: str, level: str = &amp;#39;info&amp;#39;, msg_id: str = &amp;#39;&amp;#39;): &lt;br/&gt; _log(self, message: str, level: str = &amp;#39;info&amp;#39;, msg_id: str = &amp;#39;&amp;#39;): &lt;br/&gt; _get_caller_name(): &lt;br/&gt; _is_disallowed(msg_id: str): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-2568" y="-231" width="346" height="160" as="geometry" />
+    </mxCell>
+    <mxCell id="node3" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;nlp.tokenization.tokenization_mixin.TokenizationMixin&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; sentence_tokenizer: &lt;br/&gt; word_tokenizer: &lt;br/&gt; DEFAULT_SENTENCE_STRATEGY: &lt;br/&gt; DEFAULT_WORD_STRATEGY: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; sentence_tokenizer(self): &lt;br/&gt; sentence_tokenizer(self, tokenizer: SentenceTokenizer): &lt;br/&gt; word_tokenizer(self): &lt;br/&gt; word_tokenizer(self, tokenizer: WordTokenizer): &lt;br/&gt; set_word_tokenizer(self, tokenization_strategy_name: str = &amp;#39;&amp;#39;): &lt;br/&gt; set_sentence_tokenizer(self, tokenization_strategy_name: str = &amp;#39;&amp;#39;): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-3836" y="146" width="468" height="285" as="geometry" />
+    </mxCell>
+    <mxCell id="node0" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;serialization.data_serialization_mixin.DataSerializationMixin&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; data: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; auth_strategy(self): &lt;br/&gt; auth_strategy(             self,             value: AuthenticationStrategy | NoAuthenticationStrategy     ): &lt;br/&gt; source(self): &lt;br/&gt; source(self, value: str): &lt;br/&gt; file_type(self): &lt;br/&gt; file_type(self, value: str): &lt;br/&gt; file_name(self): &lt;br/&gt; file_name(self, value: str): &lt;br/&gt; sub_dir(self): &lt;br/&gt; sub_dir(self, value: str): &lt;br/&gt; original_file_name(self): &lt;br/&gt; serializer(self): &lt;br/&gt; serializer(self, strategy: SerializationStrategy): &lt;br/&gt; authenticate(self): &lt;br/&gt; save(self): &lt;br/&gt; delete(self): &lt;br/&gt; add_or_save(self): &lt;br/&gt; can_load(self): &lt;br/&gt; load(self): &lt;br/&gt; fetch(self): &lt;br/&gt; load_or_fetch_and_save(self): &lt;br/&gt; load_if_possible(self): &lt;br/&gt; _load(self): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-3311" y="12" width="445" height="635" as="geometry" />
+    </mxCell>
+    <mxCell id="edge12" edge="1" value="" parent="1" source="node9" target="node4" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-1677" y="-11" />
+          <mxPoint x="-2395" y="-11" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge3" edge="1" value="" parent="1" source="node7" target="node4" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge16" edge="1" value="" parent="1" source="node10" target="node4" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-1010" y="-11" />
+          <mxPoint x="-2395" y="-11" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge13" edge="1" value="" parent="1" source="node11" target="node9" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-1536" y="706" />
+          <mxPoint x="-1677" y="706" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge14" edge="1" value="" parent="1" source="node11" target="node4" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-1536" y="706" />
+          <mxPoint x="-1378" y="706" />
+          <mxPoint x="-1378" y="-11" />
+          <mxPoint x="-2395" y="-11" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge10" edge="1" value="" parent="1" source="node12" target="node4" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-4079" y="-11" />
+          <mxPoint x="-2395" y="-11" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge6" edge="1" value="" parent="1" source="node1" target="node7" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge0" edge="1" value="" parent="1" source="node1" target="node5" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.554;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-2374" y="1777" />
+          <mxPoint x="-2090" y="1777" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge4" edge="1" value="" parent="1" source="node1" target="node2" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.442;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-2417" y="1777" />
+          <mxPoint x="-3089" y="1777" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge17" edge="1" value="" parent="1" source="node14" target="node10" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge11" edge="1" value="" parent="1" source="node13" target="node11" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-1803" y="1777" />
+          <mxPoint x="-1536" y="1777" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge15" edge="1" value="" parent="1" source="node13" target="node5" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.431;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-1825" y="1777" />
+          <mxPoint x="-2090" y="1777" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge9" edge="1" value="" parent="1" source="node8" target="node12" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge7" edge="1" value="" parent="1" source="node6" target="node4" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-2630" y="-11" />
+          <mxPoint x="-2395" y="-11" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge1" edge="1" value="" parent="1" source="node2" target="node6" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.586;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-3055" y="763" />
+          <mxPoint x="-2630" y="763" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge8" edge="1" value="" parent="1" source="node2" target="node3" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.408;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-3124" y="763" />
+          <mxPoint x="-3602" y="763" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge2" edge="1" value="" parent="1" source="node2" target="node0" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge5" edge="1" value="" parent="1" source="node0" target="node4" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-3089" y="-11" />
+          <mxPoint x="-2395" y="-11" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+  </root>
+</mxGraphModel>

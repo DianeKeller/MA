@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">deep_prompt_evaluation.py</span>
+<span class="sd">-------------------------</span>
+<span class="sd">Version 1.0, updated on 2025-01-10</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">chunk</span> <span class="kn">import</span> <span class="n">Chunk</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">Series</span><span class="p">,</span> <span class="n">DataFrame</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_dataframe_factory</span> <span class="kn">import</span> <span class="n">MyDataFrameFactory</span>
+<span class="kn">from</span> <span class="nn">src.decorators.data_check_decorators</span> <span class="kn">import</span> <span class="n">requires_property</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.evaluation.metrics_visualization_mixin</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MetricsVisualizationMixin</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.evaluation.single_prompt_evaluation</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SinglePromptEvaluation</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.prompt_engineering.prompt_engineer_factory</span> \
+    <span class="kn">import</span> <span class="nn">get_prompt_engineer</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_analysis_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SentimentAnalysisConfig</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_stats</span> <span class="kn">import</span> <span class="n">normalize_polarities</span>
+<span class="kn">from</span> <span class="nn">src.stats.labels</span> <span class="kn">import</span> <span class="n">Labels</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_comparison_utils</span> <span class="kn">import</span> <span class="n">are_equal</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">src.utils.list_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_second_elements_from_list_of_tuples</span><span class="p">,</span>
+    <span class="n">get_first_elements_from_tuple_list_by_second_element</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.print_utils</span> <span class="kn">import</span> <span class="n">print_in_box</span>
+<span class="kn">from</span> <span class="nn">src.utils.string_utils</span> <span class="kn">import</span> <span class="n">StringUtils</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">PromptsDictType</span>
+
+<span class="c1"># Set Pandas display options</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_rows&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># Show all rows</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_columns&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># Show all columns</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.width&#39;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>  <span class="c1"># Set display width</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_colwidth&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># Set max column width</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.float_format&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{:,.5f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">float_format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{:.4f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span>
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation">[docs]</a>
+<span class="k">class</span> <span class="nc">DeepPromptEvaluation</span><span class="p">(</span><span class="n">MetricsVisualizationMixin</span><span class="p">,</span> <span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    DeepPromptEvaluation class.</span>
+
+<span class="sd">    This class evaluates prompts by analyzing their components and computing</span>
+<span class="sd">    metrics.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DeepPromptEvaluation.__init__">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">MyDataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;en&quot;</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes the DeepPromptEvaluation class with the given parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : MyDataFrame</span>
+<span class="sd">            MyDataFrame instance containing a DataFrame with different</span>
+<span class="sd">            query columns and the corresponding answers retrieved from the</span>
+<span class="sd">            LLM&#39;s API. These data are needed to evaluate the quality of the</span>
+<span class="sd">            different prompts.</span>
+
+<span class="sd">        language : str</span>
+<span class="sd">            Language code indicating the language of the sentences for which</span>
+<span class="sd">            the queries were formulated. Defaults to English (&#39;en&#39;).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoded_prompt_ingredients</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_decomposed_prompts</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_prompts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">150</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_best</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_worst</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span><span class="p">:</span> <span class="n">MyDataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_freqs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">language</span>
+
+        <span class="c1"># Variable for the current prompt name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SentimentAnalysisConfig</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_prompts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;n_best_prompts&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">describe_data</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">describe_answer_data</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">correct_labels</span> <span class="o">=</span> <span class="n">Labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;polarity&#39;</span><span class="p">],</span> <span class="s2">&quot;correct&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_all_prompt_metrics</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_ranks</span><span class="p">()</span>
+
+        <span class="c1"># Use PromptEngineer instance to get access to the basic_ingredients</span>
+        <span class="c1"># and the basic_and_composed_ingredients.</span>
+
+        <span class="n">ranking</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranking</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">ranking</span><span class="p">)</span>
+
+        <span class="n">prompt_engineer</span> <span class="o">=</span> <span class="n">get_prompt_engineer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;version&quot;</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompts</span><span class="p">:</span> <span class="n">PromptsDictType</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">prompt_engineer</span><span class="o">.</span><span class="n">get_prompts</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">basic_ingredients</span> <span class="o">=</span> <span class="n">prompt_engineer</span><span class="o">.</span><span class="n">get_basic_ingredients</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basic_and_composed_ingredients</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">prompt_engineer</span><span class="o">.</span><span class="n">get_basic_and_composed_ingredients</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">composed_ingredients</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basic_and_composed_ingredients</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">get_second_elements_from_list_of_tuples</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">basic_and_composed_ingredients</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the metrics MyDataFrame.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            A MyDataFrame containing a DataFrame with the metrics where the</span>
+<span class="sd">            metrics names are column names and the query variants rows with</span>
+<span class="sd">            metrics values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span>
+
+    <span class="nd">@metrics</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the metrics MyDataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        metrics : MyDataFrame</span>
+<span class="sd">            A MyDataFrame containing a DataFrame with the metrics where the</span>
+<span class="sd">            metrics names are column names and the query variants rows with</span>
+<span class="sd">            metrics values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span> <span class="o">=</span> <span class="n">metrics</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ranking</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ranking</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Chunk</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the data chunk.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Chunk</span>
+<span class="sd">            The data chunk Chunk with samples, query and answer columns.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
+
+    <span class="nd">@data</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Chunk</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the data chunk ensuring the polarities are normalized.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Chunk</span>
+<span class="sd">            Chunk with samples, query and answer columns.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">data</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">normalize_polarities</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">best</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_best</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_best</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_best</span>
+
+    <span class="nd">@best</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">best</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">best</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_best</span> <span class="o">=</span> <span class="n">best</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">worst</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_worst</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_worst</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_worst</span>
+
+    <span class="nd">@worst</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">worst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worst</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_worst</span> <span class="o">=</span> <span class="n">worst</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the number of best (and worst) prompts to show.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ----------</span>
+<span class="sd">        int</span>
+<span class="sd">            The the number of best (and worst) prompts to show.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_prompts</span>
+
+    <span class="nd">@n_prompts</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">n_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_prompts</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the number of best (and worst) prompts to show.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n_prompts : int</span>
+<span class="sd">            The the number of best (and worst) prompts to show.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The number of best (and worst) prompts to show normally is defined</span>
+<span class="sd">        in the SentimentAnalysisConfig settings and used in this class to</span>
+<span class="sd">        set the n_prompts property.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_prompts</span> <span class="o">=</span> <span class="n">n_prompts</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cols_to_analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves all names of &#39;answer&#39; columns from the data chunk.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            A list of names of columns in the data chunk that constitute</span>
+<span class="sd">            &#39;answer&#39; columns.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The name of an &#39;answer&#39; column starts with &quot;answer_&quot; followed by a</span>
+<span class="sd">        prompt number that corresponds to one of the numbers used to</span>
+<span class="sd">        identify the query columns in the chunk.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">col_name</span> <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">col_names</span> <span class="k">if</span>
+                <span class="n">col_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;answer&#39;</span><span class="p">)]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">correct_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Labels</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the correct labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_correct_labels</span>
+
+    <span class="nd">@correct_labels</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">correct_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Labels</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the correct labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_correct_labels</span> <span class="o">=</span> <span class="n">labels</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">all_freqs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the dictionary of sentiment frequencies for all prompts.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, List[Tuple[str, int]]]</span>
+<span class="sd">            A dictionary where the keys are the names of the prompts and the</span>
+<span class="sd">            values are lists of three tuples for the three sentiment</span>
+<span class="sd">            classes where the first element constitutes the sentiment label</span>
+<span class="sd">            and the second element is the frequency value.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_freqs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_all_freqs</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_freqs</span>
+
+    <span class="nd">@all_freqs</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">all_freqs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freqs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the dictionary of sentiment frequencies for all prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        freqs : Dict[str, List[Tuple[str, int]]]</span>
+<span class="sd">            A dictionary where the keys are the names of the prompts and the</span>
+<span class="sd">            values are lists of three tuples for the three sentiment</span>
+<span class="sd">            classes where the first element constitutes the sentiment label</span>
+<span class="sd">            and the second element is the frequ</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_freqs</span> <span class="o">=</span> <span class="n">freqs</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">all_freqs_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a DataFrame with the content of the all_freqs dictionary.</span>
+
+<span class="sd">        Returns the DataFrame from the all_freqs_my_df MyDataFrame object</span>
+<span class="sd">        created from the all_freqs dictionary..</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_freqs_my_df</span><span class="o">.</span><span class="n">df</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">all_freqs_my_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates and returns a MyDataFrame from the all_freqs dictionary.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            The created MyDataFrame with the content of the all_freqs</span>
+<span class="sd">            dictionary.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_freqs</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">all_freqs_my_df_with_totals</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the all_freqs_my_df MyDataFrame with a column for the totals.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            The all_freqs_my_df MyDataFrame with a column for the totals added.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">with_totals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_freqs_my_df</span>
+        <span class="n">with_totals</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+            <span class="s1">&#39;add_sums&#39;</span><span class="p">,</span> <span class="n">col_name</span><span class="o">=</span><span class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">with_totals</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">decomposed_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the decomposed prompts.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            The DataFrame with the decomposed prompts and their ranks.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_decomposed_prompts</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_decompose_prompts</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_decomposed_prompts</span>
+
+    <span class="nd">@decomposed_prompts</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">decomposed_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decomposed_prompts</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the decomposed_prompts property.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        decomposed_prompts : DataFrame</span>
+<span class="sd">            A DataFrame with decomposed prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_decomposed_prompts</span> <span class="o">=</span> <span class="n">decomposed_prompts</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">encoded_prompt_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the one-hot-encoded prompt ingredients.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            The one-hot-encoded prompt ingredients.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoded_prompt_ingredients</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_encode_prompt_ingredients</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoded_prompt_ingredients</span>
+
+    <span class="nd">@encoded_prompt_ingredients</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">encoded_prompt_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoded_ingredients</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the one-hot-encoded prompt ingredients.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        encoded_ingredients: DataFrame</span>
+<span class="sd">            A DataFrame with one-hot-encoded prompt ingredients.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoded_prompt_ingredients</span> <span class="o">=</span> <span class="n">encoded_ingredients</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="DeepPromptEvaluation.describe_answer_data">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation.describe_answer_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">describe_answer_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Describes the answer data columns with the pandas describe() function.</span>
+
+<span class="sd">        Filters the DataFrame wrapped in the data MyDataFrame object for</span>
+<span class="sd">        answer columns to the console and prints the filtered DataFrame to the</span>
+<span class="sd">        console.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+            <span class="s1">&#39;extract_columns_by_name_substring&#39;</span><span class="p">,</span>
+            <span class="n">substring</span><span class="o">=</span><span class="s2">&quot;answer_&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">df_T</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">answer_counts</span> <span class="o">=</span> <span class="n">df_T</span><span class="p">[[</span><span class="s1">&#39;count&#39;</span><span class="p">]]</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">answer_counts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation.describe_data">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation.describe_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">describe_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Describes the data with the pandas describe() function.</span>
+
+<span class="sd">        Prints the DataFrame wrapped in the data MyDataFrame object to the</span>
+<span class="sd">        console.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Display DataFrame programmatically</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation.compute_all_prompt_metrics">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation.compute_all_prompt_metrics">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_all_prompt_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the metrics for all columns to analyze</span>
+<span class="sd">        Instantiates a SinglePromptEvaluation instance for each column that</span>
+<span class="sd">        is to be analyzed and adds prompt metrics and frequencies to</span>
+<span class="sd">        collections of metrics and frequencies for all prompts.</span>
+
+<span class="sd">        Shows the overall frequencies after having added the sentiment</span>
+<span class="sd">        frequencies for all prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols_to_analyze</span><span class="p">:</span>
+            <span class="n">evaluation</span> <span class="o">=</span> <span class="n">SinglePromptEvaluation</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">correct_labels</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
+                <span class="n">col_name</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_prompt_metrics</span><span class="p">(</span><span class="n">evaluation</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_prompt_freqs</span><span class="p">(</span><span class="n">evaluation</span><span class="p">)</span>
+
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Frequencies&quot;</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_freqs_my_df_with_totals</span>
+
+        <span class="n">print_in_box</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation.add_prompt_freqs">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation.add_prompt_freqs">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_prompt_freqs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">:</span> <span class="n">SinglePromptEvaluation</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds sentiment frequencies for a prompt to the all_freqs dictionary.</span>
+
+<span class="sd">        Adds the sentiment frequencies for a prompt to the overall dictionary</span>
+<span class="sd">        of sentiment frequencies of all prompts.</span>
+
+<span class="sd">        Retrieves the frequencies for a single prompt from the</span>
+<span class="sd">        SinglePromptEvaluation instance created for the prompt&#39;s evaluation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        evaluation : SinglePromptEvaluation</span>
+<span class="sd">            The SinglePromptEvaluation instance created for the prompt&#39;s</span>
+<span class="sd">            evaluation.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Uncomment to output the comparison of frequencies of the correct</span>
+        <span class="c1"># labels and the predicted labels in the console.</span>
+
+        <span class="c1"># evaluation.compare_freqs()</span>
+
+        <span class="n">predicted_freqs</span> <span class="o">=</span> <span class="n">evaluation</span><span class="o">.</span><span class="n">predicted_freqs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_freqs</span><span class="p">[</span><span class="n">predicted_freqs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">predicted_freqs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation.add_prompt_metrics">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation.add_prompt_metrics">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_prompt_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evaluation</span><span class="p">:</span> <span class="n">SinglePromptEvaluation</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds computed metrics for a prompt to the overall metrics MyDataFrame.</span>
+
+<span class="sd">        The overall metrics MyDataFrame collects the metrics for all prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        evaluation : SinglePromptEvaluation</span>
+<span class="sd">            A SinglePromptEvaluation instance for the currently analyzed</span>
+<span class="sd">            prompt that computes the prompt&#39;s metrics.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">metrics</span> <span class="o">=</span> <span class="n">evaluation</span><span class="o">.</span><span class="n">compute_metrics</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">metrics</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="si">}</span><span class="s2">_prompt_metrics&quot;</span><span class="p">,</span>
+                <span class="n">index_column</span><span class="o">=</span><span class="s1">&#39;info&#39;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tmp_metrics</span> <span class="o">=</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">metrics</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="si">}</span><span class="s2">_prompt_metrics&quot;</span><span class="p">,</span>
+                <span class="n">index_column</span><span class="o">=</span><span class="s1">&#39;info&#39;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">do_with_row</span><span class="p">(</span>
+                <span class="s2">&quot;add_rows&quot;</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">tmp_metrics</span><span class="p">,</span>
+                <span class="n">ignore_index</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation.metrics_are_equal">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation.metrics_are_equal">[docs]</a>
+    <span class="k">def</span> <span class="nf">metrics_are_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric_1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metric_2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">are_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">metric_1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">metric_2</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation.get_partial_metrics">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation.get_partial_metrics">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_partial_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_substring</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts partial metrics based on the given column name substring.</span>
+
+<span class="sd">        Extracts columns from the metrics DataFrame whose column names</span>
+<span class="sd">        contain the given substring.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_substring : str</span>
+<span class="sd">            The substring to match column names with.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            A MyDataFrame object containing the extracted columns.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If the columns to extract are macro metrics, the accuracy (&#39;acc&#39;)</span>
+<span class="sd">        column is also added to the returned MyDataFrame as it is also an</span>
+<span class="sd">        overall metric.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">my_df</span> <span class="o">=</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                <span class="s2">&quot;extract_columns_by_name_substring&quot;</span><span class="p">,</span>
+                <span class="n">substring</span><span class="o">=</span><span class="n">col_substring</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Add the accuracy to the macro metrics</span>
+        <span class="k">if</span> <span class="n">col_substring</span> <span class="o">==</span> <span class="s1">&#39;macro&#39;</span><span class="p">:</span>
+            <span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;acc&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;acc&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Sort by rank</span>
+        <span class="c1"># Temporarily add the rank column and sort by it</span>
+        <span class="k">if</span> <span class="s1">&#39;rank&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">col_names</span><span class="p">:</span>
+            <span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;rank&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;rank&#39;</span><span class="p">])</span>
+            <span class="n">my_df</span> <span class="o">=</span> <span class="n">my_df</span><span class="o">.</span><span class="n">sorted</span><span class="p">(</span><span class="s1">&#39;rank&#39;</span><span class="p">,</span> <span class="n">asc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Remove the rank column</span>
+            <span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;rank&#39;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">my_df</span><span class="o">.</span><span class="n">sorted</span><span class="p">(</span><span class="n">asc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">my_df</span></div>
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation.add_ranks">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation.add_ranks">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_ranks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds ranks to the metrics based on the macro metrics.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The metrics DataFrame is changed in place. The resulting DataFrame</span>
+<span class="sd">        can be retrieved using the metrics getter of this class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_macro_ranks</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation.add_macro_ranks">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation.add_macro_ranks">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_macro_ranks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds ranks to the metrics based on the macro metrics.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The metrics DataFrame is changed in place. The resulting DataFrame</span>
+<span class="sd">        can be retrieved using the metrics getter of this class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_partial_metrics</span><span class="p">(</span><span class="s1">&#39;macro&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">df</span>
+        <span class="n">ranks</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;rank&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ranks</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">df_sorted_rounded</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;rank&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">df_sorted_rounded</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;rank&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ranks</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation.get_ranking">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation.get_ranking">[docs]</a>
+    <span class="nd">@requires_property</span><span class="p">(</span><span class="s2">&quot;metrics&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_ranking</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">replace_language_prefix</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the ranking replacing the language prefix in the row index.</span>
+
+<span class="sd">        Replaces the language prefix in the row names by a prefix that just</span>
+<span class="sd">        identifies the respective prompt.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        replace_language_prefix : bool</span>
+<span class="sd">            If set to True, the prefix replacement method is called.</span>
+<span class="sd">            Otherwise, the row names of the ranking Series remain unchanged.</span>
+<span class="sd">            Defaults to False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Series</span>
+<span class="sd">            The ranking Series with the new index (if this is replaced) or</span>
+<span class="sd">            the old index (if the replace_language_prefix was not set to True.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ranking</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;rank&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">replace_language_prefix</span><span class="p">:</span>
+            <span class="n">ranking</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_replace_language_specific_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranking</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ranking</span></div>
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation.get_metrics_for_aggregation">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation.get_metrics_for_aggregation">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_metrics_for_aggregation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_replace_language_specific_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">df</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation.analyze_correlation">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation.analyze_correlation">[docs]</a>
+    <span class="k">def</span> <span class="nf">analyze_correlation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Analyzes the correlations between all prompt parts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">complete_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_complete_correlation</span><span class="p">()</span>
+
+        <span class="n">high_corr_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_high_correlations</span><span class="p">(</span>
+            <span class="n">complete_matrix</span><span class="p">,</span> <span class="mf">0.7</span>
+        <span class="p">)</span>
+
+        <span class="n">very_high_corr_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_high_correlations</span><span class="p">(</span>
+            <span class="n">complete_matrix</span><span class="p">,</span> <span class="mf">0.8</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_rank_correlations</span><span class="p">(</span><span class="n">complete_matrix</span><span class="p">)</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+    <span class="k">def</span> <span class="nf">_analyze_complete_correlation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="c1"># The correlation_matrix contains the correlations between all the</span>
+        <span class="c1"># prompt ingredients</span>
+
+        <span class="c1"># Remove trailing whitespaces from column names to avoid issues in the</span>
+        <span class="c1"># correlation matrix</span>
+        <span class="n">encoded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoded_prompt_ingredients</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">encoded</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">encoded</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="n">correlation_matrix</span> <span class="o">=</span> <span class="n">encoded</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+
+        <span class="n">tmp_corr_matrix</span> <span class="o">=</span> <span class="n">correlation_matrix</span><span class="o">.</span><span class="n">__deepcopy__</span><span class="p">()</span>
+
+        <span class="n">sorted_indices</span> <span class="o">=</span> <span class="n">tmp_corr_matrix</span><span class="p">[</span><span class="s1">&#39;rank&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+            <span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">sorted_corr_matrix</span> <span class="o">=</span> <span class="n">tmp_corr_matrix</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+            <span class="n">sorted_indices</span><span class="p">,</span> <span class="n">sorted_indices</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">sorted_corr_matrix</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">!=</span>
+                <span class="n">sorted_corr_matrix</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;The correlation matrix is not symmetric.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># The following call results in a modified correlation matrix!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_correlation_heatmap</span><span class="p">(</span><span class="n">sorted_corr_matrix</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">sorted_corr_matrix</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">!=</span>
+                <span class="n">sorted_corr_matrix</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;The correlation matrix is not symmetric.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sorted_corr_matrix</span>
+
+<div class="viewcode-block" id="DeepPromptEvaluation._analyze_high_correlations">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation._analyze_high_correlations">[docs]</a>
+    <span class="k">def</span> <span class="nf">_analyze_high_correlations</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">corr_matrix</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Keeps only ingredients with high absolute correlation values.</span>
+
+<span class="sd">        Keeps only ingredients with absolutecorrelation values above the given</span>
+<span class="sd">        threshold.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        corr_matrix : DataFrame</span>
+<span class="sd">            A Pandas DataFrame representing the correlation matrix.</span>
+
+<span class="sd">        threshold : float</span>
+<span class="sd">            The threshold for keeping ingredients with high correlation values.</span>
+<span class="sd">            Defaults to 0.7.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            The reduced correlation matrix.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">cols_to_keep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_high_corr_rows</span><span class="p">(</span><span class="n">corr_matrix</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;rank&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cols_to_keep</span><span class="p">:</span>
+            <span class="n">cols_to_keep</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rank&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Reduce the correlation matrix to the columns and rows with high</span>
+        <span class="c1"># correlation values</span>
+        <span class="n">high_corr_matrix</span> <span class="o">=</span> <span class="n">corr_matrix</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+            <span class="n">cols_to_keep</span><span class="p">,</span>
+            <span class="n">cols_to_keep</span>
+        <span class="p">]</span>
+
+        <span class="n">tmp_high_corr_matrix</span> <span class="o">=</span> <span class="n">high_corr_matrix</span><span class="o">.</span><span class="n">__deepcopy__</span><span class="p">()</span>
+
+        <span class="n">sorted_indices</span> <span class="o">=</span> <span class="n">tmp_high_corr_matrix</span><span class="p">[</span><span class="s1">&#39;rank&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+            <span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">sorted_high_corr_matrix</span> <span class="o">=</span> <span class="n">tmp_high_corr_matrix</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+            <span class="n">sorted_indices</span><span class="p">,</span> <span class="n">sorted_indices</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_correlation_heatmap</span><span class="p">(</span><span class="n">sorted_high_corr_matrix</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sorted_high_corr_matrix</span></div>
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation._find_high_corr_rows">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation._find_high_corr_rows">[docs]</a>
+    <span class="k">def</span> <span class="nf">_find_high_corr_rows</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">corr_matrix</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Identifies rows with high correlation values (positive or negative)</span>
+<span class="sd">        in the given correlation matrix based on the specified threshold.</span>
+<span class="sd">        The function excludes self-correlations by masking diagonal elements</span>
+<span class="sd">        with NaN and then checks if any value in a row exceeds the threshold</span>
+<span class="sd">        in magnitude.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        corr_matrix : DataFrame</span>
+<span class="sd">            The correlation matrix containing pairwise correlation values. It</span>
+<span class="sd">            is assumed to have the same index and column labels.</span>
+
+<span class="sd">        threshold : float</span>
+<span class="sd">            The threshold used to detect high correlations. Rows with any</span>
+<span class="sd">            value above this threshold or below -threshold (ignoring</span>
+<span class="sd">            self-correlations) will be identified. Default is 0.7.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            A list of index labels corresponding to the rows in the</span>
+<span class="sd">            correlation matrix that have at least one correlation value</span>
+<span class="sd">            exceeding the specified threshold in magnitude.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Exclude self-correlations setting them to NaN</span>
+        <span class="n">masked_matrix</span> <span class="o">=</span> <span class="n">corr_matrix</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">masked_matrix</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+        <span class="c1"># Identify rows where the absolute value of any correlation exceeds</span>
+        <span class="c1"># the threshold</span>
+        <span class="n">high_corr_rows</span> <span class="o">=</span> <span class="n">masked_matrix</span><span class="o">.</span><span class="n">index</span><span class="p">[</span>
+            <span class="p">(</span><span class="n">masked_matrix</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">high_corr_rows</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation._analyze_rank_correlations">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation._analyze_rank_correlations">[docs]</a>
+    <span class="k">def</span> <span class="nf">_analyze_rank_correlations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">corr_matrix</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Analyzes the rank correlations for specific prefixes in the matrix.</span>
+
+<span class="sd">        The method processes the input correlation matrix to extract</span>
+<span class="sd">        correlations of all parts of the prompt with the rank, excluding</span>
+<span class="sd">        self-correlation of the &quot;rank&quot; itself. It then utilizes unique</span>
+<span class="sd">        prefixes from the correlation indices to identify structured groups</span>
+<span class="sd">        of correlations. Finally, it sorts and visualizes the partial</span>
+<span class="sd">        correlations for each prefix using a heatmap.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        corr_matrix : DataFrame</span>
+<span class="sd">            A Pandas DataFrame representing the correlation matrix. It must</span>
+<span class="sd">            contain a column named &#39;rank&#39;, which includes the correlations</span>
+<span class="sd">            of various prompt elements with the rank.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method does not return a value; instead, it visualizes a</span>
+<span class="sd">        heatmap for specific partial rank correlations.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Extract only the correlation of all prompt parts with the  rank,</span>
+        <span class="c1"># excluding the self-correlation of &quot;rank&quot;</span>
+        <span class="n">rank_correlation</span> <span class="o">=</span> <span class="n">corr_matrix</span><span class="p">[</span><span class="s1">&#39;rank&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;rank&#39;</span><span class="p">)</span>
+
+        <span class="n">prefixes</span> <span class="o">=</span> <span class="n">StringUtils</span><span class="o">.</span><span class="n">get_unique_prefixes</span><span class="p">(</span><span class="n">Series</span><span class="p">(</span>
+            <span class="n">rank_correlation</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
+        <span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="n">prefixes</span><span class="p">:</span>
+            <span class="n">partial_rank_correlation</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">rank_correlation</span><span class="p">[</span>
+                    <span class="n">rank_correlation</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">_&quot;</span><span class="p">)</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">show_correlation_heatmap</span><span class="p">(</span>
+                <span class="n">partial_rank_correlation</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_set_best</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">best</span> <span class="o">=</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">sorted</span><span class="p">(</span><span class="s1">&#39;rank&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">df</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">n_prompts</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_query_col</span><span class="p">(</span><span class="n">best</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_worst</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">worst</span> <span class="o">=</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">sorted</span><span class="p">(</span><span class="s1">&#39;rank&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">n_prompts</span><span class="p">:]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">worst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_query_col</span><span class="p">(</span><span class="n">worst</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DeepPromptEvaluation._decompose_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation._decompose_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">_decompose_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decomposes prompts into basic ingredients.</span>
+
+<span class="sd">        Sets the decomposed_prompts property.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This implementation supposes there is only one basic ingredient per</span>
+<span class="sd">        prompt part.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Extract rank column as a DataFrame from the metrics</span>
+        <span class="c1"># MyDataFrame</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+            <span class="s1">&#39;extract_columns&#39;</span><span class="p">,</span> <span class="n">col_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;rank&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># Iterate through the ranks</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="c1"># Get the query number from the index field of the rank</span>
+            <span class="n">query_nr</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">StringUtils</span><span class="o">.</span><span class="n">get_int_behind_last_underscore</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+
+            <span class="c1"># Get the prompt&#39;s parts dictionary from the prompts dictionary</span>
+            <span class="n">prompt_parts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts</span><span class="p">[</span><span class="n">query_nr</span><span class="p">]</span>
+
+            <span class="c1"># Decompose composed ingredients:</span>
+
+            <span class="c1"># With each part</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">prompt_parts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1"># Check whether the part is in the composed_ingredients list</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">composed_ingredients</span><span class="p">)</span> <span class="ow">and</span> \
+                        <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">composed_ingredients</span><span class="p">:</span>
+                    <span class="c1"># if yes, find and add basic ingredient to the DataFrame</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_basic_ingredient</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># if no, add the part to the DataFrame</span>
+                    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+        <span class="c1"># Set the decomposed_prompts property to the DataFrame with the</span>
+        <span class="c1"># metrics and ingredients.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decomposed_prompts</span> <span class="o">=</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation._add_basic_ingredient">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation._add_basic_ingredient">[docs]</a>
+    <span class="k">def</span> <span class="nf">_add_basic_ingredient</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">prompt_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">prompt_part_category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">prompt_part_value</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds basic ingredients to the provided DataFrame.</span>
+
+<span class="sd">        For the given prompt part category, adds basic ingredients variantsto</span>
+<span class="sd">        the provided DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : DataFrame</span>
+<span class="sd">            A DataFrame whose rows represent the prompts, with a rank</span>
+<span class="sd">            column containing the rank the prompt has received, and columns</span>
+<span class="sd">            representing basic ingredients like &quot;before_sentence&quot;,</span>
+<span class="sd">            &quot;before_mention&quot;.</span>
+
+<span class="sd">        prompt_name : str</span>
+<span class="sd">            The prompt name (e.g. &quot;en_1&quot;) indicating the row in which to add</span>
+<span class="sd">            the ingredients derived from the prompt_part_value parameter.</span>
+
+<span class="sd">        prompt_part_category : str</span>
+<span class="sd">            Prompt part category like &quot;before_sentence&quot; or &quot;question&quot; for</span>
+<span class="sd">            which to retrieve basic ingredients categories like</span>
+<span class="sd">            &quot;sentence_label&quot;, &quot;politeness&quot;, &quot;toward&quot; etc.</span>
+
+<span class="sd">        prompt_part_value : str</span>
+<span class="sd">            Concrete prompt part in which to identify basic ingredients to</span>
+<span class="sd">            insert into the DataFrame, e.g. &quot;Can you specifiy the opinion in</span>
+<span class="sd">            the statement targeted at the individual. \nHere is the</span>
+<span class="sd">            statement: &quot;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            The DataFrame with the found basic ingredients added.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># Get the basic ingredients categories for the given prompt part</span>
+        <span class="c1"># category.</span>
+        <span class="n">basic_ingredients_categories</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_basic_ingredients_categories_for_prompt_part_category</span><span class="p">(</span>
+                <span class="n">prompt_part_category</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># print(f&quot;\nPrompt part category: {prompt_part_category}&quot;)</span>
+        <span class="c1"># print (</span>
+        <span class="c1">#   f&quot;Basic ingredients categories: {basic_ingredients_categories}&quot;</span>
+        <span class="c1"># )</span>
+
+        <span class="c1"># For each basic ingredients category</span>
+        <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">basic_ingredients_categories</span><span class="p">:</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">basic_category_ingredients</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_ingredients</span><span class="p">[</span><span class="n">category</span><span class="p">]</span>
+
+            <span class="c1"># print(f&quot;Basic category: {category}&quot;)</span>
+            <span class="c1"># print(f&quot;Basic ingredients: {basic_category_ingredients}&quot;)</span>
+
+            <span class="k">for</span> <span class="n">ingredient</span> <span class="ow">in</span> <span class="n">basic_category_ingredients</span><span class="p">:</span>
+                <span class="c1"># print (</span>
+                <span class="c1">#   f&quot;Ingredient: {ingredient} - in prompt part value:</span>
+                <span class="c1">#   {ingredient in prompt_part_value}&quot;</span>
+                <span class="c1"># )</span>
+
+                <span class="k">if</span> <span class="n">ingredient</span> <span class="ow">in</span> <span class="n">prompt_part_value</span><span class="p">:</span>
+                    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">prompt_name</span><span class="p">,</span> <span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="n">ingredient</span>
+                    <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="c1"># Do not look for more ingredients from the same category</span>
+                    <span class="k">break</span>
+                <span class="c1"># Ensure that capitalization is not a problem</span>
+                <span class="k">if</span> <span class="n">ingredient</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">prompt_part_value</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">prompt_name</span><span class="p">,</span> <span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="n">ingredient</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                    <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="c1"># Do not look for more ingredients from the same category</span>
+                    <span class="k">break</span>
+
+        <span class="c1"># Return the modified DataFrame</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="DeepPromptEvaluation._encode_prompt_ingredients">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation._encode_prompt_ingredients">[docs]</a>
+    <span class="k">def</span> <span class="nf">_encode_prompt_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies one-hot encoding in preparation of the correlation analysis.</span>
+
+<span class="sd">        The resulting encoded prompt ingredients DataFrame is stored in the</span>
+<span class="sd">        corresponding property.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">encoded</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">decomposed_prompts</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+                <span class="s1">&#39;rank&#39;</span><span class="p">,</span>
+                <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">encoded</span><span class="p">[</span><span class="s1">&#39;rank&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decomposed_prompts</span><span class="p">[</span><span class="s1">&#39;rank&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoded_prompt_ingredients</span> <span class="o">=</span> <span class="n">encoded</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_add_query_col</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">metrics</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">col_names</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">col_name</span> <span class="o">==</span> <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;query_&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">StringUtils</span><span class="o">.</span><span class="n">get_int_behind_last_underscore</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">):</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">do_with_field</span><span class="p">(</span>
+                        <span class="s2">&quot;get_field_value&quot;</span><span class="p">,</span>
+                        <span class="n">row_identifier</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">col_identifier</span><span class="o">=</span><span class="n">col_name</span>
+                    <span class="p">)</span>
+
+                    <span class="n">sentence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">do_with_field</span><span class="p">(</span>
+                        <span class="s2">&quot;get_field_value&quot;</span><span class="p">,</span>
+                        <span class="n">row_identifier</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">col_identifier</span><span class="o">=</span><span class="s1">&#39;sentence_normalized&#39;</span>
+                    <span class="p">)</span>
+
+                    <span class="n">mention</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">do_with_field</span><span class="p">(</span>
+                        <span class="s2">&quot;get_field_value&quot;</span><span class="p">,</span>
+                        <span class="n">row_identifier</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">col_identifier</span><span class="o">=</span><span class="s1">&#39;mention&#39;</span>
+                    <span class="p">)</span>
+
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                        <span class="n">sentence</span><span class="p">,</span> <span class="s2">&quot;[SENTENCE]&quot;</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                        <span class="n">mention</span><span class="p">,</span> <span class="s2">&quot;[MENTION]&quot;</span>
+                    <span class="p">)</span>
+
+                    <span class="n">metrics</span><span class="o">.</span><span class="n">do_with_field</span><span class="p">(</span>
+                        <span class="s2">&quot;set_field_value&quot;</span><span class="p">,</span>
+                        <span class="n">row_identifier</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+                        <span class="n">col_identifier</span><span class="o">=</span><span class="s1">&#39;query&#39;</span><span class="p">,</span>
+                        <span class="n">value</span><span class="o">=</span><span class="n">value</span>
+                    <span class="p">)</span>
+        <span class="k">return</span> <span class="n">metrics</span>
+
+    <span class="k">def</span> <span class="nf">_initialize_all_freqs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_freqs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;correct&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_labels</span><span class="o">.</span><span class="n">freqs</span><span class="p">}</span>
+
+<div class="viewcode-block" id="DeepPromptEvaluation._replace_language_specific_index">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation._replace_language_specific_index">[docs]</a>
+    <span class="k">def</span> <span class="nf">_replace_language_specific_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">Series</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">Series</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Replaces the original language-specific index in a DataFrame or Series.</span>
+
+<span class="sd">        Replaces the language prefix with the overall prefix &#39;prompt&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;prompt&#39;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">prefix</span> <span class="o">+</span> <span class="n">idx</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span>
+            <span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_verify_row_and_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sorted_corr_matrix</span><span class="p">):</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="n">sorted_corr_matrix</span>
+
+        <span class="n">identical</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">matrix</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">col_nr</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">col_name</span><span class="p">)</span>
+            <span class="n">row_name</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">col_nr</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">row_name</span> <span class="o">!=</span> <span class="n">col_name</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;row: _</span><span class="si">{</span><span class="n">row_name</span><span class="si">}</span><span class="s2">_ vs. col: _</span><span class="si">{</span><span class="n">col_name</span><span class="si">}</span><span class="s2">_&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;row = col: _</span><span class="si">{</span><span class="n">row_name</span><span class="si">}</span><span class="s2">_&quot;</span><span class="p">)</span>
+                <span class="n">identical</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Identical: </span><span class="si">{</span><span class="n">identical</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># endregion --- Protected Methods</span>
+<div class="viewcode-block" id="DeepPromptEvaluation._get_basic_ingredients_categories_for_prompt_part_category">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation.DeepPromptEvaluation._get_basic_ingredients_categories_for_prompt_part_category">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_basic_ingredients_categories_for_prompt_part_category</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">prompt_part_category</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the basic ingredients categories for a prompt part category.</span>
+
+<span class="sd">        Retrieves the basic ingredients categories from which a prompt part</span>
+<span class="sd">        category is composed. Searches the prompt part category in the</span>
+<span class="sd">        basic_and_composed_ingredients property and returns the</span>
+<span class="sd">        corresponding list of basic ingredients categories.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prompt_part_category : str</span>
+<span class="sd">            Prompt part category like &quot;before_sentence&quot; or &quot;question&quot; for</span>
+<span class="sd">            which to retrieve basic ingredients categories like</span>
+<span class="sd">            &quot;sentence_label&quot;, &quot;politeness&quot;, &quot;toward&quot; etc.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[Any]</span>
+<span class="sd">            The list of basic ingredients categories found for the prompt</span>
+<span class="sd">            part category.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">basic_ingredients_categories</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">get_first_elements_from_tuple_list_by_second_element</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">basic_and_composed_ingredients</span><span class="p">,</span> <span class="n">prompt_part_category</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">basic_ingredients_categories</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

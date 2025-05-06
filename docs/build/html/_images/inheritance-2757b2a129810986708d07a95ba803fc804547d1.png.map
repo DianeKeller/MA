@@ -1,0 +1,5 @@
+<map id="inheritanced2082789f9" name="inheritanced2082789f9">
+<area shape="rect" id="node1" title="Abstract base class for generic types." alt="" coords="5,5,77,31"/>
+<area shape="rect" id="node3" title="Base class for protocol classes." alt="" coords="125,5,200,31"/>
+<area shape="rect" id="node2" href="#SentimentAnalysis.src.loggable.Loggable" target="_top" title="Protocol for classes that can be logged." alt="" coords="248,5,328,31"/>
+</map>

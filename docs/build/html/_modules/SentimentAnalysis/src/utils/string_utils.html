@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.utils.string_utils &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.utils.string_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.utils.string_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">string_utils.py</span>
+<span class="sd">---------------</span>
+<span class="sd">Version 1.0, updated on 2024-12-04</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Set</span>
+
+<span class="kn">import</span> <span class="nn">unicodedata</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">Series</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.decorators.data_check_decorators</span> <span class="kn">import</span> <span class="n">input_not_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">LoggingMixin</span><span class="p">()</span><span class="o">.</span><span class="n">log</span>
+
+
+<div class="viewcode-block" id="StringUtils">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.string_utils.StringUtils">[docs]</a>
+<span class="k">class</span> <span class="nc">StringUtils</span><span class="p">(</span><span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    StringUtils class.</span>
+
+<span class="sd">    Static class for handling strings.</span>
+
+<span class="sd">    Class Methods</span>
+<span class="sd">    -------------</span>
+<span class="sd">    all_end_with_underscore_and_numbers(lst: List[str]) -&gt; bool:</span>
+<span class="sd">        Checks if all strings in the list end with an underscore and numbers.</span>
+
+<span class="sd">    convert_class_name_into_module_name(class_name: str) -&gt; str:</span>
+<span class="sd">        Returns the module name of a given class.</span>
+
+<span class="sd">    first_char_to_upper(string: str) -&gt; str:</span>
+<span class="sd">        Converts the first character of a string to uppercase.</span>
+
+<span class="sd">    get_first_sentence(input_string: str) -&gt; str:</span>
+<span class="sd">        Extracts the first sentence from the provided input string.</span>
+
+<span class="sd">    get_int_behind_last_underscore(s: str) -&gt; int:</span>
+<span class="sd">        Returns the number behind the last underscore in a string.</span>
+
+<span class="sd">    get_prefixes(elements: Union[List[str], pandas.core.series.Series])</span>
+<span class="sd">            -&gt; List[str]:</span>
+<span class="sd">        Extracts prefixes separated by underscores from strings.</span>
+
+<span class="sd">    get_str_before_last_underscore(s: str) -&gt; str:</span>
+<span class="sd">        Returns the string before the last underscore in a string.</span>
+
+<span class="sd">    get_unique_prefixes(elements: Union[List[str], pandas.core.series.Series])</span>
+<span class="sd">            -&gt; Set[str]:</span>
+<span class="sd">        Extracts a list of unique prefixes from strings.</span>
+
+<span class="sd">    normalize_string(s: str) -&gt; str:</span>
+<span class="sd">        Normalizes a string.</span>
+
+<span class="sd">    remove_extension_from_file_name(file_name: str) -&gt; str:</span>
+<span class="sd">        Removes the file extension from a given file name.</span>
+
+<span class="sd">    shorten_string_by_n_chars(s: str, n_chars: int) -&gt; str:</span>
+<span class="sd">        Shortens a string by the specified number of characters.</span>
+
+<span class="sd">    trim(s: str) -&gt; str:</span>
+<span class="sd">        Removes leading and trailing whitespace from a string.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="StringUtils.convert_class_name_into_module_name">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.string_utils.StringUtils.convert_class_name_into_module_name">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">convert_class_name_into_module_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the module name of a given class.</span>
+
+<span class="sd">        Converts the CamelCase class name to its snake_case module name.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        class_name: str</span>
+<span class="sd">            The name of the class whose module is requested.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The module name of the given class.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            &gt;&gt;&gt; convert_class_name_into_module_name(&#39;TxtStrategy&#39;)</span>
+<span class="sd">            &#39;txt_strategy&#39;</span>
+
+<span class="sd">            &gt;&gt;&gt; convert_class_name_into_module_name(&#39;MyClass1&#39;)</span>
+<span class="sd">            &#39;my_class_1&#39;</span>
+
+<span class="sd">            &gt;&gt;&gt; convert_class_name_into_module_name(&#39;MyClassV20&#39;)</span>
+<span class="sd">            &#39;my_class_v_20&#39;</span>
+
+<span class="sd">            &gt;&gt;&gt; convert_class_name_into_module_name(&#39;Class2023Update&#39;)</span>
+<span class="sd">            &#39;class_2023_update&#39;</span>
+
+<span class="sd">            &gt;&gt;&gt; convert_class_name_into_module_name(&#39;HTTPRequest&#39;)</span>
+<span class="sd">            &#39;http_request&#39;</span>
+
+<span class="sd">            &gt;&gt;&gt; convert_class_name_into_module_name(&#39;JSONParser&#39;)</span>
+<span class="sd">            &#39;json_parser&#39;</span>
+<span class="sd">            &gt;&gt;&gt; convert_class_name_into_module_name(&#39;IDNumber&#39;)</span>
+<span class="sd">            &#39;id_number&#39;</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Explanation of the regex per line:</span>
+
+<span class="sd">        [1] Set x flag to allow comments at the end of the lines.</span>
+<span class="sd">        [2] Find a position before an uppercase letter that is preceded by</span>
+<span class="sd">            a lowercase letter or a digit,</span>
+<span class="sd">        [3] Or a position before an uppercase letter followed by a</span>
+<span class="sd">            lowercase letter when preceded by another uppercase letter (e.g.,</span>
+<span class="sd">            HTTPRequest -&gt; http_request),</span>
+<span class="sd">        [4] Or a position before a digit that is preceded by a letter.</span>
+<span class="sd">        [5] Use the regex (to find a position that needs to be modified) in the</span>
+<span class="sd">            class_name string, insert an underscore at that position and</span>
+<span class="sd">            convert the resulting string to lower case.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">regex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;&#39;&#39;(?x)                        # [1]</span>
+<span class="s1">            (?&lt;=[a-z0-9])(?=[A-Z])          # [2]</span>
+<span class="s1">            | (?&lt;=[A-Z])(?=[A-Z][a-z])      # [3]</span>
+<span class="s1">            | (?&lt;=[a-zA-Z])(?=\d)        # [4]</span>
+<span class="s1">    &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>  <span class="c1"># [5]</span></div>
+
+
+<div class="viewcode-block" id="StringUtils.trim">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.string_utils.StringUtils.trim">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes leading and trailing whitespace from a string.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        s</span>
+<span class="sd">            The string to be trimmed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The trimmed string.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="StringUtils.normalize_string">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.string_utils.StringUtils.normalize_string">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">normalize_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Normalizes a string.</span>
+
+<span class="sd">        Normalizes a string by converting it to lowercase and replacing</span>
+<span class="sd">        diacritics with their base form.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        s</span>
+<span class="sd">            The string to be normalized.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The normalized string.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="c1"># Normalize diacritics to separate characters</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s2">&quot;NFKD&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+
+        <span class="c1"># Remove diacritic marks</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">s</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">combining</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+
+
+<div class="viewcode-block" id="StringUtils.remove_extension_from_file_name">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.string_utils.StringUtils.remove_extension_from_file_name">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="nd">@input_not_none_or_empty</span><span class="p">(</span><span class="s1">&#39;File name&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">remove_extension_from_file_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes the file extension from a given file name.</span>
+
+<span class="sd">        1Splits the file name at the last dot and only returns the first</span>
+<span class="sd">        part of the string.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_name</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The file name without the file extension.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - If the file name does not contain a dot, the entire file name will be</span>
+<span class="sd">          returned.</span>
+
+<span class="sd">        - If the file name contains multiple dots, only the last extension will</span>
+<span class="sd">          be removed.</span>
+
+<span class="sd">        - Make sure you pass a real file name not strings like one or two dots</span>
+<span class="sd">          only. The latter will return unexpected results.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if the file name consists only of dots</span>
+        <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;The file name cannot consist only of dots.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># For hidden files, ensure the file name is not split at the first dot</span>
+        <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">file_name</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># If it&#39;s a hidden file without an extension, return it as is</span>
+            <span class="k">return</span> <span class="n">file_name</span>
+
+        <span class="c1"># In other cases, split the file name from the right side into a</span>
+        <span class="c1"># maximum of two parts</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="StringUtils.shorten_string_by_n_chars">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.string_utils.StringUtils.shorten_string_by_n_chars">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">shorten_string_by_n_chars</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">n_chars</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shortens a string by the specified number of characters.</span>
+
+<span class="sd">        Removes the given number of characters from the end of the string.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        s : str</span>
+<span class="sd">            The string that is to be shortened.</span>
+
+<span class="sd">        n_chars : int</span>
+<span class="sd">            The number of characters to remove from the end of the string.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The shortened string.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If the number of characters to remove is larger than the number of</span>
+<span class="sd">        characters in the string, an empty string is returned.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">n_chars</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">s</span><span class="p">[:</span><span class="o">-</span><span class="n">n_chars</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span></div>
+
+
+<div class="viewcode-block" id="StringUtils.all_end_with_underscore_and_numbers">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.string_utils.StringUtils.all_end_with_underscore_and_numbers">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">all_end_with_underscore_and_numbers</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if all strings in the list end with an underscore and numbers.</span>
+
+<span class="sd">        Checks if all strings in the list end with an underscore followed by</span>
+<span class="sd">        one or more numbers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lst : List[str]</span>
+<span class="sd">            List of strings to check.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if all strings match the pattern, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;_\d+$&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StringUtils.get_str_before_last_underscore">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.string_utils.StringUtils.get_str_before_last_underscore">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_str_before_last_underscore</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the string before the last underscore in a string.</span>
+
+<span class="sd">        Extracts the string before the last underscore using the</span>
+<span class="sd">        get_int_behind_last_underscore method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        s : str</span>
+<span class="sd">            The string from which to extract the part before the last</span>
+<span class="sd">            underscore. The string must contain at least one underscore</span>
+<span class="sd">            and a number as last part of the</span>
+<span class="sd">            string, e.g. &quot;attempt_1&quot;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The extracted string part.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the last part of the string cannot be converted into an integer.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">nr</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_int_behind_last_underscore</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">nr</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StringUtils.get_first_sentence">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.string_utils.StringUtils.get_first_sentence">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_first_sentence</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">input_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts the first sentence from the provided input string.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        input_string : str</span>
+<span class="sd">            The string from which to extract the first sentence.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The first sentence of the input string, or an empty string if no</span>
+<span class="sd">            sentence is found.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">input_string</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="c1"># Split the input string by &#39;.&#39;, take the first part as the first</span>
+        <span class="c1"># sentence.</span>
+        <span class="n">first_sentence</span> <span class="o">=</span> <span class="n">input_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">first_sentence</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="k">if</span> <span class="n">first_sentence</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="StringUtils.get_int_behind_last_underscore">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.string_utils.StringUtils.get_int_behind_last_underscore">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_int_behind_last_underscore</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the number behind the last underscore in a string.</span>
+
+<span class="sd">        Splits the string at the underscores and tries to convert the last part</span>
+<span class="sd">        into an integer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        s : str</span>
+<span class="sd">            The string from which to extract the integer number. The</span>
+<span class="sd">            string must contain an underscore and a number as last part of the</span>
+<span class="sd">            string, e.g. &quot;attempt_1&quot;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The extracted integer value.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the last part of the string cannot be converted into an integer.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> cannot be converted into a number&quot;</span> <span class="o">%</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span></div>
+
+
+<div class="viewcode-block" id="StringUtils.get_prefixes">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.string_utils.StringUtils.get_prefixes">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_prefixes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="n">Series</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts prefixes separated by underscores from strings.</span>
+
+<span class="sd">        Returns the first part of each string in the provided list or Series,</span>
+<span class="sd">        up to the first underscore.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        elements : List[str] | Series</span>
+<span class="sd">            List or Series of strings from which to extract the prefixes.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            List of extracted prefixes.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prefixes</span> <span class="o">=</span> <span class="n">elements</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">prefixes</span></div>
+
+
+<div class="viewcode-block" id="StringUtils.get_unique_prefixes">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.string_utils.StringUtils.get_unique_prefixes">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_unique_prefixes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="n">Series</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts a list of unique prefixes from strings.</span>
+
+<span class="sd">        Uses the get_prefixes function to extract all prefixes, then converts</span>
+<span class="sd">        the list into a set containing each element only once.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        elements : List[str] | Series</span>
+<span class="sd">            List or Series of strings from which to extract the prefixes.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Set[str]</span>
+<span class="sd">            A set of unique prefixes extracted from the elements.</span>
+<span class="sd">            .</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">prefixes</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_prefixes</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">prefixes</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StringUtils.first_char_to_upper">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.string_utils.StringUtils.first_char_to_upper">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">first_char_to_upper</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts the first character of a string to uppercase.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        string : str</span>
+<span class="sd">            The string to be converted.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The converted string.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        In contrast to the inbuilt &quot;capitalize&quot; method that converts the</span>
+<span class="sd">        whole string to lower case before capitalizing the first character,</span>
+<span class="sd">        this method leaves the characters in the string untouched and only</span>
+<span class="sd">        capitalizes the very first character.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="n">string</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

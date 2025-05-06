@@ -1,0 +1,42 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+title DictionaryChunker
+
+start
+:Initialize DictionaryChunker with
+  - the dictionary to be chunked
+  - the required chunk size
+  - a name for the checkpoints that will be created;
+:Read checkpoint (if exists);
+if (Checkpoint exists?) then (Yes)
+    :Set current_chunk to saved checkpoint value;
+    note left
+        Resume from the last saved chunk.
+    end note
+else (No)
+    :Set current_chunk to 1;
+    note right
+        Start processing from the first chunk.
+    end note
+endif
+
+:Create iterator for dictionary items;
+:Skip to current_chunk in iterator;
+
+while (More items in dictionary?) is (Yes)
+    :Call get_next_chunk();
+    :Log INFO: start of chunk;
+    :Set checkpoint for current chunk;
+    :Retrieve items from iterator for chunk;
+    if (End of iterator reached?) then (Yes)
+        :Break loop;
+    endif
+    :Increment current_chunk;
+    :Return chunk and chunk number;
+endwhile (No)
+
+:Return empty chunk and last chunk number;
+stop
+
+
+@enduml

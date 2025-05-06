@@ -1,0 +1,43 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+title Balanced Samples Generation Process
+
+start
+
+:Initialize SamplesManager;
+:Check if balanced samples are available;
+
+if (Balanced Samples Found?) then (Yes)
+    :Load balanced samples from disk;
+    stop
+else (No)
+    :Create balanced samples;
+endif
+
+:Select first language as reference;
+:Retrieve unbalanced samples for reference language;
+:Normalize polarities in unbalanced samples;
+
+while (For each sentiment: positive, negative, neutral?) is (Yes)
+    :Filter samples by sentiment;
+    :Reduce samples to maximum allowed size;
+    :Add sentiment-specific samples to reference set;
+endwhile (No)
+
+:Shuffle reference samples;
+:Save reference samples to disk;
+
+while (For each remaining language?) is (Yes)
+    :Retrieve unbalanced samples for the language;
+    :Normalize polarities in dataset;
+    :Extract rows matching reference sample indices;
+    :Save balanced dataset for language to disk;
+endwhile (No)
+
+:Balanced datasets created successfully;
+stop
+@enduml
+
+stop
+
+@enduml

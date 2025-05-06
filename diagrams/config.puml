@@ -1,0 +1,225 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+partition "SentimentAnalysisConfig" {
+    :initialize:
+            <color:grey>api: str = '',
+            <color:grey>llm: T | None = None,
+            <color:grey>from_sample: int = 0,
+            <color:grey>to_sample: int = 9999999,
+            <color:grey>batch_size: int = 100,
+            <color:grey>data_offset: int = 0,
+            <color:grey>n_batches: int = 1,
+            <color:grey>chunk_size: int = 15,
+            <color:grey>version: str = '00',
+            <color:grey>balance: int = 33,
+            <color:grey>balanced: bool = False,
+            <color:grey>n_best_prompts: int = 5,
+            <color:grey>target_n_prompts: int = 150,
+            <color:grey>with_validation: bool = True;
+}
+
+partition "ServerlessBloomWorkflow" {
+
+    :Initialize config:
+            <color:grey>api='',
+            <color:grey>llm=None,
+            <color:grey>from_sample=0,
+            <color:grey>to_sample=9999999,
+            <color:blue>*batch_size=99,
+            <color:blue>*data_offset=1,
+            <color:grey>*n_batches=1,
+            <color:grey>*chunk_size=15,
+            <color:blue>*version='01',
+            <color:grey>*balance=33,
+            <color:blue>*balanced=True,
+            <color:grey>*n_best_prompts=5,
+            <color:grey>*target_n_prompts=150,
+            <color:grey>*with_validation=True;
+
+    :ServerlessBloom._add_api_to_config:
+        config.set(api = ServerlessBloom.API),
+        llm = ServerlessBloom;
+    :Llm._add_llm_instance_to_config:
+        config.set(llm = ServerlessBloom;
+
+    switch (operation?)
+    case (prompt engineering)
+        :Update config:
+            <color:grey>api='',
+            <color:grey>llm=None,
+            <color:grey>from_sample=0,
+            <color:grey>to_sample=9999999,
+            <color:green>*batch_size=1,
+            <color:green>*data_offset=0,
+            <color:grey>n_batches=1,
+            <color:grey>chunk_size=15,
+            <color:green>*version=str(strategy_nr).zfill(2),
+            <color:grey>balance=33,
+            <color:green>*balanced=False,
+            <color:grey>n_best_prompts=5,
+            <color:grey>target_n_prompts=150,
+            <color:grey>with_validation=True;
+
+    case (sentiment analysis)
+        if (all languages?) then (yes)
+            :Update config:
+                <color:grey>api='',
+                <color:grey>llm=None,
+                <color:grey>from_sample=0,
+                <color:grey>to_sample=9999999,
+                <color:blue>*batch_size=99,
+                <color:green>*data_offset=101,
+                <color:grey>n_batches=1,
+                <color:grey>chunk_size=15,
+                <color:green>*version=version,
+                <color:grey>balance=33,
+                <color:blue>*balanced=True,
+                <color:grey>n_best_prompts=5,
+                <color:grey>target_n_prompts=150,
+                <color:grey>with_validation=True;
+
+            while (more languages to process) is (yes)
+                :<color:orange>Llm.predict_sentiments_in_language(language):
+                config.set(language = language);
+
+            endwhile (no)
+
+            :Llm.predict_sentiments:
+            config.remove(language);
+
+        else (no)
+            :Update config:
+                <color:grey>api='',
+                <color:grey>llm=None,
+                <color:grey>from_sample=0,
+                <color:grey>to_sample=9999999,
+                <color:blue>*batch_size=99,
+                <color:green>*data_offset=1,
+                <color:grey>n_batches=1,
+                <color:grey>chunk_size=15,
+                <color:green>*version=version,
+                <color:grey>balance=33,
+                <color:blue>*balanced=True.
+                <color:grey>n_best_prompts=5,
+                <color:grey>target_n_prompts=150,
+                <color:grey>with_validation=True;
+
+            :<color:orange>Llm.predict_sentiments_in_language:
+            config.set(language = language);
+
+        endif
+
+
+    case (prompt optimization)
+        :Update config:
+            <color:grey>api='',
+            <color:grey>llm=None,
+            <color:grey>from_sample=0,
+            <color:grey>to_sample=9999999,
+            <color:blue>*batch_size=99,
+            <color:blue>*data_offset=1,
+            <color:grey>n_batches=1,
+            <color:grey>*chunk_size=15,
+            <color:green>*version=str(strategy_nr).zfill(2),
+            <color:grey>balance=33,
+            <color:blue>*balanced=True,
+            <color:grey>n_best_prompts=5,
+            <color:grey>target_n_prompts=150,
+            <color:grey>with_validation=True;
+
+        :ServerlessBloomWorkflow_prompt_optimization:
+            config.set(version = str(strategy_nr).zfill(2));
+
+        :OptimizationWorkflow.find_optimization_potential_for_language(language):
+            config.set(language = language);
+
+        :PromptOptimizer(language, chunk_size, chunks);
+        :get_prompt_engineer(strategy_nr);
+            :PromptEngineeringFactory._getstrategy(strategy_nr);
+            :PromptEngineeringStrategy._set_prompt_engineering_config(strategy_nr, target_n_prompts);
+            if (n_prompts > 0?) then (yes)
+                :config.set(target_n_prompts = n_prompts);
+
+                if (n_prompts < config.get('chunk_size')?) then (yes)
+                    :config.set(chunk_size = n_prompts);
+                endif
+
+            endif
+
+
+
+    case (evaluation)
+         if (all languages?) then (yes)
+            :Update config:
+                <color:grey>api='',
+                <color:grey>llm=None,
+                <color:grey>from_sample=0,
+                <color:grey>to_sample=9999999,
+                <color:blue>*batch_size=99,
+                <color:red>*data_offset=101,
+                <color:grey>n_batches=1,
+                <color:red>*chunk_size=15,
+                <color:green>*version=version,
+                <color:grey>balance=33,
+                <color:blue>*balanced=True,
+                <color:grey>n_best_prompts=5,
+                <color:red>target_n_prompts=1,
+                <color:grey>with_validation=True;
+
+                while (more languages to process) is (yes)
+                    :<color:violet>PromptEvaluation.evaluate_prompts_for_language(language, partial_metrics=['macro']):
+                    config.set(language = language);
+                endwhile (no)
+
+                :config.remove(language);
+
+         else (no)
+            :Update config:
+                <color:grey>api='',
+                <color:grey>llm=None,
+                <color:grey>from_sample=0,
+                <color:grey>to_sample=9999999,
+                <color:blue>*batch_size=99,
+                <color:red>*data_offset=1,
+                <color:grey>n_batches=1,
+                <color:red>*chunk_size=15,
+                <color:green>*version=version,
+                <color:grey>balance=33,
+                <color:blue>balanced=True,
+                <color:grey>n_best_prompts=5,
+                <color:red>target_n_prompts=150,
+                <color:grey>with_validation=True;
+
+                :<color:violet>PromptEvaluation.evaluate_prompts_for_language(language, partial_metrics=['macro']):
+                config.set(language = language);
+         endif
+
+
+
+    endswitch
+
+
+    :PromptEngineeringStrategy._set_prompt_engineering_config(strategy_nr, n_prompts);
+    if (n_prompts > 0?) then (yes)
+        :config.set(target_n_prompts = n_prompts);
+
+        if (n_prompts < config.get('chunk_size')?) then (yes)
+            :config.set(chunk_size = n_prompts);
+        endif
+
+    endif
+
+}
+
+        :PromptEvaluation.join_best_prompts(versions);
+            while (version in versions?) is (yes)
+                :config.set(version = version);
+            endwhile (no)
+            :PromptEvaluation._save_best_prompts;
+            :config.set(version = new_version);
+stop
+
+
+@enduml

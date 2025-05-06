@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.utils.print_utils &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.utils.print_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.utils.print_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">print_utils.py</span>
+<span class="sd">--------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">This module provides formatting and printing utilities. It contains two</span>
+<span class="sd">singledispatch mechanisms, &#39;examples&#39; and &#39;restrict_length&#39; that mainly</span>
+<span class="sd">serve to format outputs, and various printing functions providing formatted</span>
+<span class="sd">output elements like white lines, separators, headers, and the output in a</span>
+<span class="sd">box with title header and body.</span>
+
+<span class="sd">Functions</span>
+<span class="sd">---------</span>
+<span class="sd">examples(my_iterable: Iterable[Any]) -&gt; Iterable[Any]:</span>
+<span class="sd">    Generic function to extract a couple of examples from the given iterable.</span>
+
+<span class="sd">restrict_length(_my_iterable: Iterable[Any], _max_length: int = 3) -&gt; None:</span>
+<span class="sd">    Generic function to restrict the length of the given iterable to the</span>
+<span class="sd">    specified maximum length.</span>
+
+<span class="sd">print_box_start() -&gt; None:</span>
+<span class="sd">    Prints a white line and a separator as the beginning of a box.</span>
+
+<span class="sd">print_double_line() -&gt; None:</span>
+<span class="sd">    Prints a line of equal signs as a text separator.</span>
+
+<span class="sd">print_header(title: str) -&gt; None:</span>
+<span class="sd">    Formats and prints a header with the specified title.</span>
+
+<span class="sd">print_in_box(title: str = &#39;&#39;, body: Any = &#39;&#39;, subtitle: str = &#39;&#39;) -&gt; None:</span>
+<span class="sd">    Prints a title, subtitle and body in a box in the console.</span>
+
+<span class="sd">print_sep() -&gt; None:</span>
+<span class="sd">    Prints a line of hyphens as a text separator.</span>
+
+<span class="sd">print_subsep() -&gt; None:</span>
+<span class="sd">    Prints a line of hyphens separated by blanks as a text separator.</span>
+
+<span class="sd">print_wline() -&gt; None:</span>
+<span class="sd">    Prints an empty line as a text separator.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">from</span> <span class="nn">constants</span> <span class="kn">import</span> <span class="n">MAX_ITEMS</span><span class="p">,</span> <span class="n">MAX_STRING_LENGTH</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">ExamplesType</span><span class="p">,</span> <span class="n">DictKeyType</span>
+
+<span class="n">WHITE_SPACE</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span>
+<span class="n">DOUBLE_LINE</span> <span class="o">=</span> <span class="s1">&#39;========================================================</span><span class="se">\n</span><span class="s1">&#39;</span>
+<span class="n">SEPARATOR</span> <span class="o">=</span> <span class="s1">&#39;--------------------------------------------------------</span><span class="se">\n</span><span class="s1">&#39;</span>
+<span class="n">SUBSEPARATOR</span> <span class="o">=</span> <span class="s1">&#39;- - - - - - - - - - - - - - - - - - - - - - - - - - - - </span><span class="se">\n</span><span class="s1">&#39;</span>
+<span class="n">WHITE_LINE</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+
+<div class="viewcode-block" id="print_sep">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.print_utils.print_sep">[docs]</a>
+<span class="k">def</span> <span class="nf">print_sep</span><span class="p">()</span> \
+        <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prints a line of hyphens as a text separator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">SEPARATOR</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="print_double_line">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.print_utils.print_double_line">[docs]</a>
+<span class="k">def</span> <span class="nf">print_double_line</span><span class="p">()</span> \
+        <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prints a line of equal signs as a text separator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">DOUBLE_LINE</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="print_subsep">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.print_utils.print_subsep">[docs]</a>
+<span class="k">def</span> <span class="nf">print_subsep</span><span class="p">()</span> \
+        <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prints a line of hyphens separated by blanks as a text separator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">SUBSEPARATOR</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="print_wline">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.print_utils.print_wline">[docs]</a>
+<span class="k">def</span> <span class="nf">print_wline</span><span class="p">()</span> \
+        <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prints an empty line as a text separator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">WHITE_LINE</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="print_header">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.print_utils.print_header">[docs]</a>
+<span class="k">def</span> <span class="nf">print_header</span><span class="p">(</span><span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Formats and prints a header with the specified title.</span>
+
+<span class="sd">    The title is preceded by box start lines, which are defined in the</span>
+<span class="sd">    print_box_start function, and followed by a line of equal signs.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    title : str</span>
+<span class="sd">        The title of the header.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">print_box_start</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">print_double_line</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="print_box_start">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.print_utils.print_box_start">[docs]</a>
+<span class="k">def</span> <span class="nf">print_box_start</span><span class="p">()</span> \
+        <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prints a white line and a separator as the beginning of a box.</span>
+
+<span class="sd">    For the concrete form of the separator string, see the print_sep()</span>
+<span class="sd">    function and the SEPARATOR constant.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">print_wline</span><span class="p">()</span>
+    <span class="n">print_sep</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="print_in_box">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.print_utils.print_in_box">[docs]</a>
+<span class="k">def</span> <span class="nf">print_in_box</span><span class="p">(</span><span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">subtitle</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prints a title, subtitle and body in a box in the console.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    title : str</span>
+<span class="sd">        The title of the box, printed in its header. If the title is an</span>
+<span class="sd">        empty string, the header of the box will be omitted.</span>
+
+<span class="sd">    body : Any</span>
+<span class="sd">        The body of the box. If it has another data type than a string,</span>
+<span class="sd">        it will be pretty-printed so that the content of, e.g., a list or</span>
+<span class="sd">        a dictionary is displayed as a multi-line list. Defaults to an empty</span>
+<span class="sd">        string.</span>
+
+<span class="sd">    subtitle : str</span>
+<span class="sd">        An optional subtitle, which will be displayed in a separate line at</span>
+<span class="sd">        the beginning of the body section of the box. Defaults to an empty</span>
+<span class="sd">        string.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+        <span class="n">print_header</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">print_box_start</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">subtitle</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">subtitle</span><span class="si">}{</span><span class="n">WHITE_LINE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+    <span class="n">print_sep</span><span class="p">()</span></div>
+
+
+
+<span class="c1"># region --- Restrict_length Singledispatch Mechanisme</span>
+
+<div class="viewcode-block" id="restrict_length">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.print_utils.restrict_length">[docs]</a>
+<span class="nd">@singledispatch</span>
+<span class="k">def</span> <span class="nf">restrict_length</span><span class="p">(</span>
+        <span class="n">_my_iterable</span><span class="p">:</span> <span class="n">ExamplesType</span><span class="p">,</span>
+        <span class="n">_max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MAX_ITEMS</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generic function to restrict the length of the given iterable to the</span>
+<span class="sd">    specified maximum length. This function serves as the entry point for the</span>
+<span class="sd">    singledispatch mechanism, which, based on the concrete type of the</span>
+<span class="sd">    iterable, dynamically selects which of the following implementations</span>
+<span class="sd">    needs to be executed.</span>
+
+<span class="sd">    By default, this base function raises a NotImplementedError indicating</span>
+<span class="sd">    that the implementation for the specific iterable type is missing and</span>
+<span class="sd">    should be added and registered.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _my_iterable: ExamplesType</span>
+<span class="sd">        The iterable whose length needs to be restricted.</span>
+
+<span class="sd">    _max_length: int</span>
+<span class="sd">        The maximum length of the iterable.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    NotImplementedError</span>
+<span class="sd">        If the implementation for the specific iterable type is missing</span>
+<span class="sd">        and should be added and registered.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt; restrict_length([1, 2, 3, 4, 5], 3)</span>
+<span class="sd">        [1, 2, 3]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Found no implementation for the provided iterable type </span><span class="si">%s</span><span class="s2">.&quot;</span>
+           <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">_my_iterable</span><span class="p">))</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<span class="nd">@restrict_length</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_restrict_list_length</span><span class="p">(</span>
+        <span class="n">my_list</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span>
+        <span class="n">max_items</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MAX_ITEMS</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="n">max_items</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">my_list</span><span class="p">),</span> <span class="n">max_items</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">my_list</span><span class="p">[:</span><span class="n">max_items</span><span class="p">]</span>
+
+
+<span class="nd">@restrict_length</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_restrict_dict_length</span><span class="p">(</span>
+        <span class="n">my_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+        <span class="n">max_items</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MAX_ITEMS</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">max_items</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">my_dict</span><span class="p">),</span> <span class="n">max_items</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_items</span><span class="p">):</span>
+        <span class="n">results</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">my_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">my_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">results</span>
+
+
+<div class="viewcode-block" id="_restrict_string_length">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.print_utils._restrict_string_length">[docs]</a>
+<span class="nd">@restrict_length</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_restrict_string_length</span><span class="p">(</span>
+        <span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MAX_STRING_LENGTH</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Formats a string by splitting it into lines of the specified maximum</span>
+<span class="sd">    length.</span>
+
+<span class="sd">    Inserts a line break each time a line would exceed the maximum length if</span>
+<span class="sd">    continued.</span>
+
+<span class="sd">    Attempts to break at whitespace, hyphen or underscore to avoid breaking</span>
+<span class="sd">    a line in the middle of words.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    string : str</span>
+<span class="sd">       The input string to be formatted.</span>
+
+<span class="sd">    max_length : int, optional</span>
+<span class="sd">       The maximum allowed line length of the output string (default is</span>
+<span class="sd">       MAX_STRING_LENGTH).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">       The formatted string.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt; _restrict_string_length(&quot;hello world&quot;, 7)</span>
+<span class="sd">        &#39;hello \nworld&#39;</span>
+
+<span class="sd">        &gt;&gt;&gt; _restrict_string_length(&quot;hello-world&quot;, 10)</span>
+<span class="sd">        &#39;hello-\nworld&#39;</span>
+
+<span class="sd">        &gt;&gt;&gt; _restrict_string_length(&quot;hello_world&quot;, 5)</span>
+<span class="sd">        &#39;hello_\nworld&#39;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">string</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_length</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">string</span>
+
+    <span class="n">new_string</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">regex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;[\s\-_]+&#39;</span>
+
+    <span class="k">while</span> <span class="n">string</span><span class="p">:</span>
+        <span class="c1"># If the string is shorter than max_length, append it directly</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">string</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_length</span><span class="p">:</span>
+            <span class="n">new_string</span> <span class="o">+=</span> <span class="n">string</span>
+            <span class="k">break</span>
+
+        <span class="c1"># Find the last whitespace or break character before max_length</span>
+        <span class="n">break_match</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">string</span><span class="p">[:</span><span class="n">max_length</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">break_match</span><span class="p">:</span>
+            <span class="c1"># If a break character is found, break at the last one</span>
+            <span class="n">last_break</span> <span class="o">=</span> <span class="n">break_match</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+            <span class="n">new_string</span> <span class="o">+=</span> <span class="n">string</span><span class="p">[:</span><span class="n">last_break</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">string</span> <span class="o">=</span> <span class="n">string</span><span class="p">[</span><span class="n">last_break</span><span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If no break character is found, break at max_length</span>
+            <span class="c1"># and include trailing whitespaces if any</span>
+            <span class="n">slice_end</span> <span class="o">=</span> <span class="n">max_length</span>
+            <span class="k">while</span> <span class="n">slice_end</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">string</span><span class="p">)</span> <span class="ow">and</span> <span class="n">string</span><span class="p">[</span><span class="n">slice_end</span><span class="p">]</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span>
+                <span class="n">slice_end</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># Extend slice to include trailing whitespaces</span>
+            <span class="n">new_string</span> <span class="o">+=</span> <span class="n">string</span><span class="p">[:</span><span class="n">slice_end</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">string</span> <span class="o">=</span> <span class="n">string</span><span class="p">[</span><span class="n">slice_end</span><span class="p">:]</span>
+
+    <span class="k">return</span> <span class="n">new_string</span></div>
+
+
+
+<span class="c1"># endregion --- Restrict_length Singledispatch Mechanisme</span>
+
+<span class="c1"># region --- Examples Singledispatch Mechanism</span>
+
+<div class="viewcode-block" id="examples">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.print_utils.examples">[docs]</a>
+<span class="nd">@singledispatch</span>
+<span class="k">def</span> <span class="nf">examples</span><span class="p">(</span><span class="n">my_iterable</span><span class="p">:</span> <span class="n">ExamplesType</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">ExamplesType</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generic function to extract a couple of examples from the given</span>
+<span class="sd">    iterable. This function</span>
+<span class="sd">    serves as the entry point for the</span>
+<span class="sd">    singledispatch mechanism, which, based on the concrete type of the</span>
+<span class="sd">    iterable, dynamically selects which of the following implementations</span>
+<span class="sd">    needs to be executed.</span>
+
+<span class="sd">    By default, this base function raises a NotImplementedError indicating</span>
+<span class="sd">    that the implementation for the specific iterable type is missing and</span>
+<span class="sd">    should be added and registered.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    my_iterable: ExamplesType</span>
+<span class="sd">        The iterable from which the examples will be taken.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ExamplesType</span>
+<span class="sd">        A new iterable containing the examples.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    NotImplementedError</span>
+<span class="sd">        If the implementation for the specific iterable type is missing</span>
+<span class="sd">        and should be added and registered.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - The number of examples to extract from the iterable is fixed by the</span>
+<span class="sd">      global MAX_ITEMS constant, which is specified in the NUM category section</span>
+<span class="sd">      in the settings file.</span>
+
+<span class="sd">    - While the return types of the different implementations are subtypes of</span>
+<span class="sd">      Iterable, the type checker does not seem to understand this. Therefore,</span>
+<span class="sd">      type checking is disabled for the return types.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Found no implementation for the provided iterable type </span><span class="si">%s</span><span class="s2">.&quot;</span>
+           <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">my_iterable</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">msg</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">my_iterable</span></div>
+
+
+
+<div class="viewcode-block" id="_dict_examples">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.print_utils._dict_examples">[docs]</a>
+<span class="nd">@examples</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_dict_examples</span><span class="p">(</span><span class="n">my_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts a couple of examples from the given dictionary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    my_dict: Dict</span>
+<span class="sd">        The dictionary from which the examples will be taken.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dict[DictKeyType, Any]</span>
+<span class="sd">        A new dictionary containing the examples.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - The number of examples to extract from the dictionary is fixed by the</span>
+<span class="sd">      global MAX_ITEMS constant, which is specified in the NUM category section</span>
+<span class="sd">      in the settings file.</span>
+
+<span class="sd">    - While dict is a subtype of Iterable, the type checker does not seem to</span>
+<span class="sd">      understand this. Therefore, type checking is disabled for the return</span>
+<span class="sd">      type.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">restrict_length</span><span class="p">(</span><span class="n">my_dict</span><span class="p">,</span> <span class="n">MAX_ITEMS</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
+
+
+
+<div class="viewcode-block" id="_list_examples">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.print_utils._list_examples">[docs]</a>
+<span class="nd">@examples</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_list_examples</span><span class="p">(</span><span class="n">my_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> \
+        <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts a couple of examples from the given list.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    my_list: List</span>
+<span class="sd">        The list from which the examples will be taken.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[Any]</span>
+<span class="sd">        A new list containing the examples.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - The number of examples to extract from the list is fixed by the</span>
+<span class="sd">      global MAX_ITEMS constant, which is specified in the NUM category section</span>
+<span class="sd">      in the settings file.</span>
+
+<span class="sd">    - While List is a subtype of Iterable, the type checker does not seem to</span>
+<span class="sd">      understand this. Therefore, type checking is disabled for the return</span>
+<span class="sd">      type.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">restrict_length</span><span class="p">(</span><span class="n">my_list</span><span class="p">,</span> <span class="n">MAX_ITEMS</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
+
+
+<span class="c1"># endregion --- Examples Singledispatch Mechanism</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

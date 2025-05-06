@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_generating_strategy &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_generating_strategy</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_generating_strategy</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">prompt_generating_strategy.py</span>
+<span class="sd">-----------------------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+
+
+<div class="viewcode-block" id="PromptGeneratingStrategy">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_generating_strategy.PromptGeneratingStrategy">[docs]</a>
+<span class="k">class</span> <span class="nc">PromptGeneratingStrategy</span><span class="p">(</span>
+    <span class="n">ABC</span><span class="p">,</span>
+    <span class="n">LoggingMixin</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    PromptGeneratingStrategy class.</span>
+
+<span class="sd">    Base class for PromptGeneratingStrategy subclasses.</span>
+
+<span class="sd">    Class for handling the assembly of the parts of a single prompt based on</span>
+<span class="sd">    selected prompt ingredients, thus generating a prompt.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    In this program, a &#39;prompt&#39; refers to a dictionary containing prompt</span>
+<span class="sd">    components used to construct specific &#39;queries&#39; for given samples. In</span>
+<span class="sd">    contrast, a &#39;query&#39; is the text generated by combining a prompt&#39;s</span>
+<span class="sd">    components with a sample&#39;s text and relevant details, forming the</span>
+<span class="sd">    payload sent to an API.</span>
+
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    answer_before_mention : str</span>
+<span class="sd">        The &quot;answer_before_mention&quot; part of the prompt.</span>
+
+<span class="sd">    answer_start : str</span>
+<span class="sd">        The &quot;answer_start&quot; part of the prompt.</span>
+
+<span class="sd">    before_mention : str</span>
+<span class="sd">        The &quot;before_mention&quot; part of the prompt.</span>
+
+<span class="sd">    before_sentence : str</span>
+<span class="sd">        The &quot;before_sentence&quot; part of the prompt.</span>
+
+<span class="sd">    prompt_part_categories : List[str]</span>
+<span class="sd">        The prompt part categories used to build queries.</span>
+
+<span class="sd">    prompt_parts : Dict[str, str]</span>
+<span class="sd">        Assembles the prompt parts of a single prompt.</span>
+
+<span class="sd">    question : str</span>
+<span class="sd">        The &quot;question&quot; part of the prompt.</span>
+
+<span class="sd">    scale : str</span>
+<span class="sd">        The &quot;scale&quot; part of the prompt.</span>
+
+<span class="sd">    selected_ingredients : Dict[str, str]</span>
+<span class="sd">        The selected prompt ingredients from which to compose prompt parts.</span>
+
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    generate_prompt() -&gt; Dict[str, str]:</span>
+<span class="sd">        Assembles and returns the prompt parts of a single prompt.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ING</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;ingredient&#39;</span><span class="p">)</span>
+    <span class="n">STR</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;string&#39;</span><span class="p">)</span>
+    <span class="n">CMD</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;command&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PromptGeneratingStrategy.__init__">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_generating_strategy.PromptGeneratingStrategy.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selected_ingredients</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes the PromptParts class with the given selected ingredients.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        selected_ingredients : Dict[str, str]</span>
+<span class="sd">            A dictionary where the keys correspond to ingredients categories</span>
+<span class="sd">            and the values to selected ingredients values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_selected_ingredients</span> <span class="o">=</span> <span class="n">selected_ingredients</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_patterns</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">selected_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the selected prompt ingredients.</span>
+
+<span class="sd">        Returns the selected prompt ingredients from which to compose prompt</span>
+<span class="sd">        parts.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, str]</span>
+<span class="sd">            A dictionary where the keys correspond to ingredients categories</span>
+<span class="sd">            and the values to selected ingredients values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selected_ingredients</span>
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+<div class="viewcode-block" id="PromptGeneratingStrategy.generate_prompt">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_generating_strategy.PromptGeneratingStrategy.generate_prompt">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">generate_prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assembles an returns the prompt parts of a single prompt.</span>
+
+<span class="sd">        Abstract method that needs to be implemented by the subclasses.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, str]</span>
+<span class="sd">            Dictionary of prompt parts representing a single prompt. The</span>
+<span class="sd">            keys in the dictionary are the prompt part categories and the</span>
+<span class="sd">            values are the alternative values the prompt part categories can</span>
+<span class="sd">            have.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            If the concrete stategy does not implement this abstract method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+
+<div class="viewcode-block" id="PromptGeneratingStrategy.define_prompt_part_generation_patterns">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_generating_strategy.PromptGeneratingStrategy.define_prompt_part_generation_patterns">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">define_prompt_part_generation_patterns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Defines the prompt part generation patterns.</span>
+
+<span class="sd">        Abstract method that needs to be implemented by the subclasses.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            If the concrete stategy does not implement this abstract method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+
+<div class="viewcode-block" id="PromptGeneratingStrategy.get_prompt_part_generation_pattern">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_generating_strategy.PromptGeneratingStrategy.get_prompt_part_generation_pattern">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_prompt_part_generation_pattern</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">define_prompt_part_generation_patterns</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_patterns</span><span class="p">[</span><span class="n">category</span><span class="p">]</span></div>
+</div>
+
+
+        <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

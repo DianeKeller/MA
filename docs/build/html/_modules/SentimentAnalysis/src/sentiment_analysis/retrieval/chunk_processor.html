@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.retrieval.chunk_processor &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.retrieval.chunk_processor</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.retrieval.chunk_processor</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">chunk_processor.py</span>
+<span class="sd">------------------</span>
+<span class="sd">Version 1.0, updated on 2024-12-25</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.prompt_engineering.prompt_engineer_factory</span> \
+    <span class="kn">import</span> <span class="nn">get_prompt_engineer</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.dictionary_chunker</span> <span class="kn">import</span> <span class="n">DictionaryChunker</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_dataframe_factory</span> <span class="kn">import</span> <span class="n">MyDataFrameFactory</span>
+<span class="kn">from</span> <span class="nn">src.decorators.data_check_decorators</span> <span class="kn">import</span> <span class="n">parameters_not_empty</span>
+<span class="kn">from</span> <span class="nn">src.decorators.type_check_decorators</span> <span class="kn">import</span> <span class="n">enforce_input_types</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> \
+    <span class="n">BatchFinishedException</span><span class="p">,</span> <span class="n">ChunkFinishedException</span><span class="p">,</span> <span class="n">CriticalException</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.query_column_processor</span> <span class="kn">import</span> \
+    <span class="n">QueryColumnProcessor</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_analysis_config</span> <span class="kn">import</span> \
+    <span class="n">SentimentAnalysisConfig</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">PromptsDictType</span>
+
+
+<div class="viewcode-block" id="ChunkProcessor">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.chunk_processor.ChunkProcessor">[docs]</a>
+<span class="k">class</span> <span class="nc">ChunkProcessor</span><span class="p">(</span><span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ChunkProcessor class.</span>
+
+<span class="sd">    This class provides the attributes and methods for the processing of</span>
+<span class="sd">    chunks of the prompts collection.</span>
+
+<span class="sd">    The multiple prompts generated are divided in smaller collections</span>
+<span class="sd">    of variants so that ideally, one chunk can be processed and sent to the</span>
+<span class="sd">    LLM&#39;s API before the Hugging Face rate limit hits.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    language : str</span>
+<span class="sd">        The language of the samples.</span>
+
+<span class="sd">    samples : MyDataFrame</span>
+<span class="sd">        The batch samples to process.</span>
+
+<span class="sd">    all_prompts : PromptsDictType</span>
+<span class="sd">        All prompts generated by the PromptEngineer.</span>
+
+<span class="sd">    chunk : PromptsDictType | None</span>
+<span class="sd">        The current chunk being processed.</span>
+
+<span class="sd">    chunk_nr : int</span>
+<span class="sd">        The current chunk number.</span>
+
+<span class="sd">    chunk_samples : MyDataFrame</span>
+<span class="sd">        The chunk_samples to process in batches.</span>
+
+<span class="sd">    chunk_size : int</span>
+<span class="sd">        The size of each chunk, according to the sentiment analysis</span>
+<span class="sd">        configuration.</span>
+
+<span class="sd">    iterator_counter : int</span>
+<span class="sd">        Tracks the number of queries processed.</span>
+
+<span class="sd">    queries_chunker : DictionaryChunker | None</span>
+<span class="sd">        The queries chunker.</span>
+
+<span class="sd">    skip_chunker : bool</span>
+<span class="sd">        A flag indicating whether to skip the chunk generation in</span>
+<span class="sd">        the current iteration.</span>
+
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    process_chunk(chunk: PromptsDictType) -&gt; None:</span>
+<span class="sd">        Processes the given chunk.</span>
+
+<span class="sd">    process_chunks() -&gt; MyDataFrame:</span>
+<span class="sd">        Gets the chunks and processes them iteratively.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ChunkProcessor.__init__">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.chunk_processor.ChunkProcessor.__init__">[docs]</a>
+    <span class="nd">@parameters_not_empty</span><span class="p">()</span>
+    <span class="nd">@enforce_input_types</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">batch_samples</span><span class="p">:</span> <span class="n">MyDataFrame</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes the ChunkProcessor instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">            The language of the samples.</span>
+
+<span class="sd">        batch_samples : MyDataFrame</span>
+<span class="sd">            The batch samples to process.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chunk_samples</span><span class="p">:</span> <span class="n">MyDataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">:</span> <span class="n">MyDataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queries_chunker</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">language</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">:</span> <span class="n">MyDataFrame</span> <span class="o">=</span> <span class="n">batch_samples</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunk</span><span class="p">:</span> <span class="n">PromptsDictType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunk_nr</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iterator_counter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skip_chunker</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Configs used in this class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SentimentAnalysisConfig</span><span class="p">()</span>
+        <span class="n">strategy_nr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">))</span>
+
+        <span class="c1"># ATTENTION: The PromptEngineeringStrategy changes the config settings.</span>
+        <span class="c1"># If things do not work as expected, check if the config returns the</span>
+        <span class="c1"># wrong settings.</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_engineer</span> <span class="o">=</span> <span class="n">get_prompt_engineer</span><span class="p">(</span><span class="n">strategy_nr</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_prompts</span><span class="p">:</span> <span class="n">PromptsDictType</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prompt_engineer</span><span class="o">.</span><span class="n">get_prompts</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;All </span><span class="si">%d</span><span class="s2"> prompts loaded!&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_prompts</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;Could not find validated prompts. Ensure you run prompt &quot;</span>
+                <span class="s2">&quot;engineering before attempting to retrieve sentiments from &quot;</span>
+                <span class="s2">&quot;the LLM.&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">samples</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the samples to process in batches.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span>
+
+    <span class="nd">@samples</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the samples to process in batches.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="n">samples</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">chunk_nr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the chunk number.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chunk_nr</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_chunk_nr</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chunk_nr</span>
+
+    <span class="nd">@chunk_nr</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">chunk_nr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk_nr</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the chunk number.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chunk_nr</span> <span class="o">=</span> <span class="n">chunk_nr</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">chunk_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the chunk_samples to process in batches.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chunk_samples</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chunk_samples</span>
+
+    <span class="nd">@chunk_samples</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">chunk_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk_samples</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the chunk_samples to process in batches.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chunk_samples</span> <span class="o">=</span> <span class="n">chunk_samples</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">queries_chunker</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DictionaryChunker</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the queries chunker.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queries_chunker</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_queries_chunker</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queries_chunker</span>
+
+    <span class="nd">@queries_chunker</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">queries_chunker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queries_chunker</span><span class="p">:</span> <span class="n">DictionaryChunker</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the queries chunker.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queries_chunker</span> <span class="o">=</span> <span class="n">queries_chunker</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="ChunkProcessor.process_chunks">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.chunk_processor.ChunkProcessor.process_chunks">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the chunks and processes them.</span>
+<span class="sd">        </span>
+<span class="sd">        In a loop, asks the queries_chunker to return a chunk and </span>
+<span class="sd">        calls the process_chunk method to process the chunk.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame </span>
+<span class="sd">            The chunk samples with all the query and answer columns added.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The queries chunker iteratively produces chunks and manages the </span>
+<span class="sd">        corresponding checkpoint.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_chunker</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_generate_chunk</span><span class="p">()</span>
+                <span class="k">except</span> <span class="n">BatchFinishedException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BatchFinishedException</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># After skipping the chunker reset the skip_chunker property</span>
+                <span class="c1"># to False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">skip_chunker</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">process_chunk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_samples</span></div>
+
+
+<div class="viewcode-block" id="ChunkProcessor.process_chunk">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.chunk_processor.ChunkProcessor.process_chunk">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">:</span> <span class="n">PromptsDictType</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes the given chunk.</span>
+<span class="sd">        </span>
+<span class="sd">        Uses the chunk to add query columns to the batch samples by calling </span>
+<span class="sd">        the _get_chunk_samples method. The resulting chunk samples are then </span>
+<span class="sd">        passed to a QueryColumnProcessor instance which will process the </span>
+<span class="sd">        query columns.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chunk : PromptsDictType</span>
+<span class="sd">            The current chunk of prompt parts sets needed to generate the </span>
+<span class="sd">            query columns.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If this method passes a newly created chunk to the</span>
+<span class="sd">        QueryColumnProcessor, this will raise a ChunkFinishedException,</span>
+<span class="sd">        because the current results DataFrame&#39;s columns do not match the</span>
+<span class="sd">        query numbers of the new chunk. Therefore, when catching this</span>
+<span class="sd">        exception and returning to the process_chunks method, the generation</span>
+<span class="sd">        of yet another chunk must be prevented. This is done with the</span>
+<span class="sd">        skip_chunker boolean variable.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chunk_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_chunk_samples</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+
+            <span class="c1"># Save the DataFrame with the chunk_samples so that at least the</span>
+            <span class="c1"># queries are saved, even if they produce no valid answers at</span>
+            <span class="c1"># all in the chunk.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chunk_samples</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+            <span class="n">query_column_processor</span> <span class="o">=</span> <span class="n">QueryColumnProcessor</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chunk_samples</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">iterator_counter</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="n">query_column_processor</span><span class="o">.</span><span class="n">process_query_columns</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="n">ChunkFinishedException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">skip_chunker</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chunk_nr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">iterator_counter</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="c1"># Log and handle unexpected errors</span>
+            <span class="n">chunk_nr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterator_counter</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span>
+                <span class="s2">&quot;Error processing chunk </span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">chunk_nr</span><span class="p">,</span> <span class="n">err</span><span class="p">),</span> <span class="s1">&#39;error&#39;</span>
+            <span class="p">)</span>
+            <span class="k">raise</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+<div class="viewcode-block" id="ChunkProcessor._generate_chunk">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.chunk_processor.ChunkProcessor._generate_chunk">[docs]</a>
+    <span class="k">def</span> <span class="nf">_generate_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates the next chunk of prompts and stores it as a property.</span>
+
+<span class="sd">        Sets the chunk and the iterator_counter properties.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Generating new chunk. Current chunk: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk_nr</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunk</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterator_counter</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queries_chunker</span><span class="o">.</span><span class="n">get_next_chunk</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;All chunks processed!&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">BatchFinishedException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;New chunk: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk_nr</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;-</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChunkProcessor._set_queries_chunker">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.chunk_processor.ChunkProcessor._set_queries_chunker">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_queries_chunker</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Splits the prompts in chunks of 15 variants.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        15 queries for 100 samples is the number of queries wich will pass</span>
+<span class="sd">        before the Hugging Face rate limit hits.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">queries_chunker</span> <span class="o">=</span> <span class="n">DictionaryChunker</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_prompts</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChunkProcessor._set_chunk_nr">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.chunk_processor.ChunkProcessor._set_chunk_nr">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_chunk_nr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the chunk number for the chunk checkpoint name.</span>
+
+<span class="sd">        The iterator counter of the chunker corresponds to the number of the</span>
+<span class="sd">        queries it has taken from the queries dictionary.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunk_nr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterator_counter</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChunkProcessor._get_chunk_samples">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.chunk_processor.ChunkProcessor._get_chunk_samples">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_chunk_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">:</span> <span class="n">PromptsDictType</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads an existing chunk_samples MyDataFrame object or creates it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chunk : PromptsDictType</span>
+<span class="sd">            The current chunk.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chunk_samples_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_chunk_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk_nr</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Create an empty MyDataFrame with the chunk samples name</span>
+        <span class="n">my_df</span> <span class="o">=</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">chunk_samples_name</span><span class="p">)</span>
+
+        <span class="c1"># Use csv format instead of the default pkl format for (My)DataFrames</span>
+        <span class="c1"># to be able to open the file with MSExcel.</span>
+        <span class="n">my_df</span><span class="o">.</span><span class="n">file_type</span> <span class="o">=</span> <span class="s1">&#39;csv&#39;</span>
+
+        <span class="c1"># Try to find and load an existing MyDataFrame with this name</span>
+        <span class="k">if</span> <span class="n">my_df</span><span class="o">.</span><span class="n">can_load</span><span class="p">():</span>
+            <span class="n">my_df</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">my_df</span>
+
+        <span class="c1"># Otherwise fill the MydataFrame based on the samples property of</span>
+        <span class="c1"># this class by using the query parts contained in the chunk.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_query_cols</span><span class="p">(</span><span class="n">my_df</span><span class="p">,</span> <span class="n">chunk</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChunkProcessor._add_query_cols">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.chunk_processor.ChunkProcessor._add_query_cols">[docs]</a>
+    <span class="k">def</span> <span class="nf">_add_query_cols</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">my_df</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">,</span>
+            <span class="n">chunk</span><span class="p">:</span> <span class="n">PromptsDictType</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the chunk samples.</span>
+
+<span class="sd">        Fills the provided empty MyDataFrame with the samples with which this</span>
+<span class="sd">        class was initialized and the query columns composed from the prompt</span>
+<span class="sd">        parts in the provided chunk.</span>
+
+<span class="sd">        Calls the PromptEngineer initialized when the ChunkProcessor itself</span>
+<span class="sd">        was initialized to perform this prompt engineering strategy-specific</span>
+<span class="sd">        task.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        my_df : MyDataFrame</span>
+<span class="sd">            The provided empty MyDataFrame, which has already been assigned</span>
+<span class="sd">            the correct name attribute for its serialization.</span>
+
+<span class="sd">        chunk : PromptsDictType</span>
+<span class="sd">            The current chunk that was returned by the queries chunker,</span>
+<span class="sd">            containing the prompt parts from which to build the queries for</span>
+<span class="sd">            the samples in the current batch.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            The provided MyDataFrame object with the batch samples and</span>
+<span class="sd">            different query columns added.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">my_df</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_engineer</span><span class="o">.</span><span class="n">add_query_cols</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">chunk</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">my_df</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

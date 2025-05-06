@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">prompt_optimizer.py</span>
+<span class="sd">---------------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Set</span>
+
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.item_series</span> <span class="kn">import</span> <span class="n">ItemSeries</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.str_series</span> <span class="kn">import</span> <span class="n">StrSeries</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.prompt_engineering</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">prompts_and_ingredients_manager</span> <span class="k">as</span> <span class="n">manager</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.prompt_engineering.prompt_engineer_factory</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_prompt_engineer</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.prompt_engineering.prompt_printer</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PromptPrinter</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_analysis_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SentimentAnalysisConfig</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">src.utils.list_sort_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">sort_list_of_tuples_by_desc_second_element_asc_first</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.list_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_first_elements_from_list_of_tuples</span><span class="p">,</span>
+    <span class="n">is_substring_of_list_content</span><span class="p">,</span>
+    <span class="n">remove_elements_from_list</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="PromptOptimizer">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer">[docs]</a>
+<span class="k">class</span> <span class="nc">PromptOptimizer</span><span class="p">(</span><span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    PromptOptimizer class.</span>
+
+<span class="sd">    This class provides methods for analyzing valid and invalid prompt</span>
+<span class="sd">    variants and ingredients so that decision can be taken which prompt</span>
+<span class="sd">    ingredients should be removed from the lists used for prompt generation.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    VALIDATED_PROMPTS_FILE_NAME : str</span>
+<span class="sd">        File name for storing validated prompts.</span>
+
+<span class="sd">    FREQ_THRESHOLD : int</span>
+<span class="sd">        Minimum frequency an ingredient should have if it appears only in</span>
+<span class="sd">        invalid prompts to be excluded from the lists of possible ingredients.</span>
+
+<span class="sd">    VALID : str</span>
+<span class="sd">        The &#39;valid&#39; label.</span>
+
+<span class="sd">    INVALID : str</span>
+<span class="sd">        The &#39;invalid&#39; label.</span>
+
+<span class="sd">    chunk_size : int</span>
+<span class="sd">       Size of each chunk.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">VALIDATED_PROMPTS_FILE_NAME</span> <span class="o">=</span> <span class="s1">&#39;prompt_sets_history_1&#39;</span>
+
+    <span class="c1"># Number of times an ingredient must at least have been used to qualify</span>
+    <span class="c1"># for removal if it only leads to invalid prompts.</span>
+    <span class="n">FREQ_THRESHOLD</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="c1"># Variants types</span>
+
+    <span class="n">VALID</span> <span class="o">=</span> <span class="s2">&quot;valid&quot;</span>
+    <span class="n">INVALID</span> <span class="o">=</span> <span class="s2">&quot;invalid&quot;</span>
+
+<div class="viewcode-block" id="PromptOptimizer.__init__">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span>
+            <span class="n">chunks</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">MyDataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the PromptOptimizer with the specified parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">           Language code (default is &#39;en&#39;).</span>
+
+<span class="sd">        chunks : Dict[int, MyDataFrame]</span>
+<span class="sd">            Data chunks dictionary, where the keys are the integer numbers</span>
+<span class="sd">            of the chunks and the value is a MyDataFrame with the chunk data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">PromptsAndIngredientsManager</span><span class="p">(</span>
+            <span class="n">language</span><span class="p">,</span> <span class="n">chunks</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Whether values of previous prompt engineering strategies should be</span>
+        <span class="c1"># used to countercheck results when only invalid values are retrieved</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">check_previous</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">language</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunks</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">MyDataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="n">chunks</span>
+
+        <span class="c1"># Configs used in this class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SentimentAnalysisConfig</span><span class="p">()</span>
+        <span class="n">strategy_nr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">))</span>
+
+        <span class="c1"># Set the printer with the strategy number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">printer</span> <span class="o">=</span> <span class="n">PromptPrinter</span><span class="p">(</span><span class="n">strategy_nr</span><span class="p">)</span>
+
+        <span class="c1"># ATTENTION: The PromptEngineeringStrategy used to set the</span>
+        <span class="c1"># prompt_engineer modifies the configuration settings. Hence, use any</span>
+        <span class="c1"># config settings only after the prompt_engineer is created.</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_engineer</span> <span class="o">=</span> <span class="n">get_prompt_engineer</span><span class="p">(</span><span class="n">strategy_nr</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">)</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize variables for collections of</span>
+<span class="sd">        - prompt-parts that are always valid / invalid</span>
+<span class="sd">        - ingredients that always produce valid / invalid prompts</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">only_valid_prompt_parts</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">only_invalid_prompt_parts</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">only_valid_ingredients</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">only_invalid_ingredients</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="PromptOptimizer.find_influential_variants_by_col_name">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer.find_influential_variants_by_col_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_influential_variants_by_col_name</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">valid_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">invalid_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">previous_valid_df</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+        <span class="n">List</span><span class="p">[</span>
+            <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+        <span class="p">],</span>
+        <span class="n">List</span><span class="p">[</span>
+            <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+        <span class="p">]</span>
+    <span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds influential variants of prompt parts or ingredients.</span>
+
+<span class="sd">        Examines which prompt parts or ingredients in a column that</span>
+<span class="sd">        corresponds to a variants category only lead to valid</span>
+<span class="sd">        prompts and which ones only to invalid prompts.</span>
+
+<span class="sd">        Returns the lists of valid and invalid variants which are found to</span>
+<span class="sd">        significantly influence the validity of a prompt.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        valid_df : DataFrame</span>
+<span class="sd">            A DataFrame with valid prompts or prompt ingredients sets.</span>
+
+<span class="sd">        invalid_df : DataFrame</span>
+<span class="sd">            A DataFrame with invalid prompts or prompt ingredients sets.</span>
+
+<span class="sd">        col_name : str</span>
+<span class="sd">            Name of the column whose values are to be examined. The name</span>
+<span class="sd">            equals the category to which the prompt parts or ingredients</span>
+<span class="sd">            belong.</span>
+
+<span class="sd">        previous_valid_df : DataFrame</span>
+<span class="sd">            A DataFrame with valid prompts or prompt ingredients sets from</span>
+<span class="sd">            one or more previous prompt engineering strategies.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Tuple[</span>
+<span class="sd">            List[</span>
+<span class="sd">                Tuple[str, int]</span>
+<span class="sd">            ],</span>
+<span class="sd">            List[</span>
+<span class="sd">                Tuple[str, int]</span>
+<span class="sd">            ]</span>
+<span class="sd">        ]</span>
+<span class="sd">            Two lists of tuples with the prompt parts or ingredients of</span>
+<span class="sd">            the category corresponding to the examined column&#39;s name that</span>
+<span class="sd">            were found to significantly influence the validity of a prompt.</span>
+<span class="sd">            The first list is the list of elements always leading to valid</span>
+<span class="sd">            prompts, the second list contains the elements that lead to</span>
+<span class="sd">            invalid prompts.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method is used by</span>
+<span class="sd">        - find_influential_variants</span>
+<span class="sd">          (</span>
+<span class="sd">            - find_influential_prompt_parts,</span>
+<span class="sd">            - find_influential_prompt_ingredients_sets,</span>
+<span class="sd">            which presently are not used</span>
+<span class="sd">          )</span>
+<span class="sd">        - analyze_valid_invalid_correlation_by_category</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Extract the column&#39;s values from the valid data ...</span>
+        <span class="n">valid_col_values</span> <span class="o">=</span> <span class="n">StrSeries</span><span class="p">(</span>
+            <span class="n">valid_df</span><span class="p">[</span><span class="n">col_name</span><span class="p">],</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">VALID</span>
+        <span class="p">)</span>
+        <span class="c1"># ... and from the invalid data. Store the values in StrSeries types</span>
+        <span class="c1"># that will provide the frequencies of the values.</span>
+        <span class="n">invalid_col_values</span> <span class="o">=</span> <span class="n">StrSeries</span><span class="p">(</span>
+            <span class="n">invalid_df</span><span class="p">[</span><span class="n">col_name</span><span class="p">],</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">INVALID</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Reduce the number of occurrences of each value to 1 per result set:</span>
+        <span class="n">unique_valid</span> <span class="o">=</span> <span class="n">valid_col_values</span><span class="o">.</span><span class="n">distinct_elements</span>
+        <span class="n">unique_invalid</span> <span class="o">=</span> <span class="n">invalid_col_values</span><span class="o">.</span><span class="n">distinct_elements</span>
+
+        <span class="c1"># Prepare result lists</span>
+        <span class="n">only_valid</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">only_invalid</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Iterate through the values of the valid data&#39;s column</span>
+        <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">unique_valid</span><span class="p">:</span>
+            <span class="c1"># Ensure the value is not also among the values of the</span>
+            <span class="c1"># invalid data&#39;s column.</span>
+            <span class="k">if</span> <span class="n">el</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_invalid</span><span class="p">:</span>
+                <span class="c1"># If the value only appeared in the valid data, add it to</span>
+                <span class="c1"># the only_valid list, together with the value&#39;s frequency</span>
+                <span class="n">freq</span> <span class="o">=</span> <span class="n">valid_col_values</span><span class="o">.</span><span class="n">frequencies</span><span class="p">[</span><span class="n">el</span><span class="p">]</span>
+                <span class="n">only_valid</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">el</span><span class="p">,</span> <span class="n">freq</span><span class="p">))</span>
+
+        <span class="c1"># Iterate through the values of the invalid data&#39;s column</span>
+        <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">unique_invalid</span><span class="p">:</span>
+            <span class="c1"># Ensure the value is not also among the values of the</span>
+            <span class="c1"># valid data&#39;s column.</span>
+            <span class="k">if</span> <span class="n">el</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_valid</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">previous_valid_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">previous_valid_col_values</span> <span class="o">=</span> <span class="n">StrSeries</span><span class="p">(</span>
+                        <span class="n">previous_valid_df</span><span class="p">[</span><span class="n">col_name</span><span class="p">],</span>
+                        <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">VALID</span>
+                    <span class="p">)</span>
+                    <span class="n">previous_unique_valid</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">previous_valid_col_values</span><span class="o">.</span><span class="n">distinct_elements</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">el</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">previous_unique_valid</span><span class="p">:</span>
+                        <span class="c1"># If the value only appeared in the invalid data,</span>
+                        <span class="c1"># and was not valid in previous strategies, add it to</span>
+                        <span class="c1"># the only_invalid list, together with the value&#39;s</span>
+                        <span class="c1"># frequency</span>
+                        <span class="n">freq</span> <span class="o">=</span> <span class="n">invalid_col_values</span><span class="o">.</span><span class="n">frequencies</span><span class="p">[</span><span class="n">el</span><span class="p">]</span>
+                        <span class="n">only_invalid</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">el</span><span class="p">,</span> <span class="n">freq</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Was valid in previous strategies: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">el</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">freq</span> <span class="o">=</span> <span class="n">invalid_col_values</span><span class="o">.</span><span class="n">frequencies</span><span class="p">[</span><span class="n">el</span><span class="p">]</span>
+                    <span class="n">only_invalid</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">el</span><span class="p">,</span> <span class="n">freq</span><span class="p">))</span>
+
+        <span class="c1"># Sort the result lists first by frequency and then alphabetically</span>
+        <span class="n">sorted_only_valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sort_variants_with_freqs</span><span class="p">(</span><span class="n">only_valid</span><span class="p">)</span>
+        <span class="n">sorted_only_invalid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sort_variants_with_freqs</span><span class="p">(</span><span class="n">only_invalid</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sorted_only_valid</span><span class="p">,</span> <span class="n">sorted_only_invalid</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer.find_influential_variants">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer.find_influential_variants">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_influential_variants</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">valid</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">,</span>
+            <span class="n">invalid</span><span class="p">:</span> <span class="n">MyDataFrame</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds influential variants of prompt parts or prompt ingredients.</span>
+
+<span class="sd">        Examines which prompt parts or prompt ingredients only lead to valid</span>
+<span class="sd">        prompts and which ones only to invalid prompts. Sets the &#39;only&#39;</span>
+<span class="sd">        properties accordingly.</span>
+
+<span class="sd">        Prints the results (the respective &#39;only&#39; DataFrames and their</span>
+<span class="sd">        descriptions):</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        valid : MyDataFrame</span>
+<span class="sd">            DataFrame with valid prompts or prompt sets.</span>
+
+<span class="sd">        invalid : MyDataFrame</span>
+<span class="sd">            DataFrame with invalid prompts or prompt sets.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the name of the valid data does not correspond to one of the</span>
+<span class="sd">            expected values (VALID_PROMPTS_NAME or</span>
+<span class="sd">            VALID_INGREDIENTS_SETS_NAME).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Prepare result dictionaries:</span>
+        <span class="n">only_valid</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">only_invalid</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">prompts_manager</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Distinguish between prompt parts and prompt ingredients to store</span>
+            <span class="c1"># them in the corresponding class variables:</span>
+            <span class="n">is_prompts_collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_prompts_collection</span><span class="p">(</span><span class="n">valid</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">CriticalException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span> <span class="kn">from</span> <span class="nn">err</span>
+
+        <span class="k">if</span> <span class="n">prompts_manager</span><span class="o">.</span><span class="n">check_previous</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_prompts_collection</span><span class="p">:</span>
+                <span class="n">previous_valid_df</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">prompts_manager</span><span class="o">.</span><span class="n">previous_valid_prompts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">previous_valid_df</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">prompts_manager</span><span class="o">.</span><span class="n">previous_valid_ingredients_sets</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">previous_valid_df</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Distinguish between prompt parts and prompt ingredients to store</span>
+        <span class="c1"># Iterate through the columns of the data (which are assumed to be</span>
+        <span class="c1"># the same for valid and invalid data)</span>
+        <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">valid</span><span class="o">.</span><span class="n">col_names</span><span class="p">:</span>
+            <span class="c1"># From valid and invalid data, extract the values that only appear</span>
+            <span class="c1"># in valid data and those that only appear in invalid data</span>
+            <span class="n">valid_values</span><span class="p">,</span> <span class="n">invalid_values</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">find_influential_variants_by_col_name</span><span class="p">(</span>
+                    <span class="n">valid</span><span class="o">.</span><span class="n">df</span><span class="p">,</span> <span class="n">invalid</span><span class="o">.</span><span class="n">df</span><span class="p">,</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">previous_valid_df</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Store the results in the corresponding dictionaries</span>
+            <span class="n">only_valid</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">valid_values</span>
+            <span class="n">only_invalid</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">invalid_values</span>
+
+        <span class="c1"># Distinguish between prompt parts and prompt ingredients to store</span>
+        <span class="c1"># them in the corresponding class variables:</span>
+        <span class="k">if</span> <span class="n">is_prompts_collection</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">only_valid_prompt_parts</span> <span class="o">=</span> <span class="n">only_valid</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">only_invalid_prompt_parts</span> <span class="o">=</span> <span class="n">only_invalid</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="o">.</span><span class="n">print_variants_dicts</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">only_valid_prompt_parts</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">only_invalid_prompt_parts</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">only_valid_ingredients</span> <span class="o">=</span> <span class="n">only_valid</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">only_invalid_ingredients</span> <span class="o">=</span> <span class="n">only_invalid</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="o">.</span><span class="n">print_variants_dicts</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">only_valid_ingredients</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">only_invalid_ingredients</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer.find_influential_prompt_parts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer.find_influential_prompt_parts">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_influential_prompt_parts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds prompt parts that may be responsible for the validity of prompts.</span>
+
+<span class="sd">        Calls the find_influential_variants method to perform the</span>
+<span class="sd">        comparison.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method does not return any values. The</span>
+<span class="sd">        find_influential_variants method will update the &#39;only&#39; dictionaries</span>
+<span class="sd">        of this class and additionally, it will output its findings to the</span>
+<span class="sd">        console.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">valid_prompts</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">invalid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">invalid_prompts</span><span class="o">.</span><span class="n">data</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">find_influential_variants</span><span class="p">(</span><span class="n">valid</span><span class="p">,</span> <span class="n">invalid</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer.find_influential_prompt_ingredients_sets">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer.find_influential_prompt_ingredients_sets">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_influential_prompt_ingredients_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds influential prompt ingredients for valid and invalid prompts.</span>
+
+<span class="sd">        Calls the find_influential_variants method to perform the</span>
+<span class="sd">        comparison.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">valid_ingredients_sets</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">invalid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">invalid_ingredients_sets</span><span class="o">.</span><span class="n">data</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">find_influential_variants</span><span class="p">(</span><span class="n">valid</span><span class="p">,</span> <span class="n">invalid</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer.print_overall_prompts_results">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer.print_overall_prompts_results">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_overall_prompts_results</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the overall prompts results.</span>
+
+<span class="sd">        Prints the number of prompts processed and the</span>
+<span class="sd">        resulting numbers of valid and invalid prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="o">.</span><span class="n">print_prompt_statistics</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">valid_prompts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">n_rows</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">invalid_prompts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">n_rows</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">all_prompts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">n_rows</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer.correlation_analysis">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer.correlation_analysis">[docs]</a>
+    <span class="k">def</span> <span class="nf">correlation_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds and prints ingredients that correlate with prompt validity.</span>
+
+<span class="sd">        Analyzes valid and invalid prompts to find ingredients that correlate</span>
+<span class="sd">        with valid or invalid outcomes.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="o">.</span><span class="n">print_prompt_statistics</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">valid_prompts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">n_rows</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">invalid_prompts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">n_rows</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">all_prompts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">n_rows</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">analyze_valid_invalid_correlation_per_category</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer.analyze_valid_invalid_correlation_per_category">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer.analyze_valid_invalid_correlation_per_category">[docs]</a>
+    <span class="k">def</span> <span class="nf">analyze_valid_invalid_correlation_per_category</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Analyzes valid and invalid correlations across specified categories.</span>
+
+<span class="sd">        This method evaluates whether there is a correlation between</span>
+<span class="sd">        prompt ingredients and the validity of prompts, i.e., whether a</span>
+<span class="sd">        prompt is valid or invalid. It analyzes categories such as &#39;order&#39;,</span>
+<span class="sd">        &#39;scale&#39;, &#39;politeness&#39;, and others deemed relevant, while excluding</span>
+<span class="sd">        those considered irrelevant (e.g., &#39;preposition&#39;). It builds two</span>
+<span class="sd">        dictionaries containing results for only valid and only invalid</span>
+<span class="sd">        ingredients, respectively.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method does not return any value. It calls the</span>
+<span class="sd">        analyze_valid_invalid_correlation_by_category method to perform the</span>
+<span class="sd">        analysis for each category and print the results</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">valid_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">valid_ingredients_sets</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span>
+        <span class="n">invalid_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">invalid_ingredients_sets</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span>
+
+        <span class="c1"># Check only categories that seem to influence whether a prompt</span>
+        <span class="c1"># triggers a valid answer (e.g. &#39;preposition&#39; or &#39;toward&#39; are</span>
+        <span class="c1"># irrelevant):</span>
+        <span class="n">categories</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;answer_start&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;given&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;politeness&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;scale&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;sentence_label&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;target&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;task&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;thought&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;what&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;where&#39;</span>
+        <span class="p">]</span>
+
+        <span class="n">only_valid</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">category</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">categories</span>
+        <span class="p">}</span>
+        <span class="n">only_invalid</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">category</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">categories</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">:</span>
+            <span class="n">only_valid</span><span class="p">[</span><span class="n">category</span><span class="p">],</span> <span class="n">only_invalid</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">analyze_valid_invalid_correlation_by_category</span><span class="p">(</span>
+                    <span class="n">category</span><span class="p">,</span> <span class="n">valid_df</span><span class="p">,</span> <span class="n">invalid_df</span>
+                <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer.analyze_valid_invalid_correlation_by_category">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer.analyze_valid_invalid_correlation_by_category">[docs]</a>
+    <span class="k">def</span> <span class="nf">analyze_valid_invalid_correlation_by_category</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">valid_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">invalid_df</span><span class="p">:</span> <span class="n">DataFrame</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Analyzes valid and invalid correlations of the specified category.</span>
+
+<span class="sd">        Evaluates whether there is a correlation between prompt ingredients</span>
+<span class="sd">        of the given category and the validity of prompts, i.e., whether a</span>
+<span class="sd">        prompt is valid or invalid.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        category : str</span>
+<span class="sd">            The name of the ingredients category to analyze.</span>
+
+<span class="sd">        valid_df : DataFrame</span>
+<span class="sd">            A DataFrame containing valid ingredient sets.</span>
+
+<span class="sd">        invalid_df : DataFrame</span>
+<span class="sd">            A DataFrame containing invalid ingredient sets.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Tuple[Any, Any]</span>
+<span class="sd">            A tuple containing two elements:</span>
+<span class="sd">            (1) A collection of ingredients that produce only valid prompts.</span>
+<span class="sd">            (2) A collection of ingredients that produce only invalid prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">valid_values</span><span class="p">,</span> <span class="n">invalid_values</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">find_influential_variants_by_col_name</span><span class="p">(</span>
+                <span class="n">valid_df</span><span class="p">,</span>
+                <span class="n">invalid_df</span><span class="p">,</span>
+                <span class="n">category</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">previous_valid_ingredients_sets</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">n_unique_values</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_all_unique_ingredients</span><span class="p">(</span><span class="n">category</span><span class="p">))</span>
+        <span class="n">n_valid_unique_values</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_unique_ingredients</span><span class="p">(</span>
+                <span class="n">category</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">VALID</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">n_invalid_unique_values</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_unique_ingredients</span><span class="p">(</span>
+                <span class="n">category</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVALID</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">total_n_elements_in_category</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompt_engineer</span><span class="o">.</span><span class="n">get_all_ingredients</span><span class="p">()[</span><span class="n">category</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="o">.</span><span class="n">print_category_analysis</span><span class="p">(</span>
+            <span class="n">category</span><span class="p">,</span>
+            <span class="n">valid_values</span><span class="p">,</span>
+            <span class="n">invalid_values</span><span class="p">,</span>
+            <span class="n">n_unique_values</span><span class="p">,</span>
+            <span class="n">n_valid_unique_values</span><span class="p">,</span>
+            <span class="n">n_invalid_unique_values</span><span class="p">,</span>
+            <span class="n">total_n_elements_in_category</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">valid_values</span><span class="p">,</span> <span class="n">invalid_values</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer.finegrained_analysis">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer.finegrained_analysis">[docs]</a>
+    <span class="k">def</span> <span class="nf">finegrained_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Analyzes the basic ingredients of composed ingredients.</span>
+
+<span class="sd">        Refines the results of the correlation analysis.</span>
+
+<span class="sd">        Since the categories analyzed in the correlation analysis are not</span>
+<span class="sd">        atomic enough (as they are composed of more basic ingredients),</span>
+<span class="sd">        they cannot be removed from any ingredients lists. Therefore,</span>
+<span class="sd">        this method uses the results of the correlation analysis to perform</span>
+<span class="sd">        a more finegrained analysis on the basic ingredients and determine</span>
+<span class="sd">        the elements that should be removed from the basic ingredients lists.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Includes only categories that seem to have an influence on whether</span>
+<span class="sd">        the prompt is valid or invalid and that are composed of ingredients </span>
+<span class="sd">        that are not already included in the ingredients collection. </span>
+<span class="sd">        After optimization of the prompt engineering, this is </span>
+<span class="sd">        only true for scale:</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">engineer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_engineer</span>
+
+        <span class="n">basic_and_composed</span> <span class="o">=</span> <span class="n">engineer</span><span class="o">.</span><span class="n">get_basic_and_composed_ingredients</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">basic</span><span class="p">,</span> <span class="n">composed</span> <span class="ow">in</span> <span class="n">basic_and_composed</span><span class="p">:</span>
+            <span class="n">ingredients</span> <span class="o">=</span> <span class="n">engineer</span><span class="o">.</span><span class="n">get_basic_ingredients</span><span class="p">()[</span><span class="n">basic</span><span class="p">]</span>
+            <span class="n">category</span> <span class="o">=</span> <span class="n">composed</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_perform_finegrained_analysis</span><span class="p">(</span><span class="n">ingredients</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer.discarded_prompts_analysis">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer.discarded_prompts_analysis">[docs]</a>
+    <span class="k">def</span> <span class="nf">discarded_prompts_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Analyzes the discarded prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">discarded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">discarded_prompts</span>
+
+        <span class="n">categories</span> <span class="o">=</span> <span class="n">discarded</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">col_names</span>
+        <span class="c1"># Exclude irrelevant categories where the total number of</span>
+        <span class="c1"># ingredient variants is known to be used in valid prompts:</span>
+        <span class="n">irrelevant_categories</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;before_mention&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;answer_start&#39;</span>
+        <span class="p">]</span>
+        <span class="n">categories</span> <span class="o">=</span> <span class="n">remove_elements_from_list</span><span class="p">(</span>
+            <span class="n">categories</span><span class="p">,</span> <span class="n">irrelevant_categories</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Prepare a dictionary to store the invalid values per category</span>
+        <span class="n">only_invalid_values_per_category</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">:</span>
+            <span class="c1"># List of category values in discarded prompts</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">ItemSeries</span><span class="p">(</span>
+                <span class="n">discarded</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">category</span><span class="p">],</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">category</span><span class="si">}</span><span class="s2">&#39; values in discarded prompts&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># List of category values in valid prompts</span>
+            <span class="n">valid_category_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">valid_prompts</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span>
+                <span class="n">category</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+            <span class="n">freqs</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">frequencies</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="o">.</span><span class="n">print_unique_category_values_with_freqs</span><span class="p">(</span>
+                <span class="n">category</span><span class="p">,</span>
+                <span class="n">freqs</span><span class="p">,</span>
+                <span class="n">validity</span><span class="o">=</span><span class="s1">&#39;discarded&#39;</span><span class="p">,</span>
+                <span class="n">min_freq</span><span class="o">=</span><span class="mi">2</span>
+            <span class="p">)</span>
+
+            <span class="n">only_invalid_category_values</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">freq</span> <span class="ow">in</span> <span class="n">freqs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">freqs</span><span class="p">[</span><span class="n">freq</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">freq</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_category_values</span><span class="p">:</span>
+                        <span class="n">only_invalid_category_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Exit the loop as freqs is sorted in descending</span>
+                    <span class="c1"># frequency order</span>
+                    <span class="k">break</span>
+
+            <span class="c1"># Sort the invalid values per category and store them in the</span>
+            <span class="c1"># prepared dictionary</span>
+            <span class="n">only_invalid_values_per_category</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">sorted</span><span class="p">(</span><span class="n">only_invalid_category_values</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="o">.</span><span class="n">print_invalid_prompt_parts</span><span class="p">(</span>
+            <span class="n">only_invalid_values_per_category</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_finegrained_prompt_parts_analysis</span><span class="p">(</span>
+            <span class="n">only_invalid_values_per_category</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_finegrained_prompt_parts_analysis</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">prompt_parts</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="p">):</span>
+        <span class="n">basic_ingredients</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retrieve_basic_ingredients_from_prompt_parts</span><span class="p">(</span>
+            <span class="n">prompt_parts</span>
+        <span class="p">)</span>
+        <span class="n">invalid_ingredients</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">ingredients_category</span><span class="p">,</span> <span class="n">ingredient</span> <span class="ow">in</span> <span class="n">basic_ingredients</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_used_in_valid_prompts</span><span class="p">(</span>
+                    <span class="n">ingredients_category</span><span class="p">,</span> <span class="n">ingredient</span>
+            <span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_used_in_previous_valid_prompts</span><span class="p">(</span>
+                <span class="n">ingredients_category</span><span class="p">,</span> <span class="n">ingredient</span>
+            <span class="p">):</span>
+                <span class="k">if</span> <span class="n">ingredients_category</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">invalid_ingredients</span><span class="p">:</span>
+                    <span class="n">invalid_ingredients</span><span class="p">[</span><span class="n">ingredients_category</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="n">invalid_ingredients</span><span class="p">[</span><span class="n">ingredients_category</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ingredient</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="o">.</span><span class="n">print_invalid_ingredients_in_discarded_prompts</span><span class="p">(</span>
+            <span class="n">invalid_ingredients</span>
+        <span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_retrieve_basic_ingredients_from_prompt_parts</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">prompt_parts</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+
+        <span class="n">basic_ingredients</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">ingredient</span>
+            <span class="k">for</span> <span class="n">parts_category</span> <span class="ow">in</span> <span class="n">prompt_parts</span>
+            <span class="k">for</span> <span class="n">prompt_part</span> <span class="ow">in</span> <span class="n">prompt_parts</span><span class="p">[</span><span class="n">parts_category</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">ingredient</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_engineer</span><span class="o">.</span><span class="n">decompose_prompt_part</span><span class="p">(</span>
+                <span class="n">parts_category</span><span class="p">,</span> <span class="n">prompt_part</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">basic_ingredients</span>
+
+<div class="viewcode-block" id="PromptOptimizer._is_used_in_valid_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer._is_used_in_valid_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">_is_used_in_valid_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ingredient</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check whether an ingredient is used in valid prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        category : str</span>
+<span class="sd">            The category of the ingredient. Matches the name of the relevant</span>
+<span class="sd">            column in the valid_ingredients_sets Dataframe.</span>
+
+<span class="sd">        ingredient : str</span>
+<span class="sd">            Prompt ingredient to look for in the column.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the ingredient is used in valid prompts, False otherwise.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method uses Pandas&#39;s isin method to benefit from the fast and</span>
+<span class="sd">        memory-efficient vectorized operation Pandas uses for lookups in</span>
+<span class="sd">        Series.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">valid_ingredients_sets</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span>
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">category</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="n">ingredient</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer._is_used_in_previous_valid_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer._is_used_in_previous_valid_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">_is_used_in_previous_valid_prompts</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">ingredient</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check whether an ingredient is used in previous valid prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        category : str</span>
+<span class="sd">            The category of the ingredient. Matches the name of the relevant</span>
+<span class="sd">            column in the valid_ingredients_sets Dataframe.</span>
+
+<span class="sd">        ingredient : str</span>
+<span class="sd">            Prompt ingredient to look for in the column.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the ingredient is used in valid prompts, False otherwise.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method uses Pandas&#39;s isin method to benefit from the fast and</span>
+<span class="sd">        memory-efficient vectorized operation Pandas uses for lookups in</span>
+<span class="sd">        Series.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">previous_valid_ingredients_sets</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span>
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">category</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="n">ingredient</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">()</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="PromptOptimizer._get_all_unique_ingredients">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer._get_all_unique_ingredients">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_all_unique_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets all unique ingredients for the specified category.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        category : str</span>
+<span class="sd">            The category to get unique ingredients for.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            List of all unique ingredients for the specified category.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">all_ingredients_sets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">all_ingredients_sets</span>
+
+        <span class="k">if</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">all_ingredients_sets</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">col_names</span><span class="p">:</span>
+            <span class="n">col_values</span> <span class="o">=</span> <span class="n">StrSeries</span><span class="p">(</span>
+                <span class="n">all_ingredients_sets</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">category</span><span class="p">],</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">category</span>
+            <span class="p">)</span>
+            <span class="n">unique_values</span> <span class="o">=</span> <span class="n">col_values</span><span class="o">.</span><span class="n">distinct_elements</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="o">.</span><span class="n">print_unique_category_values</span><span class="p">(</span>
+                <span class="n">category</span><span class="p">,</span>
+                <span class="n">unique_values</span><span class="p">,</span>
+                <span class="s1">&#39;all&#39;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                                    <span class="s2">&quot;Unknown column in prompts: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">category</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">unique_values</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer._get_unique_ingredients">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer._get_unique_ingredients">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_unique_ingredients</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">validity</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets unique ingredients for the specified category and validity.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        category : str</span>
+<span class="sd">            The category to get unique ingredients for.</span>
+
+<span class="sd">        validity : str, optional</span>
+<span class="sd">            The validity (&#39;valid&#39; or &#39;invalid&#39;) to filter by (default is &#39;&#39;).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            List of unique ingredients for the specified category and validity.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">validity</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_all_unique_ingredients</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+
+        <span class="n">prompts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_ingredients_sets_by_validity</span><span class="p">(</span><span class="n">validity</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">prompts</span><span class="o">.</span><span class="n">col_names</span><span class="p">:</span>
+            <span class="n">col_values</span> <span class="o">=</span> <span class="n">StrSeries</span><span class="p">(</span><span class="n">prompts</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">category</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">category</span><span class="p">)</span>
+            <span class="n">unique_values</span> <span class="o">=</span> <span class="n">col_values</span><span class="o">.</span><span class="n">distinct_elements</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="o">.</span><span class="n">print_unique_category_values</span><span class="p">(</span>
+                <span class="n">category</span><span class="p">,</span>
+                <span class="n">unique_values</span><span class="p">,</span>
+                <span class="n">validity</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;Unknown column in prompts: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">category</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">unique_values</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer._get_ingredients_sets_by_validity">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer._get_ingredients_sets_by_validity">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_ingredients_sets_by_validity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validity</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets ingredients sets by validity.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        validity : str</span>
+<span class="sd">            The validity status (&#39;valid&#39; or &#39;invalid&#39;).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            The ingredients sets with the specified validity.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">match</span> <span class="n">validity</span><span class="p">:</span>
+            <span class="k">case</span> <span class="s2">&quot;valid&quot;</span><span class="p">:</span>
+                <span class="n">prompts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">valid_ingredients_sets</span><span class="o">.</span><span class="n">data</span>
+            <span class="k">case</span> <span class="s2">&quot;invalid&quot;</span><span class="p">:</span>
+                <span class="n">prompts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">invalid_ingredients_sets</span><span class="o">.</span><span class="n">data</span>
+            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                    <span class="s2">&quot;Unknown validity value: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">validity</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">prompts</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer._is_prompts_collection">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer._is_prompts_collection">[docs]</a>
+    <span class="k">def</span> <span class="nf">_is_prompts_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">valid</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines if the given valid data is a &quot;prompts&quot; collection.</span>
+
+<span class="sd">        Determines if the given valid data is a &quot;prompts&quot; or a</span>
+<span class="sd">        ingredients sets collection.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        valid : MyDataFrame</span>
+<span class="sd">            The valid data. The MyDataFrame&#39;s name attribute is</span>
+<span class="sd">            evaluated to determine its collection type.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            `True` if the dataframe belongs is a &quot;prompts&quot; collection,</span>
+<span class="sd">            `False` if it is a &quot;ingredient sets&quot; collection.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            Raised when the `name` attribute of the provided dataframe does</span>
+<span class="sd">            not match any expected values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">match</span> <span class="n">valid</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">case</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">VALID_PROMPTS_NAME</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">case</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">VALID_INGREDIENTS_SETS_NAME</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                    <span class="s2">&quot;Unknown variants type. Cannot set &#39;only&#39; variants.&quot;</span>
+                <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer._is_sufficiently_frequent">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer._is_sufficiently_frequent">[docs]</a>
+    <span class="k">def</span> <span class="nf">_is_sufficiently_frequent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basic_ingredient</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the given ingredient was used often enough to be removed.</span>
+
+<span class="sd">        Calls the _compute_frequency_of_possible_invalid_basic_ingredient</span>
+<span class="sd">        method to determine how often the ingredient was used. It then</span>
+<span class="sd">        compares the frequency with the threshold set at the beginning of</span>
+<span class="sd">        this class.</span>
+
+<span class="sd">        If a basic ingredient appears to be invalid because all the prompts</span>
+<span class="sd">        it has contributed to are invalid, the ingredient is still kept in</span>
+<span class="sd">        the corresponding list of possible ingredients if it was only used</span>
+<span class="sd">        very infrequently so that it is unsure whether it will always lead</span>
+<span class="sd">        to the prompt being invalid.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        basic_ingredient : str</span>
+<span class="sd">            The ingredient that possibly should be removed from the list</span>
+<span class="sd">            because it is used in prompts that always result to be invalid.</span>
+
+<span class="sd">        category: str</span>
+<span class="sd">            The composed category in whose elements the elements of the</span>
+<span class="sd">            basic ingredients_list need to be searched.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the frequency is equal to or higher than the defined</span>
+<span class="sd">            threshold, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_frequency_in_invalid_prompts</span><span class="p">(</span>
+            <span class="n">basic_ingredient</span><span class="p">,</span> <span class="n">category</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">freq</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">FREQ_THRESHOLD</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer._compute_frequency_in_invalid_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer._compute_frequency_in_invalid_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">_compute_frequency_in_invalid_prompts</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">basic_ingredient</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">category</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the frequency of a basic ingredient in the invalid prompts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        basic_ingredient : str</span>
+<span class="sd">            The ingredient that possibly should be removed from the list</span>
+<span class="sd">            because it is used in prompts that always result to be invalid.</span>
+
+<span class="sd">        category : str</span>
+<span class="sd">            The composed category in whose elements the elements of the</span>
+<span class="sd">            basic ingredients_list need to be searched.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The frequency of the basic ingredient in invalid prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">only_invalid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">only_invalid_ingredients</span>
+
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">freq</span> <span class="k">for</span> <span class="n">ingredient</span><span class="p">,</span> <span class="n">freq</span> <span class="ow">in</span> <span class="n">only_invalid</span><span class="p">[</span><span class="n">category</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">basic_ingredient</span> <span class="ow">in</span> <span class="n">ingredient</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer._perform_finegrained_analysis">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer._perform_finegrained_analysis">[docs]</a>
+    <span class="k">def</span> <span class="nf">_perform_finegrained_analysis</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">ingredients</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">category</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs the analysis for the given ingredients in the given category.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ingredients : List[str]</span>
+<span class="sd">            List of basic prompt ingredients that were used to compose the</span>
+<span class="sd">            ingredients of a composed category.</span>
+
+<span class="sd">        category: str</span>
+<span class="sd">            The composed category in whose elements the elements of the</span>
+<span class="sd">            basic ingredients_list need to be searched.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method requires the only_invalid_ingredients property to be set</span>
+<span class="sd">        beforehand. Therefore, if the property is not set, the</span>
+<span class="sd">        find_influential_prompt_ingredients_sets method is executed first to</span>
+<span class="sd">        ensure the property is set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">all_valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">valid_ingredients_sets</span><span class="o">.</span><span class="n">data</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">only_invalid_ingredients</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">find_influential_prompt_ingredients_sets</span><span class="p">()</span>
+
+        <span class="n">only_invalid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">only_invalid_ingredients</span>
+
+        <span class="c1"># Skip the entire method if the category is not a key in the</span>
+        <span class="c1"># only_invalid dictionary:</span>
+        <span class="k">if</span> <span class="n">category</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">only_invalid</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Category &#39;</span><span class="si">%s</span><span class="s2">&#39; cannot be processed!&quot;</span> <span class="o">%</span> <span class="n">category</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+            <span class="k">return</span>
+
+        <span class="c1"># Extract the list of first tuple elements from the list of</span>
+        <span class="c1"># only_invalid tuples</span>
+        <span class="n">invalid_category_elements</span> <span class="o">=</span> <span class="n">get_first_elements_from_list_of_tuples</span><span class="p">(</span>
+            <span class="n">only_invalid</span><span class="p">[</span><span class="n">category</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Get the list of unique category elements from all valid</span>
+        <span class="c1"># ingredients sets</span>
+        <span class="n">all_valid_category_elements</span> <span class="o">=</span> <span class="n">StrSeries</span><span class="p">(</span>
+            <span class="n">all_valid</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">category</span><span class="p">],</span> <span class="s1">&#39;all_valid_category_elements&#39;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">distinct_elements</span>
+
+        <span class="n">bad_elements</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">good_elements</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Check whether a basic ingredient whose composed category is always</span>
+        <span class="c1"># used in invalid prompts is nevertheless used in any valid prompts.</span>
+        <span class="c1"># If so, it is a good ingredient, otherwise a bad one.</span>
+        <span class="k">for</span> <span class="n">ingredient</span> <span class="ow">in</span> <span class="n">ingredients</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_substring_of_list_content</span><span class="p">(</span>
+                    <span class="n">ingredient</span><span class="p">,</span>
+                    <span class="n">invalid_category_elements</span>
+            <span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_sufficiently_frequent</span><span class="p">(</span><span class="n">ingredient</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span> \
+                        <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_substring_of_list_content</span><span class="p">(</span>
+                    <span class="n">ingredient</span><span class="p">,</span>
+                    <span class="n">all_valid_category_elements</span>
+                <span class="p">):</span>
+                    <span class="n">bad_elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ingredient</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">good_elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ingredient</span><span class="p">)</span>
+
+        <span class="c1"># Sort the results alphabetically</span>
+        <span class="n">bad_elements</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">bad_elements</span><span class="p">)</span>
+        <span class="n">good_elements</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">good_elements</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">printer</span><span class="o">.</span><span class="n">print_finegrained_analysis</span><span class="p">(</span>
+            <span class="n">category</span><span class="p">,</span> <span class="n">bad_elements</span><span class="p">,</span> <span class="n">good_elements</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PromptOptimizer._sort_variants_with_freqs">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompt_optimizer.PromptOptimizer._sort_variants_with_freqs">[docs]</a>
+    <span class="k">def</span> <span class="nf">_sort_variants_with_freqs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]])</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sort the list of tuples containing the variants and frequencies.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lst : List[Tuple[str, int]]</span>
+<span class="sd">            The list of variants with frequencies.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[Tuple[str, int]]</span>
+<span class="sd">            The sorted list.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">sort_list_of_tuples_by_desc_second_element_asc_first</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

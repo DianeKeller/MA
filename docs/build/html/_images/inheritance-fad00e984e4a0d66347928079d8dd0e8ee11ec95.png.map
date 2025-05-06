@@ -1,0 +1,5 @@
+<map id="inheritancebfbd85805f" name="inheritancebfbd85805f">
+<area shape="rect" id="node1" title="LoggingMixin class." alt="" coords="21,5,125,31"/>
+<area shape="rect" id="node2" href="#SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor.QueryProcessor" target="_top" title="QueryProcessor class." alt="" coords="188,31,311,56"/>
+<area shape="rect" id="node3" title="TokenizationMixin class." alt="" coords="5,55,140,80"/>
+</map>

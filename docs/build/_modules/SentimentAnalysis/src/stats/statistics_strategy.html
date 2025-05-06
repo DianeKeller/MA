@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.stats.statistics_strategy &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.stats.statistics_strategy</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.stats.statistics_strategy</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">statistics_strategy.py</span>
+<span class="sd">----------------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">heapq</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">ABC</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">statistics</span> <span class="kn">import</span> <span class="n">mean</span><span class="p">,</span> <span class="n">median</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Set</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">constants</span> <span class="kn">import</span> <span class="n">BIG_DATA_THRESHOLD</span><span class="p">,</span> <span class="n">INT_NONE</span>
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_ordered_dict</span> <span class="kn">import</span> <span class="n">MyOrderedDict</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.stats.visualization.command_line_strategy</span> <span class="kn">import</span> <span class="n">CommandLineStrategy</span>
+<span class="kn">from</span> <span class="nn">src.stats.visualization.diagram</span> <span class="kn">import</span> <span class="n">Diagram</span>
+<span class="kn">from</span> <span class="nn">src.stats.visualization.plotter</span> <span class="kn">import</span> <span class="n">Plotter</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">src.utils.dict_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">filter_dict_by_value</span><span class="p">,</span>
+    <span class="n">filter_dict_keys_by_value</span><span class="p">,</span>
+    <span class="n">get_n_items_from_top</span><span class="p">,</span>
+    <span class="n">get_n_items_from_bottom</span><span class="p">,</span> <span class="n">dict_to_string</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.late_imports</span> <span class="kn">import</span> <span class="n">LateImports</span>
+<span class="kn">from</span> <span class="nn">src.utils.list_utils</span> <span class="kn">import</span> <span class="n">list_to_string</span>
+<span class="kn">from</span> <span class="nn">src.utils.print_utils</span> <span class="kn">import</span> <span class="n">examples</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">DictKeyType</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">src.data_structures.item_list</span> <span class="kn">import</span> <span class="n">ItemList</span>
+    <span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+
+
+<div class="viewcode-block" id="StatisticsStrategy">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.statistics_strategy.StatisticsStrategy">[docs]</a>
+<span class="k">class</span> <span class="nc">StatisticsStrategy</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class serves as an interface within the framework of</span>
+<span class="sd">    a strategy pattern. It enables a dynamic change of statistical</span>
+<span class="sd">    strategies according to the statistical categories to be analyzed (</span>
+<span class="sd">    e.g. length, frequency, element count) from a collection of items. The</span>
+<span class="sd">    class declares common methods used by all supported statistics strategies</span>
+<span class="sd">    for the computation, analysis and visualization of statistical data.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    diagram : Diagram</span>
+<span class="sd">        A diagram object used for visualizing statistical data.</span>
+
+<span class="sd">    examples_highest_values : str</span>
+<span class="sd">        A string representation of some of the items having the highest</span>
+<span class="sd">        statistical value in the collection. Computed property without setter.</span>
+
+<span class="sd">    examples_lowest_values : str</span>
+<span class="sd">        A string representation of some of the items having the lowest</span>
+<span class="sd">        statistical value in the collection. Computed property without setter.</span>
+
+<span class="sd">    examples_near_means : str</span>
+<span class="sd">        A string representation of some of the items having statistical values</span>
+<span class="sd">        close to the mean of the collection. Computed property without setter.</span>
+
+<span class="sd">    examples_near_median : str</span>
+<span class="sd">        A string representation of some of the items having statistical values</span>
+<span class="sd">        close to the median of the collection. Computed property without</span>
+<span class="sd">        setter.</span>
+
+<span class="sd">    highest_value : int</span>
+<span class="sd">        The highest statistical value in the collection. Computed property</span>
+<span class="sd">        without setter.</span>
+
+<span class="sd">    highest_value_ids : List[Any]</span>
+<span class="sd">        A list of item IDs having the highest statistical value. Computed</span>
+<span class="sd">        property without setter.</span>
+
+<span class="sd">    highest_value_items : List[Any]</span>
+<span class="sd">        A list of items having the highest statistical value.  Computed</span>
+<span class="sd">        property without setter.</span>
+
+<span class="sd">    item_ids_and_values : MyOrderedDict</span>
+<span class="sd">        A dictionary containing the item IDs and their corresponding</span>
+<span class="sd">        statistical values.</span>
+
+<span class="sd">    item_type : str</span>
+<span class="sd">        The type of the elements in the item list as a string. Computed</span>
+<span class="sd">        property without setter.</span>
+
+<span class="sd">    items : ItemList</span>
+<span class="sd">        A collection of items to be analyzed statistically.</span>
+
+<span class="sd">    items_and_values : MyOrderedDict</span>
+<span class="sd">        A dictionary containing the items and their corresponding statistical</span>
+<span class="sd">        values.</span>
+
+<span class="sd">    items_near_means : Dict[DictKeyType, int]</span>
+<span class="sd">        A dictionary of items having statistical values close to the mean of</span>
+<span class="sd">        the collection. Computed property without setter.</span>
+
+<span class="sd">    items_near_median : Dict[DictKeyType, int]</span>
+<span class="sd">        A dictionary of items having statistical values close to the median of</span>
+<span class="sd">        the collection. Computed property without setter.</span>
+
+<span class="sd">    lowest_value : int</span>
+<span class="sd">        The lowest statistical value in the collection. Computed property</span>
+<span class="sd">        without setter.</span>
+
+<span class="sd">    lowest_value_ids : List[Any]</span>
+<span class="sd">        A list of item IDs having the lowest statistical value. Computed</span>
+<span class="sd">        property without setter.</span>
+
+<span class="sd">    lowest_value_items : List[Any]</span>
+<span class="sd">        A list of items having the lowest statistical value. Computed property</span>
+<span class="sd">        without setter.</span>
+
+<span class="sd">    mean_value : float</span>
+<span class="sd">        The mean of the statistical values in the collection. Computed</span>
+<span class="sd">        property without setter.</span>
+
+<span class="sd">    median_value : float</span>
+<span class="sd">        The median of the statistical values in the collection. Computed</span>
+<span class="sd">        property without setter.</span>
+
+<span class="sd">    name : str</span>
+<span class="sd">        The name of the statistics, used to identify the data row in case the</span>
+<span class="sd">        statistics for different data rows are assembled in a common data</span>
+<span class="sd">        structure.</span>
+
+<span class="sd">    n_items : int</span>
+<span class="sd">        The number of items to be analyzed. Computed property without setter.</span>
+
+<span class="sd">    second_highest_value : int</span>
+<span class="sd">        The second-highest statistical value in the collection. Computed</span>
+<span class="sd">        property without setter.</span>
+
+<span class="sd">    second_highest_value_ids : List[Any]</span>
+<span class="sd">        A list of item IDs having the second-highest statistical value.</span>
+<span class="sd">        Computed property without setter.</span>
+
+<span class="sd">    second_highest_value_items : List[Any]</span>
+<span class="sd">        A list of items having the second-highest statistical value. Computed</span>
+<span class="sd">        property without setter.</span>
+
+<span class="sd">    second_lowest_value : int</span>
+<span class="sd">        The second-lowest statistical value in the collection. Computed</span>
+<span class="sd">        property without setter.</span>
+
+<span class="sd">    second_lowest_value_ids : List[Any]</span>
+<span class="sd">        A list of item IDs having the second-lowest statistical value.</span>
+<span class="sd">        Computed property without setter.</span>
+
+<span class="sd">    second_lowest_value_items : List[Any]</span>
+<span class="sd">        A list of items having the second-lowest statistical value. Computed</span>
+<span class="sd">        property without setter.</span>
+
+<span class="sd">    stat_category : str</span>
+<span class="sd">        The name of the statistical category to be analyzed. It is used to</span>
+<span class="sd">        name the column holding the statistical values of the items in the</span>
+<span class="sd">        dataframe used to store the statistical data, e.g. &#39;Frequency&#39;,</span>
+<span class="sd">        &#39;Length&#39;, &#39;Count&#39;.</span>
+
+<span class="sd">    unique_values : Set[int]</span>
+<span class="sd">        A set containing the unique statistical values in the collection.</span>
+<span class="sd">        Computed property without setter.</span>
+
+<span class="sd">    values : List[int]</span>
+<span class="sd">        A list of statistical values of all items in the collection. Computed</span>
+<span class="sd">        property without setter.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    analyze(items: Any) -&gt; None:</span>
+<span class="sd">        Analyzes the given items.</span>
+
+<span class="sd">    get(item: Any, default: int = 0) -&gt; int:</span>
+<span class="sd">        Returns the statistical value for the given item.</span>
+
+<span class="sd">    get_n_highest_items(n: int) -&gt; Dict[DictKeyType, Any]:</span>
+<span class="sd">        Gets n items having the highest statistical values in the collection.</span>
+
+<span class="sd">    get_n_lowest_items(self, n: int) -&gt; Dict[DictKeyType, Any]:</span>
+<span class="sd">        Gets n items having the lowest statistical values in the collection.</span>
+
+<span class="sd">    to_dataframe() -&gt; MyDataFrame:</span>
+<span class="sd">        Converts the items and their statistical values into a dataframe.</span>
+
+<span class="sd">    visualize(ax: plt.Axes | None = None) -&gt; None:</span>
+<span class="sd">        Visualizes the data statistics.</span>
+
+
+<span class="sd">    Abstract Methods</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    compute_items_and_values() -&gt; None:</span>
+<span class="sd">        Computes the items and their corresponding statistical values.</span>
+
+<span class="sd">    compute_item_ids_and_values() -&gt; None:</span>
+<span class="sd">        Computes the item IDs and their corresponding statistical values.</span>
+
+<span class="sd">    to_string() -&gt; str:</span>
+<span class="sd">        Returns a string representation of the strategy.</span>
+
+<span class="sd">    to_string_showing_ids() -&gt; str:</span>
+<span class="sd">        Returns a string representation of the strategy showing item IDs</span>
+<span class="sd">        instead of item values.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="StatisticsStrategy.__init__">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.statistics_strategy.StatisticsStrategy.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">items</span><span class="p">:</span> <span class="n">ItemList</span><span class="p">,</span>
+            <span class="n">stat_category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes a new instance of the StatisticsStrategy class with a</span>
+<span class="sd">        collection of items and a statistical category.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        items : ItemList</span>
+<span class="sd">            A collection of items to be analyzed statistically. An ItemList</span>
+<span class="sd">            object contains a list of elements, a name identifying the</span>
+<span class="sd">            ItemList and some methods to manipulate the list elements and to</span>
+<span class="sd">            get some basic characteristics of the list (number of elements,</span>
+<span class="sd">            distinct elements).</span>
+
+<span class="sd">        stat_category : str</span>
+<span class="sd">            The name of the statistical category to be analyzed.</span>
+
+<span class="sd">        name : str</span>
+<span class="sd">            The name of the statistics. Defaults to an empty string. Can be</span>
+<span class="sd">            used to identify the data row in case the statistics for</span>
+<span class="sd">            different data rows are assembled in a common data structure.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_unique_values</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+
+        <span class="c1"># Initializing MyOrderedDict objects with empty OrderedDicts.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_items_and_values</span><span class="p">:</span> <span class="n">MyOrderedDict</span> <span class="o">=</span> <span class="n">MyOrderedDict</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_item_ids_and_values</span><span class="p">:</span> <span class="n">MyOrderedDict</span> <span class="o">=</span> <span class="n">MyOrderedDict</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_items</span><span class="p">:</span> <span class="n">ItemList</span> <span class="o">=</span> <span class="n">items</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stat_category</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">stat_category</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_diagram</span><span class="p">:</span> <span class="n">Diagram</span> <span class="o">=</span> <span class="n">Diagram</span><span class="p">(</span><span class="n">Plotter</span><span class="p">(</span><span class="n">CommandLineStrategy</span><span class="p">()))</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the name of the statistics.</span>
+
+<span class="sd">        Used to identify the data row in case the statistics for different</span>
+<span class="sd">        data rows are assembled in a common data structure.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the name of the statistics.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">diagram</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Diagram</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the diagram object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Diagram</span>
+<span class="sd">            The diagram object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_diagram</span>
+
+    <span class="nd">@diagram</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">diagram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diagram</span><span class="p">:</span> <span class="n">Diagram</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the diagram object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        diagram : Diagram</span>
+<span class="sd">            The new diagram object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_diagram</span> <span class="o">=</span> <span class="n">diagram</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">ItemList</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the collection of items to be analyzed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ItemList</span>
+<span class="sd">            The collection of items to be analyzed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_items</span>
+
+    <span class="nd">@items</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">:</span> <span class="n">ItemList</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the collection of items to be analyzed.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        items : ItemList</span>
+<span class="sd">        The new collection of items to be analyzed.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_items</span> <span class="o">=</span> <span class="n">items</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the number of items. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">n_elements</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">stat_category</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the name of the statistical category to be analyzed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stat_category</span>
+
+    <span class="nd">@stat_category</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">stat_category</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stat_category</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the name of the statistical category to be analyzed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stat_category</span> <span class="o">=</span> <span class="n">stat_category</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">items_and_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyOrderedDict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the items and their corresponding statistical values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_items_and_values</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compute_items_and_values</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_items_and_values</span>
+
+    <span class="nd">@items_and_values</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">items_and_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items_and_values</span><span class="p">:</span> <span class="n">MyOrderedDict</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the item ids and their corresponding statistical values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_items_and_values</span> <span class="o">=</span> <span class="n">items_and_values</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">item_ids_and_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyOrderedDict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the item ids and their corresponding statistical values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item_ids_and_values</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compute_item_ids_and_values</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item_ids_and_values</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;item_ids_and_values could not be computed.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_item_ids_and_values</span>
+
+    <span class="nd">@item_ids_and_values</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">item_ids_and_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_ids_and_values</span><span class="p">:</span> <span class="n">MyOrderedDict</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the item ids and their corresponding statistical values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_item_ids_and_values</span> <span class="o">=</span> <span class="n">item_ids_and_values</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">item_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the type of the elements in the item list as a string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">element_type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the list of statistical values of all items in the collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items_and_values</span><span class="o">.</span><span class="n">my_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">highest_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the highest statistical value in the collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">INT_NONE</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">second_highest_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the second-highest statistical value in the collection.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method distinguishes between small and big datasets to delegate</span>
+<span class="sd">        the task of finding the second-highest value in the collection to the</span>
+<span class="sd">        corresponding method that is optimized for this task and the given</span>
+<span class="sd">        size of data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">n_elements</span> <span class="o">&lt;</span> <span class="n">BIG_DATA_THRESHOLD</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_small_dataset_second_highest_value</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_big_dataset_second_highest_value</span>
+
+        <span class="k">return</span> <span class="n">INT_NONE</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_small_dataset_second_highest_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the second-highest statistical value in the collection.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method is optimized for small datasets of up to 300,000 elements.</span>
+<span class="sd">        For bigger datasets, use the &#39;_big_dataset_second_highest_value&#39;</span>
+<span class="sd">        method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">highest_value</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">INT_NONE</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_big_dataset_second_highest_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the second-highest statistical value in the collection.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method is optimized for big datasets of over 300,000 elements.</span>
+<span class="sd">        For smaller datasets, use the &#39;_small_dataset_second_highest_value&#39;</span>
+<span class="sd">        method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">heapq</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unique_values</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">INT_NONE</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">unique_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the unique statistical values in the collection.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_unique_values</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_unique_values</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unique_values</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lowest_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the lowest statistical value in the collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unique_values</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">INT_NONE</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">second_lowest_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the second-lowest statistical value in the collection.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method distinguishes between small and big datasets to delegate</span>
+<span class="sd">        the task of finding the second-lowest value in the collection to the</span>
+<span class="sd">        corresponding method that is optimized for this task and the given</span>
+<span class="sd">        size of data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">n_elements</span> <span class="o">&lt;</span> <span class="n">BIG_DATA_THRESHOLD</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_small_dataset_second_lowest_value</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_big_dataset_second_lowest_value</span>
+
+        <span class="k">return</span> <span class="n">INT_NONE</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_small_dataset_second_lowest_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the second-lowest statistical value in the collection.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method is optimized for small datasets of up to 300,000 elements.</span>
+<span class="sd">        For bigger datasets, use the &#39;_big_dataset_second_lowest_value&#39;</span>
+<span class="sd">        method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lowest_value</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">INT_NONE</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_big_dataset_second_lowest_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the second-lowest statistical value in the collection.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method is optimized for big datasets of over 300,000 elements.</span>
+<span class="sd">        For smaller datasets, use the &#39;_small_dataset_second_lowest_value&#39;</span>
+<span class="sd">        method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">heapq</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unique_values</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">INT_NONE</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mean_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the mean of the statistical values in the collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">median_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the median of the statistical values in the collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">median</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">highest_value_items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the items having the highest statistical value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">filter_dict_keys_by_value</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">items_and_values</span><span class="o">.</span><span class="n">my_dict</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">highest_value</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">second_highest_value_items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the items having the second-highest statistical value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">filter_dict_keys_by_value</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">items_and_values</span><span class="o">.</span><span class="n">my_dict</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">second_highest_value</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lowest_value_items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the items having the lowest statistical value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">filter_dict_keys_by_value</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">items_and_values</span><span class="o">.</span><span class="n">my_dict</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lowest_value</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">second_lowest_value_items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the items having the second-lowest statistical value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">filter_dict_keys_by_value</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">items_and_values</span><span class="o">.</span><span class="n">my_dict</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">second_lowest_value</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">items_near_median</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets items having statistical values close to the median of the</span>
+<span class="sd">        collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">filter_dict_by_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">median_value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">items_and_values</span><span class="o">.</span><span class="n">my_dict</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">items_near_means</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets items having statistical values close to the means of the</span>
+<span class="sd">        collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">filter_dict_by_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mean_value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">items_and_values</span><span class="o">.</span><span class="n">my_dict</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">highest_value_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the ids of the items having the highest statistical value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">filter_dict_keys_by_value</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">item_ids_and_values</span><span class="o">.</span><span class="n">my_dict</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">highest_value</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">second_highest_value_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the ids of the items having the second-highest statistical value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">filter_dict_keys_by_value</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">item_ids_and_values</span><span class="o">.</span><span class="n">my_dict</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">second_highest_value</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lowest_value_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the ids of the items having the lowest statistical value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">filter_dict_keys_by_value</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">item_ids_and_values</span><span class="o">.</span><span class="n">my_dict</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lowest_value</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">second_lowest_value_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the ids of the items having the second-lowest statistical value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">filter_dict_keys_by_value</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">item_ids_and_values</span><span class="o">.</span><span class="n">my_dict</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">second_lowest_value</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ids_near_median</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the ids of the items having statistical values close to the</span>
+<span class="sd">        median of the collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">filter_dict_by_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">median_value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item_ids_and_values</span><span class="o">.</span><span class="n">my_dict</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ids_near_means</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the ids of the items having statistical values close to the</span>
+<span class="sd">        means of the collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">filter_dict_by_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mean_value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item_ids_and_values</span><span class="o">.</span><span class="n">my_dict</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">examples_near_means</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the string representation of some of the items having statistical</span>
+<span class="sd">        values close to the means of the collection.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The number of items included in the string representation is</span>
+<span class="sd">        restricted by the examples function to the number of MAX_ITEMS set in</span>
+<span class="sd">        the &#39;NUM&#39; category of the project settings.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">dict_to_string</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">examples</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items_near_means</span><span class="p">)))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">examples_near_median</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the string representation of some of the items having statistical</span>
+<span class="sd">        values close to the median of the collection.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The number of items included in the string representation is</span>
+<span class="sd">        restricted by the examples function to the number of MAX_ITEMS set in</span>
+<span class="sd">        the &#39;NUM&#39; category of the project settings.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">dict_to_string</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">examples</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items_near_median</span><span class="p">)))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">examples_lowest_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the string representation of some of the items having the highest</span>
+<span class="sd">        statistical value in the collection.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The number of items included in the string representation is</span>
+<span class="sd">        restricted by the examples function to the number of MAX_ITEMS set in</span>
+<span class="sd">        the &#39;NUM&#39; category of the project settings.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">list_to_string</span><span class="p">(</span><span class="n">examples</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lowest_value_items</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">examples_highest_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the string representation of some of the items having the highest</span>
+<span class="sd">        statistical value in the collection.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The number of items included in the string representation is</span>
+<span class="sd">        restricted by the examples function to the number of MAX_ITEMS set in</span>
+<span class="sd">        the &#39;NUM&#39; category of the project settings.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_n_unique_items</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">list_to_string</span><span class="p">(</span><span class="n">examples</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">highest_value_items</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Methods</span>
+
+    <span class="c1"># TODO: implement or remove</span>
+<div class="viewcode-block" id="StatisticsStrategy.analyze">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.statistics_strategy.StatisticsStrategy.analyze">[docs]</a>
+    <span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Analyzes the given items.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="StatisticsStrategy.get">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.statistics_strategy.StatisticsStrategy.get">[docs]</a>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the statistical value for the given item.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        item : Any</span>
+<span class="sd">            The item for which the statistical value is requested.</span>
+
+<span class="sd">        default : int</span>
+<span class="sd">            The default value to return if the item is not found in the</span>
+<span class="sd">            collection. Defaults to 0.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The statistical value for the given item. Equals to the specified</span>
+<span class="sd">            default value if the item is not in the collection.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - The possible statistical categories being frequency, length or</span>
+<span class="sd">          count, the statistical values are all supposed to be integers.</span>
+
+<span class="sd">        - This method aims at providing a safe way to query statistical values</span>
+<span class="sd">          by returning a default value when the requested item is not present,</span>
+<span class="sd">          thus avoiding KeyErrors.</span>
+
+<span class="sd">        - The caller can specify a different default value if 0 is not</span>
+<span class="sd">          suitable for their context.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># The &#39;get&#39; method of the dict type also provides the option to</span>
+        <span class="c1"># specify a default value.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">items_and_values</span><span class="o">.</span><span class="n">my_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StatisticsStrategy.get_n_highest_items">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.statistics_strategy.StatisticsStrategy.get_n_highest_items">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_n_highest_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets n items having the highest statistical values in the collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">get_n_items_from_top</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">items_and_values</span><span class="o">.</span><span class="n">my_dict</span><span class="p">,</span>
+            <span class="n">n</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StatisticsStrategy.get_n_lowest_items">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.statistics_strategy.StatisticsStrategy.get_n_lowest_items">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_n_lowest_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DictKeyType</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets n items having the lowest statistical values in the collection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">get_n_items_from_bottom</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">items_and_values</span><span class="o">.</span><span class="n">my_dict</span><span class="p">,</span>
+            <span class="n">n</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StatisticsStrategy.to_dataframe">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.statistics_strategy.StatisticsStrategy.to_dataframe">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts the items and their statistical values into a dataframe.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            The dataframe containing the items and statistical values,</span>
+<span class="sd">            wrapped in a MyDataFrame object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Prevent circular imports</span>
+        <span class="n">my_dataframe_factory_cls</span> <span class="o">=</span> <span class="n">LateImports</span><span class="o">.</span><span class="n">get_my_dataframe_factory_class</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">my_dataframe_factory_cls</span><span class="p">()</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">items_and_values</span><span class="o">.</span><span class="n">my_dict</span><span class="p">,</span>
+            <span class="n">row_names</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StatisticsStrategy.visualize">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.statistics_strategy.StatisticsStrategy.visualize">[docs]</a>
+    <span class="k">def</span> <span class="nf">visualize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Visualizes the data statistics.</span>
+
+<span class="sd">        Provides a basic visualization of the statistical data by printing a</span>
+<span class="sd">        DataFrame summary leveraging DataFrame properties and functions:</span>
+
+<span class="sd">        - shape</span>
+<span class="sd">            Displays the number of rows and columns in the DataFrame.</span>
+<span class="sd">        - describe</span>
+<span class="sd">            Provides descriptive statistics such as mean, median, and others</span>
+<span class="sd">            for columns containing numerical data.</span>
+<span class="sd">        - head</span>
+<span class="sd">            Prints the first 5 rows of the DataFrame.</span>
+<span class="sd">        - tail</span>
+<span class="sd">            Prints the last 5 rows of the DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ax : plt.Axes</span>
+<span class="sd">            The axes on which to plot the data. Needed by some of the</span>
+<span class="sd">            concrete statistics strategies. Defaults to None.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Where appropriate, strategy subclasses will extend this method by</span>
+<span class="sd">        adding individual diagrams, e.g. a Zipf frequency diagram showing</span>
+<span class="sd">        the frequency distribution of the data.</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">df</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">describe</span><span class="p">())</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">tail</span><span class="p">())</span></div>
+
+
+    <span class="c1"># endregion --- Methods</span>
+
+    <span class="c1"># region --- Abstract Methods</span>
+
+<div class="viewcode-block" id="StatisticsStrategy.compute_items_and_values">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.statistics_strategy.StatisticsStrategy.compute_items_and_values">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">compute_items_and_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Abstract method to compute the items and their corresponding</span>
+<span class="sd">        statistical values and set the _items_and_values attribute accordingly.</span>
+
+<span class="sd">        The way the statistical values are computed depends on the</span>
+<span class="sd">        statistical categories and must be defined by the corresponding</span>
+<span class="sd">        strategy subclasses.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="StatisticsStrategy.compute_item_ids_and_values">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.statistics_strategy.StatisticsStrategy.compute_item_ids_and_values">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">compute_item_ids_and_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Abstract method to compute the item ids and their corresponding</span>
+<span class="sd">        statistical values and set the _item_ids_and_values attribute</span>
+<span class="sd">        accordingly.</span>
+
+<span class="sd">        The way the statistical values are computed depends on the</span>
+<span class="sd">        statistical categories and must be defined by the corresponding</span>
+<span class="sd">        strategy subclasses.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="StatisticsStrategy.to_string_showing_ids">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.statistics_strategy.StatisticsStrategy.to_string_showing_ids">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">to_string_showing_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Composes a string representation of the strategy showing item IDs</span>
+<span class="sd">        instead of item values.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The string representation of the strategy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="StatisticsStrategy.to_string">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.statistics_strategy.StatisticsStrategy.to_string">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Composes a detailed string representation of the strategy.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A string describing the strategy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+    <span class="c1"># endregion --- Abstract Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="StatisticsStrategy._require_n_unique_items">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.stats.html#SentimentAnalysis.src.stats.statistics_strategy.StatisticsStrategy._require_n_unique_items">[docs]</a>
+    <span class="k">def</span> <span class="nf">_require_n_unique_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the number of unique items in the collection is equal to n.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Handle case where there aren&#39;t enough unique values</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unique_values</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;There are less than </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> unique values in the collection.&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;warning&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Handle gracefully</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

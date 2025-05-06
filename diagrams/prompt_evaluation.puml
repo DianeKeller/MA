@@ -1,0 +1,33 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+@startuml
+
+start
+
+:Initialize AllLanguagesEvaluation;
+:Retrieve compatible languages;
+
+repeat
+  :Set current language;
+  :Evaluate prompts for language;
+  if (Evaluation successful?) then (yes)
+    :Add metrics to overall evaluation;
+    :Add sentiment data to overall evaluation;
+  else (no)
+    :Log evaluation error;
+  endif
+repeat while (More languages to process?)
+
+:Remove language setting;
+
+:Show overall rankings;
+:Show mean metrics;
+:Show frequency comparisons;
+:Show pairwise comparisons;
+
+stop
+
+@enduml
+
+@enduml

@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.data_sources.mad_tsc_suite &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.data_sources.mad_tsc_suite</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.data_sources.mad_tsc_suite</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">mad_tsc_suite.py</span>
+<span class="sd">-----------------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
+
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+
+<span class="kn">from</span> <span class="nn">constants</span> <span class="kn">import</span> <span class="n">Language</span>
+<span class="kn">from</span> <span class="nn">src.data_sources.data_source_factory</span> <span class="kn">import</span> <span class="n">get_data_source_strategy</span>
+<span class="kn">from</span> <span class="nn">src.data_sources.data_source_suite</span> <span class="kn">import</span> <span class="n">DataSourceSuite</span>
+<span class="kn">from</span> <span class="nn">src.data_sources.mad_tsc_fact_sheet_mixin</span> <span class="kn">import</span> <span class="n">MadTscFactSheetMixin</span>
+<span class="kn">from</span> <span class="nn">src.data_sources.mad_tsc_strategy</span> <span class="kn">import</span> <span class="n">MadTscStrategy</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_dataframe_factory</span> <span class="kn">import</span> <span class="n">MyDataFrameFactory</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_stats</span> <span class="kn">import</span> <span class="n">SentimentStats</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">MadTscStrategy</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MadTscSuite">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_suite.MadTscSuite">[docs]</a>
+<span class="k">class</span> <span class="nc">MadTscSuite</span><span class="p">(</span>
+    <span class="n">DataSourceSuite</span><span class="p">,</span>
+    <span class="n">MadTscFactSheetMixin</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    MadTscSuite class.</span>
+
+<span class="sd">    This class serves as an interface that declares common operations</span>
+<span class="sd">    for all supported MAD-TSC suite strategies, including loading,</span>
+<span class="sd">    processing and comparing data subsets across different languages and</span>
+<span class="sd">    splits. It extends functionality from the DataSourceSuite class,</span>
+<span class="sd">    respecting the specific characteristics of the MAD-TSC suite.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    SUITE_NAME : str</span>
+<span class="sd">        The name of the data suite.</span>
+<span class="sd">        </span>
+<span class="sd">    SUITE_PREFIX : str</span>
+<span class="sd">        The prefix used for naming strategies and files in the suite.</span>
+<span class="sd">        </span>
+<span class="sd">    SPLIT_TRAIN : str</span>
+<span class="sd">        The string identifier for the training split.</span>
+<span class="sd">        </span>
+<span class="sd">    SPLIT_TEST : str</span>
+<span class="sd">        The string identifier for the testing split.</span>
+<span class="sd">        </span>
+<span class="sd">    SPLIT_VAL : str</span>
+<span class="sd">        The string identifier for the validation split.</span>
+<span class="sd">        </span>
+<span class="sd">    languages : List[str]</span>
+<span class="sd">        A list of supported language codes in the suite. (Read-only)</span>
+<span class="sd">        </span>
+<span class="sd">    splits : List[str]</span>
+<span class="sd">        A list of supported data splits (e.g., train, test, validation). </span>
+<span class="sd">        (Read-only)</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    are_cols_identical(subset: T, other: T, col_name: str) -&gt; bool:</span>
+<span class="sd">        Checks if a specific column is identical between two subsets.</span>
+
+<span class="sd">    choose_subset(language: str) -&gt; T:</span>
+<span class="sd">        Returns the subset corresponding to a specified language.</span>
+
+<span class="sd">    compare_cols(col_name: str, subset_names: List[str] | None = None) -&gt; None:</span>
+<span class="sd">        Compares a specific column across multiple subsets.</span>
+
+<span class="sd">    get_comparison_column(subset: T, other: T, col_name: str) -&gt; Series:</span>
+<span class="sd">        Compares a specific column between two subsets row by row.</span>
+
+<span class="sd">    get_sentiment_distributions(language: str = &#39;en&#39;, batch_size: int = 100)</span>
+<span class="sd">            -&gt; DataFrame:</span>
+<span class="sd">        Calculates sentiment distributions for a specified language and batch</span>
+<span class="sd">        size.</span>
+<span class="sd">    </span>
+<span class="sd">    show_compare_cols(col_name: str, additional_col_name: str = &#39;&#39;)</span>
+<span class="sd">            -&gt; MyDataFrame:</span>
+<span class="sd">        Compares columns across different subsets and returns a DataFrame with</span>
+<span class="sd">        the results.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">SUITE_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;MadTsc&#39;</span>
+    <span class="n">SUITE_PREFIX</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mad_tsc&#39;</span>
+
+    <span class="c1"># Define format strings as class constants</span>
+    <span class="n">STRATEGY_STR</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{self.SUITE_NAME}</span><span class="s2"> strategy &#39;</span><span class="si">{strategy_name}</span><span class="s2">&#39;&quot;</span>
+    <span class="n">SUBSET_STR</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{self.SUITE_NAME}</span><span class="s2"> subset &#39;</span><span class="si">{subset_name}</span><span class="s2">&#39;&quot;</span>
+
+    <span class="c1"># Split constants</span>
+    <span class="n">SPLIT_TRAIN</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;train&#39;</span>
+    <span class="n">SPLIT_TEST</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span>
+    <span class="n">SPLIT_VAL</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;validation&#39;</span>
+
+    <span class="c1"># List of column names that do not represent query or answer columns.</span>
+    <span class="n">NON_QUERY_COLS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;sentence_normalized&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;mention&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;polarity&#39;</span>
+    <span class="p">]</span>
+
+<div class="viewcode-block" id="MadTscSuite.__init__">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_suite.MadTscSuite.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a new instance of the MadTsc class and provides</span>
+<span class="sd">        private variables to store the different data subsets of the data suite</span>
+<span class="sd">        in memory and make them accessible via properties.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Languages used in the data suite:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Language</span><span class="o">.</span><span class="n">DE</span><span class="p">,</span>
+            <span class="n">Language</span><span class="o">.</span><span class="n">EN</span><span class="p">,</span>
+            <span class="n">Language</span><span class="o">.</span><span class="n">ES</span><span class="p">,</span>
+            <span class="n">Language</span><span class="o">.</span><span class="n">FR</span><span class="p">,</span>
+            <span class="n">Language</span><span class="o">.</span><span class="n">IT</span><span class="p">,</span>
+            <span class="n">Language</span><span class="o">.</span><span class="n">NL</span><span class="p">,</span>
+            <span class="n">Language</span><span class="o">.</span><span class="n">PT</span><span class="p">,</span>
+            <span class="n">Language</span><span class="o">.</span><span class="n">RO</span>
+        <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_splits</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SPLIT_TRAIN</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SPLIT_TEST</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SPLIT_VAL</span>
+        <span class="p">]</span>
+
+        <span class="c1"># The concrete implementations of some of the abstract methods</span>
+        <span class="c1"># called when the parent class is initialized need the above lists.</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># Dictionary for assigning files to data subsets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_files_in_subsets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_splits</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">splits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_splits</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="MadTscSuite.get_sentiment_distributions">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_suite.MadTscSuite.get_sentiment_distributions">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_sentiment_distributions</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">subset_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subset_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">language</span><span class="si">}</span><span class="s2">_&quot;</span> <span class="ow">in</span> <span class="n">subset_name</span><span class="p">:</span>
+                <span class="n">subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_subset</span><span class="p">(</span><span class="n">subset_name</span><span class="p">)</span>
+                <span class="n">stats</span> <span class="o">=</span> <span class="n">SentimentStats</span><span class="p">(</span><span class="n">subset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">)</span>
+                <span class="n">distributions</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">sentiment_distributions_for_all_batches</span><span class="p">(</span>
+                    <span class="n">batch_size</span>
+                <span class="p">)</span>
+                <span class="n">stats</span><span class="o">.</span><span class="n">show_sentiment_distributions</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">distributions</span>
+
+        <span class="k">return</span> <span class="n">DataFrame</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MadTscSuite.show_compare_cols">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_suite.MadTscSuite.show_compare_cols">[docs]</a>
+    <span class="k">def</span> <span class="nf">show_compare_cols</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">additional_col_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compares columns across different subsets and returns the result.</span>
+
+<span class="sd">        Compares columns across different subsets and returns a DataFrame with</span>
+<span class="sd">        the results.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the column to compare across the subsets.</span>
+
+<span class="sd">        additional_col_name : str</span>
+<span class="sd">            The name of an additional column to include in the comparison.</span>
+<span class="sd">            Defaults to an empty string.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            A DataFrame containing the comparison results.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">base</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Create an empty MyDataFrame instance to store the comparison results.</span>
+        <span class="n">my_df</span> <span class="o">=</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+        <span class="c1"># Loop through each subset in the suite.</span>
+        <span class="k">for</span> <span class="n">subset_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subset_names</span><span class="p">:</span>
+            <span class="n">subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_subset</span><span class="p">(</span><span class="n">subset_name</span><span class="p">)</span>
+
+            <span class="c1"># Set the first subset as the base for comparison.</span>
+            <span class="k">if</span> <span class="n">base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">base</span> <span class="o">=</span> <span class="n">subset</span>
+                <span class="c1"># Get the index column from the base subset.</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span>
+
+                <span class="c1"># If an additional column is given, take it from the base and</span>
+                <span class="c1"># add it to the new DataFrame.</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">additional_col_name</span><span class="p">):</span>
+                    <span class="n">my_df</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                        <span class="s1">&#39;add_column&#39;</span><span class="p">,</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">base</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">additional_col_name</span><span class="p">],</span>
+                        <span class="n">col_name</span><span class="o">=</span><span class="n">additional_col_name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">base</span><span class="o">.</span><span class="n">language</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Add the index column to the new DataFrame.</span>
+                <span class="n">my_df</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                    <span class="s1">&#39;add_column&#39;</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+                    <span class="n">col_name</span><span class="o">=</span><span class="n">index</span><span class="o">.</span><span class="n">name</span>
+                <span class="p">)</span>
+                <span class="n">my_df</span><span class="o">.</span><span class="n">index_column</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">name</span>
+
+                <span class="c1"># Add the specified column from the base subset to the</span>
+                <span class="c1"># new DataFrame.</span>
+                <span class="n">my_df</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                    <span class="s1">&#39;add_column&#39;</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">base</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">],</span>
+                    <span class="n">col_name</span><span class="o">=</span><span class="n">col_name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">base</span><span class="o">.</span><span class="n">language</span>
+                <span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># For subsequent subsets:</span>
+                <span class="c1"># If an additional column is given, take it from the subset and</span>
+                <span class="c1"># add it to the results DataFrame.</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">additional_col_name</span><span class="p">):</span>
+                    <span class="n">my_df</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                        <span class="s1">&#39;add_column&#39;</span><span class="p">,</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">subset</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">additional_col_name</span><span class="p">],</span>
+                        <span class="n">col_name</span><span class="o">=</span><span class="n">additional_col_name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">subset</span><span class="o">.</span><span class="n">language</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Add the specified column from the subset to the</span>
+                <span class="c1"># results DataFrame.</span>
+                <span class="n">my_df</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                    <span class="s1">&#39;add_column&#39;</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">subset</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">],</span>
+                    <span class="n">col_name</span><span class="o">=</span><span class="n">col_name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">subset</span><span class="o">.</span><span class="n">language</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Compare the current subset&#39;s column with the base subset&#39;s</span>
+                <span class="c1"># column and add the result in a new column of the results</span>
+                <span class="c1"># DataFrame. The values in the column indicate whether</span>
+                <span class="c1"># the values of the two subsets are equal.</span>
+                <span class="n">my_df</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                    <span class="s1">&#39;add_column&#39;</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_comparison_column</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">subset</span><span class="p">,</span> <span class="n">col_name</span><span class="p">),</span>
+                    <span class="n">col_name</span><span class="o">=</span><span class="s2">&quot;equal&quot;</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">base</span><span class="o">.</span><span class="n">language</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span>
+                             <span class="n">subset</span><span class="o">.</span><span class="n">language</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Return the results DataFrame.</span>
+        <span class="k">return</span> <span class="n">my_df</span></div>
+
+
+<div class="viewcode-block" id="MadTscSuite.are_cols_identical">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_suite.MadTscSuite.are_cols_identical">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">are_cols_identical</span><span class="p">(</span>
+            <span class="n">subset</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
+            <span class="n">other</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if a specific column is identical between two subsets.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subset : MadTscStrategy</span>
+<span class="sd">            The first subset to compare.</span>
+
+<span class="sd">        other : MadTscStrategy</span>
+<span class="sd">            The second subset to compare.</span>
+
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the column to compare.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the columns are identical, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">subset</span><span class="o">.</span><span class="n">are_cols_identical</span><span class="p">(</span><span class="n">col_name</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">col_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscSuite.get_comparison_column">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_suite.MadTscSuite.get_comparison_column">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_comparison_column</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">subset</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
+            <span class="n">other</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compares a specific column between two subsets row by row.</span>
+
+<span class="sd">        This method returns a boolean Series indicating whether the values in</span>
+<span class="sd">        the specified column of one subset are equal to the corresponding</span>
+<span class="sd">        values in the same column of another subset.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subset : T</span>
+<span class="sd">            The first subset to compare.</span>
+<span class="sd">        other : T</span>
+<span class="sd">            The second subset to compare.</span>
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the column to compare between the two subsets.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Series</span>
+<span class="sd">            A pandas Series of booleans where each entry is True if the</span>
+<span class="sd">            corresponding values in the columns are equal, and False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">col_comparison</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+        <span class="c1"># Explicit type casting to make the type checkers happy:</span>
+        <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">col_comparison</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscSuite.choose_subset">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_suite.MadTscSuite.choose_subset">[docs]</a>
+    <span class="k">def</span> <span class="nf">choose_subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the subset with the specified language.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">            The language of the subset.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Subset</span>
+<span class="sd">            The subset.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The subset must be loaded before calling this method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_subset</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_compose_strategy_name</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscSuite.to_string">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_suite.MadTscSuite.to_string">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides a formatted string representation of the data in the current</span>
+<span class="sd">        suite.</span>
+
+<span class="sd">        Expands the base description by suite specific details like the name</span>
+<span class="sd">        and source of the data collection, the author(s) of the collection</span>
+<span class="sd">        and the citation of the associated scientific paper. If the data</span>
+<span class="sd">        is not yet initialized, the description includes statistical insights</span>
+<span class="sd">        such as the numbers and names of the domains, languages and original</span>
+<span class="sd">        datasets contained in the data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A string representation of the data in the current MMS suite.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DESCRIPTION</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subsets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">string</span> <span class="o">+=</span> <span class="n">value</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">string</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="MadTscSuite._initialize_strategies">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_suite.MadTscSuite._initialize_strategies">[docs]</a>
+    <span class="k">def</span> <span class="nf">_initialize_strategies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize all strategies, respecting their dependencies.</span>
+
+<span class="sd">        Each strategy is configured specifying</span>
+<span class="sd">        - its strategy name,</span>
+<span class="sd">        - its data type,</span>
+<span class="sd">        - its file name,</span>
+<span class="sd">        - its language, if there is only one,</span>
+<span class="sd">        - its dataset name, if there is only one.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Set strategy configurations</span>
+        <span class="n">strategy_configs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_languages</span><span class="p">:</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_file_name</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span>
+            <span class="n">strategy_configs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span>
+                <span class="n">file_name</span> <span class="o">+</span> <span class="s2">&quot;_strategy&quot;</span><span class="p">,</span>
+                <span class="n">file_name</span><span class="p">,</span>
+                <span class="n">lang</span>
+            <span class="p">))</span>
+
+        <span class="c1"># Initialize the strategies based on their configurations</span>
+        <span class="k">for</span> <span class="p">(</span>
+                <span class="n">strategy_name</span><span class="p">,</span>
+                <span class="n">file_name</span><span class="p">,</span>
+                <span class="n">language</span>
+        <span class="p">)</span> <span class="ow">in</span> <span class="n">strategy_configs</span><span class="p">:</span>
+            <span class="n">strategy</span><span class="p">:</span> <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_strategy</span><span class="p">(</span>
+                <span class="n">file_name</span><span class="p">,</span>
+                <span class="n">language</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_strategies</span><span class="p">[</span><span class="n">strategy_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">strategy</span></div>
+
+
+<div class="viewcode-block" id="MadTscSuite._compose_file_name">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_suite.MadTscSuite._compose_file_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">_compose_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Composes the file name of the subset identified by the specified</span>
+<span class="sd">        parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">            The language of the subset.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The file name of the subset.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">SUITE_PREFIX</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">language</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="MadTscSuite._compose_strategy_name">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_suite.MadTscSuite._compose_strategy_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">_compose_strategy_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Composes the name of the strategy.</span>
+
+<span class="sd">        Composes the name of the strategy that is identified by the specified</span>
+<span class="sd">        parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">            The language of the strategy.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The name of the strategy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">SUITE_PREFIX</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">language</span><span class="si">}</span><span class="s2">_strategy&quot;</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_create_strategy</span><span class="p">(</span>
+            <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+
+        <span class="n">strategy</span><span class="p">:</span> <span class="n">T</span> <span class="o">=</span> <span class="n">get_data_source_strategy</span><span class="p">(</span>
+            <span class="s1">&#39;mad&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;tsc&#39;</span><span class="p">,</span>
+            <span class="n">file_name</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">language</span><span class="p">:</span>
+            <span class="n">strategy</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">language</span>
+
+        <span class="k">return</span> <span class="n">strategy</span>
+
+<div class="viewcode-block" id="MadTscSuite._compose_from_original_files">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_suite.MadTscSuite._compose_from_original_files">[docs]</a>
+    <span class="k">def</span> <span class="nf">_compose_from_original_files</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">subset</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
+            <span class="n">strategy_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Composes the specified subset from the original files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subset : T</span>
+<span class="sd">            The subset to compose.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The created subset is not returned from this method but</span>
+<span class="sd">        - stored in the _subsets dictionary of this class and</span>
+<span class="sd">        - saved to disk according to the serialization strategy used by the</span>
+<span class="sd">          Olympia strategy of the subset (PKL format for DataFrame objects).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Get the original files</span>
+        <span class="n">file_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_splits</span>
+
+        <span class="c1"># List for the strategies collected from the files</span>
+        <span class="n">strategies</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">file_names</span><span class="p">:</span>
+            <span class="c1"># Create a strategy for each file</span>
+            <span class="n">strategy</span><span class="p">:</span> <span class="n">T</span> <span class="o">=</span> <span class="n">get_data_source_strategy</span><span class="p">(</span>
+                <span class="s1">&#39;mad&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;tsc&#39;</span><span class="p">,</span>
+                <span class="n">file_name</span>
+            <span class="p">)</span>
+            <span class="c1"># Set the language of the strategy.</span>
+            <span class="c1"># This will also set the source.</span>
+            <span class="n">strategy</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">language</span>
+
+            <span class="n">strategies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">strategy</span><span class="p">)</span>
+
+        <span class="c1"># Create the subset</span>
+        <span class="n">subset</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">strategies</span><span class="p">)</span>
+
+        <span class="c1"># Preprocess the subset</span>
+        <span class="n">subset</span><span class="o">.</span><span class="n">preprocess</span><span class="p">()</span>
+
+        <span class="c1"># Add columns</span>
+        <span class="n">subset</span><span class="o">.</span><span class="n">add_columns</span><span class="p">()</span>
+
+        <span class="c1"># Drop single-value columns</span>
+        <span class="n">subset</span><span class="o">.</span><span class="n">drop_single_value_cols</span><span class="p">()</span>
+
+        <span class="c1"># Store the subset in the subsets collection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subsets</span><span class="p">[</span><span class="n">strategy_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset</span>
+
+        <span class="c1"># Save the subset data to disk</span>
+        <span class="n">subset</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MadTscSuite.compare_cols">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_suite.MadTscSuite.compare_cols">[docs]</a>
+    <span class="k">def</span> <span class="nf">compare_cols</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">,</span>
+            <span class="n">subset_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compares corresponding columns in different subsets.</span>
+
+<span class="sd">        Uses the first subset in the list as the base subset to which the</span>
+<span class="sd">        other subsets are compared.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_name</span>
+<span class="sd">            The name of the columns to compare.</span>
+
+<span class="sd">        subset_names : List[str] | None</span>
+<span class="sd">            The names of the subsets whose columns are to be compared.</span>
+<span class="sd">            Defaults to None. If the list is empty or None, it is set to all</span>
+<span class="sd">            loaded subsets.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">subset_names</span><span class="p">):</span>
+            <span class="n">subset_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subset_names</span>
+
+        <span class="n">base</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">subset_name</span> <span class="ow">in</span> <span class="n">subset_names</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+            <span class="n">subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_subset</span><span class="p">(</span><span class="n">subset_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">base</span> <span class="o">=</span> <span class="n">subset</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">other</span> <span class="o">=</span> <span class="n">subset</span>
+                <span class="n">what</span> <span class="o">=</span> <span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; columns&quot;</span> <span class="o">%</span> <span class="n">col_name</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_cols_identical</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">col_name</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> are identical.&quot;</span> <span class="o">%</span> <span class="n">what</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> differ.&quot;</span> <span class="o">%</span> <span class="n">what</span><span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+title BatchProcessor
+
+start
+:Initialize BatchProcessor with language and samples;
+
+partition "process_batches" {
+    :Retrieve start batch number;
+
+    if (Is checkpoint valid?) then (Yes)
+        :Proceed to process batches;
+    else (No)
+        :Raise RuntimeError;
+        stop
+    endif
+
+    while (More batches to process?) is (Yes)
+        if (Batch is within range?) then (Yes)
+            partition "process_batch" {
+                :Extract samples for the batch;
+                :Send batch samples to ChunkProcessor;
+                :Process Chunks;
+                :Receive processed results;
+                :Add results to aggregated data;
+            }
+            if (BatchFinishedException raised?) then (Yes)
+                if (All batches processed?) then (Yes)
+                    :Log INFO: all batches for language processed;
+                    :Save checkpoint;
+                    :Raise LanguageFinishedException;
+                    stop
+                else (No)
+                    :Log INFO: going to proceed with next batch;
+                endif
+            elseif (Other exception?) then (Yes)
+                :Log ERROR;
+                :Re-raise the exception;
+                stop
+            endif
+
+            :Save checkpoint;
+
+        else (No)
+            :Stop processing;
+            stop
+        endif
+    endwhile (No)
+    stop
+}
+
+@enduml
+

@@ -1,0 +1,53 @@
+<mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" background="none" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <mxCell id="node0" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;logging_mixin.LoggingMixin&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; logger: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; log(cls, message: str, level: str = &amp;#39;info&amp;#39;, msg_id: str = &amp;#39;&amp;#39;): &lt;br/&gt; _log(             self,             message: str,             level: str = &amp;#39;info&amp;#39;,             msg_id: str = &amp;#39;&amp;#39;     ): &lt;br/&gt; _get_caller_name(): &lt;br/&gt; _is_disallowed(msg_id: str): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-189" y="163" width="346" height="160" as="geometry" />
+    </mxCell>
+    <mxCell id="node2" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;sentiment_analysis.balanced_samples_provider.BalancedSamplesProvider&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; balanced_samples: &lt;br/&gt; _balanced_samples: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(             self,             samples_manager: &amp;quot;SamplesManager&amp;quot;     ): &lt;br/&gt; balanced_samples(self): &lt;br/&gt; balanced_samples(self, samples: Dict[str, MyDataFrame]): &lt;br/&gt; get_samples(self): &lt;br/&gt; _load_balanced_samples(self): &lt;br/&gt; _load_balanced_samples_for_language(self, language: str): &lt;br/&gt; _compose_dataset_name_for_language(self, language: str): &lt;br/&gt; _create_balanced_samples(self): &lt;br/&gt; _get_reference_samples(self, language: str): &lt;br/&gt; _get_other_balanced_samples(             self,             reference_samples: MyDataFrame,             language: str     ): &lt;br/&gt; _reduce_to_max_n_rows(self, my_df: MyDataFrame, max_n_rows: int): &lt;br/&gt; _filter_by_sentiment(self, my_df: MyDataFrame, sentiment: str): &lt;br/&gt; _shuffle(self, my_df: MyDataFrame): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-952" y="672" width="545" height="410" as="geometry" />
+    </mxCell>
+    <mxCell id="node4" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;sentiment_analysis.samples_manager.SamplesManager&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; languages: &lt;br/&gt; unbalanced_samples: &lt;br/&gt; unbal_provider: &lt;br/&gt; _unbalanced_samples: &lt;br/&gt; data_offset: &lt;br/&gt; balanced: &lt;br/&gt; bal_provider: &lt;br/&gt; balanced_samples: &lt;br/&gt; balance: &lt;br/&gt; _cols: &lt;br/&gt; _languages: &lt;br/&gt; _balanced_samples: &lt;br/&gt; config: &lt;br/&gt; _suite: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(             self,             suite: T,             languages: List[str] = None,             cols: List[str] = None     ): &lt;br/&gt; languages(self): &lt;br/&gt; languages(self, languages: List[str]): &lt;br/&gt; suite(self): &lt;br/&gt; suite(self, suite: T): &lt;br/&gt; suite_name(self): &lt;br/&gt; cols(self): &lt;br/&gt; cols(self, cols: List[str]): &lt;br/&gt; provenience(self): &lt;br/&gt; balanced_samples(self): &lt;br/&gt; balanced_samples(self, samples: Dict[str, MyDataFrame]): &lt;br/&gt; unbalanced_samples(self): &lt;br/&gt; unbalanced_samples(self, samples: Dict[str, MyDataFrame]): &lt;br/&gt; get_samples(self, language: str): &lt;br/&gt; get_suite_languages(self): &lt;br/&gt; _set_default_languages(self): &lt;br/&gt; _set_balanced_samples(self): &lt;br/&gt; _set_unbalanced_samples(self): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="232" y="447" width="420" height="835" as="geometry" />
+    </mxCell>
+    <mxCell id="node1" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;sentiment_analysis.samples_provider.SamplesProvider&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; samples_manager: &lt;br/&gt; logger: &lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(             self,             samples_manager: &amp;quot;SamplesManager&amp;quot;     ): &lt;br/&gt; get_samples(self): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-600" y="400" width="414" height="146" as="geometry" />
+    </mxCell>
+    <mxCell id="node3" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;sentiment_analysis.unbalanced_samples_provider.UnbalancedSamplesProvider&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; __init__(             self,             samples_manager: &amp;quot;SamplesManager&amp;quot;     ): &lt;br/&gt; get_samples(self): &lt;br/&gt; _get_unbalanced_samples_for_language(self, language: str): &lt;br/&gt; _get_sentiment_df(self, subset: S): &lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-371" y="810" width="583" height="145" as="geometry" />
+    </mxCell>
+    <mxCell id="edge2" edge="1" value="" parent="1" source="node2" target="node1" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-680" y="601" />
+          <mxPoint x="-393" y="601" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge3" edge="1" value="" parent="1" source="node4" target="node0" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="442" y="363" />
+          <mxPoint x="-16" y="363" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge1" edge="1" value="" parent="1" source="node1" target="node0" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-393" y="363" />
+          <mxPoint x="-16" y="363" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="edge0" edge="1" value="" parent="1" source="node3" target="node1" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=block;startSize=12;endArrow=none;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="-80" y="601" />
+          <mxPoint x="-393" y="601" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+  </root>
+</mxGraphModel>

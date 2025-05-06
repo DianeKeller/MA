@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.data_structures.data_frame_column_operations &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.data_structures.data_frame_column_operations</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.data_structures.data_frame_column_operations</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">data_frame_column_operations.py</span>
+<span class="sd">-------------------------------</span>
+<span class="sd">Version 1.0, updated on 2025-01-25</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">natsort</span> <span class="kn">import</span> <span class="n">natsorted</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+
+<span class="kn">from</span> <span class="nn">src.data_structures.str_series</span> <span class="kn">import</span> <span class="n">StrSeries</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.data_frame_operations</span> <span class="kn">import</span> <span class="n">DataFrameOperations</span>
+<span class="kn">from</span> <span class="nn">src.decorators.attribute_chain_decorators</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">self_attribute_chain_not_none</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.late_imports</span> <span class="kn">import</span> <span class="n">LateImports</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+    <span class="kn">from</span> <span class="nn">src.sentiment_analysis.chunk</span> <span class="kn">import</span> <span class="n">Chunk</span>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations">[docs]</a>
+<span class="k">class</span> <span class="nc">DataFrameColumnOperations</span><span class="p">(</span><span class="n">DataFrameOperations</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    DataFrameColumnOperations class.</span>
+
+<span class="sd">    Provides column-specific operations for a MyDataFrame instance.</span>
+
+<span class="sd">    This class extends DataFrameOperations to include methods that perform</span>
+<span class="sd">    operations specifically on the columns of a MyDataFrame object. It</span>
+<span class="sd">    allows for the addition, removal and modification of DataFrame columns.</span>
+
+<span class="sd">    Inherited Parameters</span>
+<span class="sd">    --------------------</span>
+<span class="sd">    my_df : MyDataFrame</span>
+<span class="sd">        An instance of MyDataFrame on which column operations will be</span>
+<span class="sd">        performed. This parameter is inherited from the DataFrameOperations</span>
+<span class="sd">        base class.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    add_column(data: DataFrame | dict | list | None = None,</span>
+<span class="sd">               col_name: str = &#39;&#39;) -&gt; None:</span>
+<span class="sd">        Adds a new column to the DataFrame with the specified data.</span>
+
+<span class="sd">    add_empty_bool_cols(col_names: list[str]) -&gt; None:</span>
+<span class="sd">        Adds empty boolean columns to the DataFrame.</span>
+
+<span class="sd">    add_empty_float_cols(col_names: list[str]) -&gt; None:</span>
+<span class="sd">        Adds empty floating-point columns to the DataFrame in the</span>
+<span class="sd">        MyDataFrame object.</span>
+
+<span class="sd">    add_empty_int_cols(col_names: list[str]) -&gt; None:</span>
+<span class="sd">        Adds empty integer columns to the DataFrame wrapped in the</span>
+<span class="sd">        MyDataFrame object.</span>
+
+<span class="sd">    add_empty_str_cols(col_names: list[str]) -&gt; None:</span>
+<span class="sd">        Adds empty string columns to the DataFrame.</span>
+
+<span class="sd">    are_cols_identical(col_name: str, other: MyDataFrame, other_col_name: str)</span>
+<span class="sd">            -&gt; bool:</span>
+<span class="sd">        Checks if a column in other data is identical with the current data.</span>
+
+<span class="sd">    drop_column(col_name: str) -&gt; None:</span>
+<span class="sd">        Removes a single column from the DataFrame.</span>
+
+<span class="sd">    drop_columns(col_names: List[str]) -&gt; None:</span>
+<span class="sd">        Removes multiple columns from the DataFrame.</span>
+
+<span class="sd">    extract_columns(col_names: List[str]) -&gt; DataFrame:</span>
+<span class="sd">        Extracts a DataFrame with the specified columns.</span>
+
+<span class="sd">    extract_columns_by_name_substring(substring: str) -&gt; DataFrame:</span>
+<span class="sd">        Extracts the columns whose names contain the specified substring.</span>
+
+<span class="sd">    find_identical_cols(other: DataFrame) -&gt; List[str]:</span>
+<span class="sd">        Finds columns in two DataFrames that have identical values in all rows.</span>
+
+<span class="sd">    get_col_index_by_col_name(col_name: str) -&gt; int:</span>
+<span class="sd">        Returns the index of the specified column by its name.</span>
+
+<span class="sd">    get_col_name_by_col_index(col_index: int) -&gt; str:</span>
+<span class="sd">        Returns the name of the column at the specified index.</span>
+
+<span class="sd">    get_col_names_by_substring(substring: str) -&gt; List[str]:</span>
+<span class="sd">        Returns the column names that contain the given substring.</span>
+
+<span class="sd">    get_col_type(col_name: str) -&gt; np.dtype:</span>
+<span class="sd">        Returns the data type of the specified column.</span>
+
+<span class="sd">    def get_unique_values_by_col_name(col_name: str) -&gt; List[Any]:</span>
+<span class="sd">        Returns the unique values of a given column in the DataFrame.</span>
+
+<span class="sd">    merge(other: MyDataFrame | DataFrame | Chunk) -&gt; None:</span>
+<span class="sd">        Adds the columns of another DataFrame to the current DataFrame.</span>
+
+<span class="sd">    merge_transposed(other: MyDataFrame) -&gt; None:</span>
+<span class="sd">        Merges two transposed DataFrames.</span>
+
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    DataFrameRowOperations</span>
+<span class="sd">        Provides row-specific operations for a MyDataFrame instance.</span>
+
+<span class="sd">    DataFrameFieldOperations</span>
+<span class="sd">        Provides field-specific operations for a MyDataFrame instance.</span>
+
+<span class="sd">    DataFrameOperations</span>
+<span class="sd">        Base class providing common MyDataFrame operations.</span>
+
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; my_df_instance = MyDataFrame()</span>
+<span class="sd">    &gt;&gt;&gt; column_operations = DataFrameColumnOperations(my_df_instance)</span>
+<span class="sd">    &gt;&gt;&gt; column_operations.add_empty_int_cols([&#39;age&#39;, &#39;year&#39;])</span>
+<span class="sd">    Adds empty integer columns named &#39;age&#39; and &#39;year&#39; to my_df_instance.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="DataFrameColumnOperations.get_col_type">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.get_col_type">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_col_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the data type of the specified column.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the column whose data type is requested.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.dtype</span>
+<span class="sd">            The data type of the specified column.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span><span class="o">.</span><span class="n">dtypes</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.get_col_index_by_col_name">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.get_col_index_by_col_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_col_index_by_col_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the index number of the specified column.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the column whose index number is requested.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The index number of the row.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            If the column name is not found in the dataframe.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The dataframe is empty. Cannot get the index number.&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">n_cols</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">col_names</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The dataframe has no columns. Cannot get the index number.&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Check if there is a column with the column name provided.</span>
+        <span class="k">if</span> <span class="n">col_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">col_names</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The dataframe has no column named &#39;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}</span><span class="s2">&#39; Cannot &quot;</span>
+                   <span class="sa">f</span><span class="s2">&quot;get the index number.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">col_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.get_unique_values_by_col_name">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.get_unique_values_by_col_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_unique_values_by_col_name</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the unique values of a given column in the dataframe.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_name : str</span>
+<span class="sd">            Name of the column whose values are to be extracted. The name</span>
+<span class="sd">            equals the category to which the prompt parts or ingredients</span>
+<span class="sd">            belong.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[Any]</span>
+<span class="sd">            List of unique elements of the given column in the data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Extract the column&#39;s values from the data, storing them</span>
+        <span class="c1"># in a StrSeries object</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">StrSeries</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">],</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">col_name</span>
+        <span class="p">)</span>
+        <span class="c1"># Reduce the number of occurrences of each value to 1 per result set:</span>
+        <span class="n">unique_values</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">distinct_elements</span>
+
+        <span class="k">return</span> <span class="n">unique_values</span></div>
+
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.add_empty_int_cols">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.add_empty_int_cols">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_empty_int_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds empty columns to the dataframe that are designed to hold integer</span>
+<span class="sd">        values to the dataframe.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_names : list[str]</span>
+<span class="sd">            The names of the columns to add.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The pandas dtype used is &#39;Int64&#39; instead of &#39;int&#39; because Int64 is a</span>
+<span class="sd">        nullable object, which allows for missing values in the dataframe,</span>
+<span class="sd">        whereas int64 switches to float64 if a value is NaN.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">col_names</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;Int64&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.add_empty_float_cols">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.add_empty_float_cols">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_empty_float_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Adds empty columns to the dataframe that are designed to hold</span>
+<span class="sd">         floating-point numbers.</span>
+
+<span class="sd">         Parameters</span>
+<span class="sd">         ----------</span>
+<span class="sd">         col_names : list[str]</span>
+<span class="sd">             The names of the columns to add.</span>
+
+<span class="sd">         Notes</span>
+<span class="sd">         -----</span>
+<span class="sd">         The pandas dtype used is &#39;Float64&#39; instead of &#39;float64&#39; to conform</span>
+<span class="sd">         with the add_empty_int_cols method.</span>
+
+<span class="sd">         &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">col_names</span><span class="p">:</span>
+            <span class="c1"># Uses &#39;Float64&#39; instead of &#39;float64&#39; to conform with the</span>
+            <span class="c1"># according int method.</span>
+            <span class="c1"># Since NaN types default to float64, the dtype could also be</span>
+            <span class="c1"># float64 to hold future float values.</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;Float64&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.add_empty_str_cols">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.add_empty_str_cols">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_empty_str_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds empty columns to the dataframe that are designed to hold string</span>
+<span class="sd">        values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_names : list[str]</span>
+<span class="sd">            List of names of the columns to add.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The newer &#39;string&#39; dtype is used instead of &#39;str&#39;, which pandas</span>
+<span class="sd">        traditionally stores as an object. &#39;String&#39; has better string</span>
+<span class="sd">        handling features, such as support of missing values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">col_names</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;string&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.add_empty_bool_cols">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.add_empty_bool_cols">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_empty_bool_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds empty columns designed to hold boolean values to the</span>
+<span class="sd">        dataframe.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_names : list[str]</span>
+<span class="sd">           The names of the columns to add.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">col_names</span><span class="p">:</span>
+            <span class="c1"># Uses &#39;boolean&#39; for nullable boolean support</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;boolean&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.add_sums">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.add_sums">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_sums</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Sum&#39;</span><span class="p">,</span>
+            <span class="n">sort</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a sum column to the DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_name: str</span>
+<span class="sd">            The name of the sum column. Default to &#39;Sum&#39;</span>
+
+<span class="sd">        sort: bool</span>
+<span class="sd">            If True, the sum column is sorted in descending order. Defaults to</span>
+<span class="sd">            False.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The DataFrame is modified in place.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Add the sum column</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">sort</span><span class="p">:</span>
+            <span class="c1"># Reset index temporarily to treat the index as a column</span>
+            <span class="n">df_reset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+            <span class="c1"># Sort by &#39;Sum&#39; (descending)</span>
+            <span class="n">df_reset</span> <span class="o">=</span> <span class="n">df_reset</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">col_name</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="c1"># Apply natural sorting to the &#39;index&#39; within groups of the same &#39;Sum&#39;</span>
+
+            <span class="n">sorted_indices</span> <span class="o">=</span> <span class="n">natsorted</span><span class="p">(</span>
+                <span class="n">df_reset</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="mi">0</span> <span class="k">if</span> <span class="n">df_reset</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                             <span class="n">df_reset</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="p">,</span>
+                             <span class="n">col_name</span>
+                         <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">99</span> <span class="k">else</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="o">-</span><span class="n">df_reset</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                        <span class="n">df_reset</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="p">,</span>
+                        <span class="n">col_name</span>
+                    <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Reorder the DataFrame using the sorted index</span>
+            <span class="n">df_reset</span> <span class="o">=</span> <span class="n">df_reset</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                <span class="n">sorted_indices</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+            <span class="c1"># Restore the index</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">df_reset</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.add_column">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.add_column">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_column</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a column to the DataFrame.</span>
+
+<span class="sd">        If the column comes in a DataFrame format, its indices are checked</span>
+<span class="sd">        to ensure the column can be safely added to the DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Any | None</span>
+<span class="sd">            The column data to add to the DataFrame. Defaults to None.</span>
+
+<span class="sd">        col_name: str</span>
+<span class="sd">            The name of the new column. If it is not provided, the number of</span>
+<span class="sd">            existing columns increased by 1 is appended to the string</span>
+<span class="sd">            &quot;Column_&quot; to get a new column name. Default is None.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the index of the column and the index of the DataFrame are</span>
+<span class="sd">            incompatible and cannot be merged.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - If data is not provided, the new column contains nothing but None</span>
+<span class="sd">          values.</span>
+
+<span class="sd">        - If &#39;data&#39; is a data structure that can be mapped to the fields of</span>
+<span class="sd">          the column like a DataFrame, a Series, a dictionary or a list, it</span>
+<span class="sd">          is supposed to contain the different values of the fields in the new</span>
+<span class="sd">          column. For this, its length must be the same as the number of rows</span>
+<span class="sd">          in the DataFrame.</span>
+
+<span class="sd">        - If &#39;data&#39; is not a data structure that can be mapped to the fields</span>
+<span class="sd">          of the column, all fields in the new column will be set to the</span>
+<span class="sd">          value of &#39;data&#39;.</span>
+
+<span class="sd">        - if the column DataFrame and the current DataFrame have different</span>
+<span class="sd">          indices, the indices are checked if they can be merged.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">col_name</span><span class="p">:</span>
+            <span class="n">col_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Column_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">n_cols</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Column name was not provided. Set to &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">col_name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">size</span>
+
+        <span class="c1"># If the new column comes as a DataFrame, verify that the indices</span>
+        <span class="c1"># are compatible with the current DataFrame.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_indices</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">,</span> <span class="n">data</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                    <span class="p">(</span>
+                        <span class="s2">&quot;There is a problem with the original DataFrame&#39;s and &quot;</span>
+                        <span class="s2">&quot;the new column&#39;s indices. Cannot merge them.&quot;</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Simply create the corresponding column in the DataFrame and</span>
+            <span class="c1"># insert the data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.are_cols_identical">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.are_cols_identical">[docs]</a>
+    <span class="k">def</span> <span class="nf">are_cols_identical</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">other</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">,</span>
+            <span class="n">other_col_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if a column in other data is identical with the current data.</span>
+
+<span class="sd">        Checks if the specified column in the current data and in the other</span>
+<span class="sd">        data structure are identical.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the column in the current data.</span>
+
+<span class="sd">        other : MyDataFrame</span>
+<span class="sd">            The other data structure to compare with.</span>
+
+<span class="sd">        other_col_name : str</span>
+<span class="sd">            The name of the column in the other strategy.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the columns are identical, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">other_col_name</span><span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.assign_dtypes">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.assign_dtypes">[docs]</a>
+    <span class="k">def</span> <span class="nf">assign_dtypes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_type_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assigns specified dtypes to the columns in the current DataFrame.</span>
+
+<span class="sd">        Assignes the dtypes provided in the column type map to the</span>
+<span class="sd">        DataFrame columns specified in the map.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_type_map: Dict[str, type]</span>
+<span class="sd">            A dictionary mapping column names to their respective data types</span>
+<span class="sd">            (e.g., INT, FLOAT), where the keys are the column names and the</span>
+<span class="sd">            values the dtypes to assign to the respective columns.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method does not return the modified DataFrame. Instead The column</span>
+<span class="sd">        types of the DataFrame are changed in place.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span>
+
+        <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="n">col_type_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+            <span class="c1"># Check if the column exists in the DataFrame</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="c1"># Cast the column to the specified data type</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.merge">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.merge">[docs]</a>
+    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">MyDataFrame</span> <span class="o">|</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">Chunk</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds the columns of another DataFrame to the current DataFrame.</span>
+
+<span class="sd">        This method adds the columns of the DataFrame in a data structure</span>
+<span class="sd">        compatible to the current MyDataFrame (MyDataFrame, DataFrame,</span>
+<span class="sd">        Chunk) to the columns of the DataFrame wrapped in the</span>
+<span class="sd">        current MyDataFrame instance, aligning the rows based on their</span>
+<span class="sd">        indexes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : MyDataFrame | DataFrame | Chunk</span>
+<span class="sd">           The other data structure to merge with. The DataFrame in this</span>
+<span class="sd">           data structure should have the same index structure as the</span>
+<span class="sd">           calling MyDataFrame.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">           If the &#39;other&#39; parameter is not an instance of MyDataFrame.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - If &#39;other&#39; is a mere DataFrame, it is used to build a MyDataFrame</span>
+<span class="sd">           object so that it can also be merged with the current MyDataFrame.</span>
+
+<span class="sd">        - The merge is done using pandas&#39; &#39;merge&#39; function with &#39;left_index&#39;</span>
+<span class="sd">         and &#39;right_index&#39; set to True, performing a SQL-like left join.</span>
+
+<span class="sd">        - If there are overlapping columns, the values from the other</span>
+<span class="sd">         MyDataFrame will be used.</span>
+
+<span class="sd">        - The merged DataFrame replaces the current DataFrame in this</span>
+<span class="sd">         MyDataFrame instance.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
+            <span class="c1"># Prevent circular imports</span>
+            <span class="n">my_dataframe_factory_cls</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">LateImports</span><span class="o">.</span><span class="n">get_my_dataframe_factory_class</span><span class="p">()</span>
+            <span class="p">)</span>
+
+            <span class="n">other</span> <span class="o">=</span> <span class="n">my_dataframe_factory_cls</span><span class="p">()</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+        <span class="c1"># Prevent circular imports</span>
+        <span class="n">my_data_frame_cls</span> <span class="o">=</span> <span class="n">LateImports</span><span class="o">.</span><span class="n">get_my_dataframe_class</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">my_data_frame_cls</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Merge needs another MyDataFrame. Got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">cast</span><span class="p">(</span><span class="n">my_data_frame_cls</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">on</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">,</span>
+            <span class="n">validate</span><span class="o">=</span><span class="s1">&#39;many_to_many&#39;</span><span class="p">,</span>
+            <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.merge_transposed">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.merge_transposed">[docs]</a>
+    <span class="nd">@self_attribute_chain_not_none</span><span class="p">(</span><span class="s1">&#39;my_df.data&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">merge_transposed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Merges two transposed DataFrames.</span>
+
+<span class="sd">        Merges the current MyDataFrame with another MyDataFrame switching</span>
+<span class="sd">        their rows to columns.</span>
+<span class="sd">        The columns of the other DataFrame are added to the columns of the</span>
+<span class="sd">        DataFrame wrapped in the current MyDataFrame instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : MyDataFrame</span>
+<span class="sd">           The other MyDataFrame to merge with. This MyDataFrame should</span>
+<span class="sd">           have the same index structure as the calling MyDataFrame.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">           If the &#39;other&#39; parameter is not an instance of MyDataFrame.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - The merge is done using pandas&#39; &#39;merge&#39; function with &#39;left_index&#39;</span>
+<span class="sd">         and &#39;right_index&#39; set to True, performing a SQL-like left join.</span>
+
+<span class="sd">        - If there are overlapping columns, the values from the other</span>
+<span class="sd">         MyDataFrame will be used.</span>
+
+<span class="sd">        - The merged DataFrame replaces the current DataFrame in this</span>
+<span class="sd">         MyDataFrame instance.</span>
+
+<span class="sd">        - Re-transposing the result of the merge would equal to adding the</span>
+<span class="sd">          rows of the other DataFrame to the rows of the current original</span>
+<span class="sd">          DataFrame.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">MyDataFrame</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Merge_transposed needs another MyDataFrame. &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Use default &#39;on&#39;, &#39;how&#39; and &#39;validate&#39; parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+            <span class="n">on</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">,</span>
+            <span class="n">validate</span><span class="o">=</span><span class="s1">&#39;many_to_many&#39;</span><span class="p">,</span>
+            <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.find_identical_cols">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.find_identical_cols">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_identical_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds columns in two DataFrames that have identical values in all rows.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            A list of the names of the columns that have identical values</span>
+<span class="sd">            in all rows.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span>
+        <span class="n">df2</span> <span class="o">=</span> <span class="n">other</span>
+
+        <span class="k">return</span> <span class="n">df1</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">df1</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">df2</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()]</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.drop_column">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.drop_column">[docs]</a>
+    <span class="k">def</span> <span class="nf">drop_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes single column from dataframe.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_name: str</span>
+<span class="sd">            The name of the column to remove.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">col_name</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.drop_columns">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.drop_columns">[docs]</a>
+    <span class="k">def</span> <span class="nf">drop_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes several columns from dataframe.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_names: List[str]</span>
+<span class="sd">            List of names of the columns to remove.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">col_names</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.extract_columns">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.extract_columns">[docs]</a>
+    <span class="k">def</span> <span class="nf">extract_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts a DataFrame with the specified columns.</span>
+
+<span class="sd">        Extracts a DataFrame with the specified columns from the current</span>
+<span class="sd">        MyDataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_names : List[str]</span>
+<span class="sd">            The names of the columns to extract.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            A DataFrame with the specified columns.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_names</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.extract_columns_by_name_substring">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.extract_columns_by_name_substring">[docs]</a>
+    <span class="k">def</span> <span class="nf">extract_columns_by_name_substring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">substring</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts the columns whose names contain the specified substring.</span>
+
+<span class="sd">        Extracts a DataFrame with the columns from the current MyDataFrame</span>
+<span class="sd">        whose names contain the specified substring.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        substring : str</span>
+<span class="sd">            The substring the column names need to contain for the column to</span>
+<span class="sd">            be extracted.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            A DataFrame with the extracted columns.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_columns</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_col_names_by_substring</span><span class="p">(</span><span class="n">substring</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.get_col_name_by_col_index">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.get_col_name_by_col_index">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_col_name_by_col_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the name of the column at the specified index.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_index : int</span>
+<span class="sd">            The index of the column to get the name of.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The name of the column at the specified index.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">col_index</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="DataFrameColumnOperations.get_col_names_by_substring">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations.get_col_names_by_substring">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_col_names_by_substring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">substring</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the column names that contain the given substring.</span>
+
+<span class="sd">        Returns the column names from the current MyDataFrame that contain the</span>
+<span class="sd">        given substring.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        substring : str</span>
+<span class="sd">            The substring the returned column names must contain.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            The list of column names from the current MyDataFrame that contain</span>
+<span class="sd">            the substring.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">substring</span> <span class="ow">in</span> <span class="n">col</span><span class="p">]</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="DataFrameColumnOperations._check_indices">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_column_operations.DataFrameColumnOperations._check_indices">[docs]</a>
+    <span class="k">def</span> <span class="nf">_check_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the indices of the two DataFrames are compatible.</span>
+
+<span class="sd">        Checks if the two DataFrames have the same indices or if they are</span>
+<span class="sd">        safe to be merged.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : DataFrame</span>
+<span class="sd">            The other DataFrame to compare with.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the two DataFrames have the same index, False otherwise.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the two DataFrames have incompatible indices:</span>
+
+<span class="sd">            - same number of indices but different names</span>
+<span class="sd">            - different number of indices but no intersection of indices.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">do_with_row</span><span class="p">(</span><span class="s2">&quot;check_indices&quot;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="n">other</span><span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

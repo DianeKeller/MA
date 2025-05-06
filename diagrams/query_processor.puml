@@ -1,0 +1,35 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+title QueryProcessor
+
+start
+
+:Initialize QueryProcessor;
+:Load Payload;
+if (API Available?) then (yes)
+    :Set API Endpoint;
+else (no)
+    :Log Error;
+    stop
+endif
+
+:Process Query;
+if (Dummy Mode?) then (yes)
+    :Return Random Value;
+    stop
+else (no)
+    :Send Query to LLM API;
+    :Handle API Response;
+    if (Valid Sentiment?) then (yes)
+        :Return Predicted Sentiment;
+    else (no)
+        :Add to Failed Answers;
+        :Return Empty String;
+    endif
+endif
+
+:Flush Failed Answers;
+:Log Completed Query;
+stop
+@enduml

@@ -1,0 +1,101 @@
+SentimentAnalysis.src.sentiment\_analysis.evaluation package
+============================================================
+
+Submodules
+----------
+
+SentimentAnalysis.src.sentiment\_analysis.evaluation.all\_languages\_evaluation module
+--------------------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.evaluation.all_languages_evaluation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.evaluation.classification\_evaluation module
+--------------------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.evaluation.classification_evaluation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.evaluation.cross\_strategy\_prompt\_evaluation module
+-----------------------------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.evaluation.cross_strategy_prompt_evaluation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.evaluation.deep\_prompt\_evaluation module
+------------------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.evaluation.deep_prompt_evaluation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.evaluation.evaluation\_workflow module
+--------------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.evaluation.evaluation_workflow
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.evaluation.language\_results\_processor module
+----------------------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.evaluation.language_results_processor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.evaluation.metrics module
+-------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.evaluation.metrics
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.evaluation.metrics\_visualization\_mixin module
+-----------------------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.evaluation.metrics_visualization_mixin
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.evaluation.optimization\_workflow module
+----------------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.evaluation.optimization_workflow
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.evaluation.prompt\_evaluation module
+------------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.evaluation.prompt_evaluation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.evaluation.single\_prompt\_evaluation module
+--------------------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.evaluation.single_prompt_evaluation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.evaluation
+   :members:
+   :undoc-members:
+   :show-inheritance:

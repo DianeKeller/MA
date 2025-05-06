@@ -1,0 +1,58 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class PromptEngineering {
+    +initialize_query_variants()
+}
+
+class PromptEngineeringWorkflow {
+    +_generate_queries()
+    +_generate_prompt_ingredients_sets()
+}
+
+class PromptEvaluation {
+    +compute_all_prompt_metrics()
+}
+
+class PromptIngredientsGenerator {
+    +get_prompt_ingredients_sets()
+}
+
+class PromptOptimizer {
+    +find_influential_query_variants()
+    +find_influential_prompt_ingredients_sets()
+}
+
+class Query {
+    +nr: int
+    +col_name: str
+}
+
+class QueryGenerator {
+    +get_queries()
+}
+
+class QueryVariants {
+    +print()
+}
+
+class ServerlessBloomPromptValidationMixin {
+    +process_query()
+    +validate_prompt()
+}
+
+class SinglePromptEvaluation {
+    +compute_metrics()
+}
+
+' Define Relationships
+PromptEvaluation --> PromptEngineering : uses
+PromptIngredientsGenerator --> PromptEngineering : uses
+QueryGenerator --> PromptEngineering : uses
+PromptEngineeringWorkflow --> PromptIngredientsGenerator : uses
+PromptEngineeringWorkflow --> QueryGenerator : uses
+PromptOptimizer --> QueryVariants : uses
+ServerlessBloomPromptValidationMixin --> Query : processes
+PromptEvaluation --> SinglePromptEvaluation : evaluates
+
+@enduml

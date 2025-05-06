@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.utils.data_comparison_utils &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.utils.data_comparison_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.utils.data_comparison_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">data_comparison_utils.py</span>
+<span class="sd">------------------------</span>
+<span class="sd">Version 1.0, updated on 2024-12-04</span>
+
+<span class="sd">This module contains a singledispatch mechanism to check whether two data</span>
+<span class="sd">structures are identical.</span>
+
+<span class="sd">Functions</span>
+<span class="sd">---------</span>
+<span class="sd">are_equal(data: T, other: T) -&gt; bool:</span>
+<span class="sd">    Compares two data structures of the same type to decide whether their</span>
+<span class="sd">    contents are identical.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypeVar</span>
+
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">DatasetDict</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">pandas._testing</span> <span class="kn">import</span> <span class="n">assert_frame_equal</span><span class="p">,</span> <span class="n">assert_series_equal</span>
+
+<span class="kn">from</span> <span class="nn">src.data_structures.my_ordered_dict</span> <span class="kn">import</span> <span class="n">MyOrderedDict</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">)</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">LoggingMixin</span><span class="p">()</span><span class="o">.</span><span class="n">log</span>
+
+
+<div class="viewcode-block" id="are_equal">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.data_comparison_utils.are_equal">[docs]</a>
+<span class="nd">@singledispatch</span>
+<span class="k">def</span> <span class="nf">are_equal</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generic function to check if two objects are equal.</span>
+
+<span class="sd">    This singledispatch mechanism provides custom comparison functionality</span>
+<span class="sd">    for data types that do not allow for a simple equality check with the</span>
+<span class="sd">    &#39;==&#39; operator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : T</span>
+<span class="sd">        The data to compare to other data</span>
+
+<span class="sd">    other : T</span>
+<span class="sd">        Other data to compare with the data</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        &#39;True&#39; if the data and the other data are equal. &#39;False&#39; otherwise.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    NotImplementedError</span>
+<span class="sd">        If the data type of the provided parameters is not covered by one of</span>
+<span class="sd">        the registered functions of this singledispatch mechanism.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function defines the singledispatch mechanism that delegates the</span>
+<span class="sd">    equality checks to the registered specialized function that covers the</span>
+<span class="sd">    the respective type of the input values. If there is no special function</span>
+<span class="sd">    for the data type of the input values, this function serves as a</span>
+<span class="sd">    &quot;catch-all&quot; function, returning a NotImplementedError.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;No equality check implemented for type </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="c1"># Dummy conditional so that a dummy return value can be defined to satisfy</span>
+    <span class="c1"># code linters that expect a return value.</span>
+    <span class="k">if</span> <span class="n">msg</span><span class="p">:</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<span class="nd">@are_equal</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">MyOrderedDict</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">MyOrderedDict</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check whether two MyOrderedDicts are equal.</span>
+
+<span class="sd">    Check whether OrderedDicts wrapped in the MyOrderedDicts contain the</span>
+<span class="sd">    same elementes and whether they are sorted in the same order.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : MyOrderedDict</span>
+<span class="sd">        The first MyOrderedDict to be compared.</span>
+
+<span class="sd">    other : MyOrderedDict</span>
+<span class="sd">        The second MyOrderedDict to be comparedl.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the MyOrderedDicts are equal, False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">my_dict</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">my_dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">first</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">first</span> <span class="ow">and</span> \
+                <span class="n">data</span><span class="o">.</span><span class="n">last</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">last</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="nd">@are_equal</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DatasetDict</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">DatasetDict</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check whether two DatasetDicts are equal.</span>
+
+<span class="sd">    Check whether two DatasetDicts contain the same number of subsets and</span>
+<span class="sd">    whether these are identical.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : DatasetDict</span>
+<span class="sd">        The first DatasetDict to be compared.</span>
+
+<span class="sd">    other : DatasetDict</span>
+<span class="sd">        The second DatasetDict to be comparedl.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the DatasetDict objects are equal, False otherwise.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        &gt;&gt;&gt; ex_data = DatasetDict({</span>
+<span class="sd">        ...     &quot;train&quot;: [1, 2, 3],</span>
+<span class="sd">        ...     &quot;test&quot;: [4, 5, 6]</span>
+<span class="sd">        ... })</span>
+<span class="sd">        &gt;&gt;&gt; ex_other = DatasetDict({</span>
+<span class="sd">        ...     &quot;train&quot;: [1, 2, 3],</span>
+<span class="sd">        ...     &quot;test&quot;: [4, 5, 6]</span>
+<span class="sd">        ... })</span>
+<span class="sd">        &gt;&gt;&gt; are_equal(ex_data, ex_other)</span>
+<span class="sd">        True</span>
+
+<span class="sd">        &gt;&gt;&gt; ex_data = DatasetDict({</span>
+<span class="sd">        ...     &quot;train&quot;: [1, 2, 3],</span>
+<span class="sd">        ...     &quot;test&quot;: [4, 5, 6]</span>
+<span class="sd">        ... })</span>
+<span class="sd">        &gt;&gt;&gt; ex_other = DatasetDict({</span>
+<span class="sd">        ...     &quot;train&quot;: [1, 2, 3],</span>
+<span class="sd">        ...     &quot;test&quot;: [4, 5, 7]</span>
+<span class="sd">        ... })</span>
+<span class="sd">        &gt;&gt;&gt; are_equal(ex_data, ex_other)</span>
+<span class="sd">        False</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># Deep check of all elements:</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+
+        <span class="c1"># Convert datasets to a dictionary of tuples for comparison.</span>
+        <span class="n">data1</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="n">other1</span> <span class="o">=</span> <span class="n">other</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+        <span class="c1"># An equality check of dictionaries compares all elements recursively,</span>
+        <span class="c1"># including their types:</span>
+        <span class="k">if</span> <span class="n">data1</span> <span class="o">!=</span> <span class="n">other1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mismatch found in subset: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="nd">@are_equal</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check whether two DataFrames are equal.</span>
+
+<span class="sd">    Check whether two DataFrames are identical.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : DataFrame</span>
+<span class="sd">        The first DataFrame to be compared.</span>
+
+<span class="sd">    other : DataFrame</span>
+<span class="sd">        The second DataFrame to be comparedl.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the DataFrames are equal, False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Basic equality check</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;DataFrames are not equal: </span><span class="si">%s</span><span class="s2"> vs. </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># More fine-grained check including data types</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">assert_frame_equal</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;DataFrames are identical&quot;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;DataFrames differ: </span><span class="si">%s</span><span class="s2"> vs. </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="_">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.data_comparison_utils._">[docs]</a>
+<span class="nd">@are_equal</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Series</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check whether two Series are equal.</span>
+
+<span class="sd">    Check whether two Series are identical.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Series</span>
+<span class="sd">        The first Series to be compared.</span>
+
+<span class="sd">    other : DataFrame</span>
+<span class="sd">        The second Series to be compared.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the Series are equal, False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Basic equality check</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Series are not equal: </span><span class="si">%s</span><span class="s2"> vs. </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># More fine-grained check including data types</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">assert_series_equal</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">check_names</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Series are identical&quot;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Series differ: </span><span class="si">%s</span><span class="s2"> vs. </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
