@@ -1,7 +1,7 @@
 ===================================
 SentimentAnalysis
 -----------------
-Version 1.0, updated on 2024-12-11
+Version 1.0, updated on 2025-05-07
 
 ===================================
 
@@ -22,6 +22,30 @@ SentimentAnalysis program will use this to authenticate you when it tries to
 retrieve sentiments from BLOOM.
 
 
+Running the SentimentAnalysis program
+=====================================
+1.  To run the SentimentAnalysis program from the command line, switch to the
+    SentimentAnalysis folder, open a command line interpreter and call the
+    sa module like this:
+
+    >>> python -m sa
+
+    You will be shown the module's documentation which will explain how to use
+    the module.
+
+2.  Other entry points that might be useful to call are:
+
+    >>> python -m src.data_sources.mad_tsc_workflow
+        This will load the MAD-TSC datasets, if they need to be loaded separately
+        from the rest of the program.
+
+    >>> python -m src.utils.sys_utils
+        This will print all system and python information made available in the
+        sys_utils module.
+
+3.  From an IDE like PyCharm, the main module may be used to run or debug the program.
+
+
 Special Coding Conventions Followed in This Program
 ===================================================
 
@@ -34,7 +58,6 @@ line, because this way, they can be easily added to or removed from the list,
 and be assorted by type hints without reaching the line length limit. One
 parameter per line makes it also easier to read and grasp which parameters
 are used.
-
 
 Method Names:
 -------------
