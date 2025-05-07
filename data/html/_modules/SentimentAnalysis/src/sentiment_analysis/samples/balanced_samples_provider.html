@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">balanced_samples_provider.py</span>
+<span class="sd">----------------------------</span>
+<span class="sd">Version 1.0, updated on 2025-01-11</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_dataframe_factory</span> <span class="kn">import</span> <span class="n">MyDataFrameFactory</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.samples.samples_provider</span> <span class="kn">import</span> <span class="n">SamplesProvider</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">src.sentiment_analysis.samples.samples_manager</span> <span class="kn">import</span> <span class="n">SamplesManager</span>
+
+
+<div class="viewcode-block" id="BalancedSamplesProvider">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.samples.html#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider">[docs]</a>
+<span class="k">class</span> <span class="nc">BalancedSamplesProvider</span><span class="p">(</span><span class="n">SamplesProvider</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    BalancedSamplesProvider class.</span>
+
+<span class="sd">    This class manages the balancing of samples to ensure uniform sentiment</span>
+<span class="sd">    distribution across samples.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    balanced_samples : Dict[str, src.data_structures.my_data_frame.MyDataFrame]</span>
+<span class="sd">        The balanced samples for all languages.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    get_samples(self)</span>
+<span class="sd">            -&gt; Dict[str, src.data_structures.my_data_frame.MyDataFrame]:</span>
+<span class="sd">        Retrieves and returns samples for sentiment analysis.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BalancedSamplesProvider.__init__">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.samples.html#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">samples_manager</span><span class="p">:</span> <span class="s2">&quot;SamplesManager&quot;</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes a new BalancedSamplesProvider instance with a</span>
+<span class="sd">        SamplesManager instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        samples_manager : SamplesManager</span>
+<span class="sd">            The SamplesManager instance that called the</span>
+<span class="sd">            BalancedSamplesProvider to delegate the retrieval of balanced</span>
+<span class="sd">            samples.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">samples_manager</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_balanced_samples</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">balanced_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MyDataFrame</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the balanced samples for all languages.</span>
+
+<span class="sd">        Returns the balanced samples for all languages that the LLM and the</span>
+<span class="sd">        data suite have in comman.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, MyDataFrame]:</span>
+<span class="sd">            The balanced samples, where the key is the language and the</span>
+<span class="sd">            value is a MyDataFrame object that contains a DataFrame with the</span>
+<span class="sd">            balanced samples for the language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_balanced_samples</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;No balanced samples found! Cannot proceed.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_balanced_samples</span>
+
+    <span class="nd">@balanced_samples</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">balanced_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MyDataFrame</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the balanced samples for all languages.</span>
+
+<span class="sd">        Sets the balanced samples for all languages that the LLM and the</span>
+<span class="sd">        data suite have in comman..</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        samples : Dict[str, MyDataFrame]</span>
+<span class="sd">            The balanced samples to set the property with, where the key is the</span>
+<span class="sd">            language and the value is the balanced samples for the respective</span>
+<span class="sd">            language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_balanced_samples</span> <span class="o">=</span> <span class="n">samples</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="BalancedSamplesProvider.get_samples">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.samples.html#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider.get_samples">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MyDataFrame</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the balanced samples for all languages.</span>
+
+<span class="sd">        Retrieves the balanced samples for all languages that the LLM and the</span>
+<span class="sd">        data suite have in comman, either by loading previously saved data</span>
+<span class="sd">        from disk or by creating balanced samples anew from the subsets of</span>
+<span class="sd">        the active data source suite.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, MyDataFrame]:</span>
+<span class="sd">            The unbalanced samples, where the key is the language and the</span>
+<span class="sd">            value is a MyDataFrame object that contains a DataFrame with the</span>
+<span class="sd">            unbalanced samples for the language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_balanced_samples</span><span class="p">():</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">balanced_samples</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_balanced_samples</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">samples</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+<div class="viewcode-block" id="BalancedSamplesProvider._load_balanced_samples">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.samples.html#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._load_balanced_samples">[docs]</a>
+    <span class="k">def</span> <span class="nf">_load_balanced_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads the balanced datasets for all languages if available.</span>
+
+<span class="sd">        Loads balanced datasets that have been saved to disk previously.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        To avoid the possibility of mixing language datasets with</span>
+<span class="sd">        different sample ids, loading is done for all languages concerned or</span>
+<span class="sd">        for none. If, for one language, no balanced samples can be found,</span>
+<span class="sd">        the loading is considered to have failed altogether and all files</span>
+<span class="sd">        will have to be re-created.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">balanced_samples</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MyDataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_balanced_samples</span><span class="p">):</span>
+
+            <span class="k">for</span> <span class="n">language</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_manager</span><span class="o">.</span><span class="n">languages</span><span class="p">:</span>
+                <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_balanced_samples_for_language</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">samples</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="n">balanced_samples</span><span class="p">[</span><span class="n">language</span><span class="p">]</span> <span class="o">=</span> <span class="n">samples</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">balanced_samples</span> <span class="o">=</span> <span class="n">balanced_samples</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="BalancedSamplesProvider._load_balanced_samples_for_language">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.samples.html#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._load_balanced_samples_for_language">[docs]</a>
+    <span class="k">def</span> <span class="nf">_load_balanced_samples_for_language</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads a balanced dataset for the specified language if available.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">            The language for which the dataset should be loaded.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            The balanced dataset loaded from disk.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If no data was found on disk, the Dataframe inside the</span>
+<span class="sd">        returned MyDataFrame object is empty. The caller should check if the</span>
+<span class="sd">        MyDataFrame contains data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">my_df</span> <span class="o">=</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_compose_dataset_name_for_language</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">my_df</span><span class="o">.</span><span class="n">can_load</span><span class="p">():</span>
+            <span class="n">my_df</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">my_df</span></div>
+
+
+<div class="viewcode-block" id="BalancedSamplesProvider._compose_dataset_name_for_language">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.samples.html#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._compose_dataset_name_for_language">[docs]</a>
+    <span class="k">def</span> <span class="nf">_compose_dataset_name_for_language</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a name for a language-specific balanced dataset.</span>
+
+<span class="sd">        Returns a name for the language-specific balanced dataset that is</span>
+<span class="sd">        beeing loaded or created.</span>
+
+<span class="sd">        Composes the name from the suite&#39;s name, the language and the number</span>
+<span class="sd">        of the balanced samples per language.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language :  str</span>
+<span class="sd">            The language of the language-specific dataset.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">man</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_manager</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">man</span><span class="o">.</span><span class="n">suite_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">language</span><span class="si">}</span><span class="s2">_balanced_</span><span class="si">{</span><span class="n">man</span><span class="o">.</span><span class="n">balance</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="BalancedSamplesProvider._create_balanced_samples">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.samples.html#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._create_balanced_samples">[docs]</a>
+    <span class="k">def</span> <span class="nf">_create_balanced_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MyDataFrame</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves or creates balanced samples datasets for all languages.</span>
+
+<span class="sd">        Retrieves balanced samples for the first language as the</span>
+<span class="sd">        reference, and then computes corresponding balanced samples for other</span>
+<span class="sd">        languages using this reference.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, MyDataFrame]</span>
+<span class="sd">            A dictionary with the balanced samples for all languages,</span>
+<span class="sd">            where the keys are the languages and the values are MyDataFrame</span>
+<span class="sd">            objects with the balanced samples for the corresponding languages.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Uses &#39;_get_reference_samples&#39; and &#39;_get_other_balanced_samples&#39; to</span>
+<span class="sd">        create or retrieve balanced datasets.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">languages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_manager</span><span class="o">.</span><span class="n">languages</span>
+        <span class="n">balanced_samples</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MyDataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># For the first language, get the balanced samples as reference samples</span>
+        <span class="n">reference_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_reference_samples</span><span class="p">(</span>
+            <span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">balanced_samples</span><span class="p">[</span><span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">reference_samples</span>
+
+        <span class="c1"># For all other languages, get the corresponding balanced samples</span>
+        <span class="k">for</span> <span class="n">language</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">other_balanced_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_other_balanced_samples</span><span class="p">(</span>
+                <span class="n">reference_samples</span><span class="p">,</span>
+                <span class="n">language</span>
+            <span class="p">)</span>
+            <span class="n">balanced_samples</span><span class="p">[</span><span class="n">language</span><span class="p">]</span> <span class="o">=</span> <span class="n">other_balanced_samples</span>
+
+        <span class="k">return</span> <span class="n">balanced_samples</span></div>
+
+
+<div class="viewcode-block" id="BalancedSamplesProvider._get_reference_samples">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.samples.html#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._get_reference_samples">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_reference_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a balanced sample MyDataFrame to use as reference samples.</span>
+
+<span class="sd">        Creates a balanced sample MyDataFrame with the specified number of</span>
+<span class="sd">        samples per sentiment category to use as reference samples</span>
+<span class="sd">        for the rest of the languages.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">            The language to get the reference samples from.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            The collection of reference samples in the given language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">man</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_manager</span>
+        <span class="n">n_samples_per_sentiment</span> <span class="o">=</span> <span class="n">man</span><span class="o">.</span><span class="n">balance</span>
+
+        <span class="n">my_df</span> <span class="o">=</span> <span class="n">man</span><span class="o">.</span><span class="n">unbalanced_samples</span><span class="p">[</span><span class="n">language</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># Replace the numerical sentiment values by textual labels</span>
+       <span class="c1"># my_df.df = normalize_polarities(my_df.df)</span>
+
+        <span class="c1"># Create an empty list for sentiment-specific MyDataFrames</span>
+        <span class="n">sentiment_specific_my_dfs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Iterate through the list of different sentiment labels:</span>
+        <span class="n">sentiments</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;positive&#39;</span><span class="p">,</span> <span class="s1">&#39;negative&#39;</span><span class="p">,</span> <span class="s1">&#39;neutral&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">sentiment</span> <span class="ow">in</span> <span class="n">sentiments</span><span class="p">:</span>
+            <span class="c1"># Get all rows with the given sentiment</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_by_sentiment</span><span class="p">(</span>
+                <span class="n">my_df</span><span class="p">,</span> <span class="n">sentiment</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Reduce the number of rows to the target number of samples per</span>
+            <span class="c1"># sentinment</span>
+            <span class="n">filtered_and_reduced</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_to_max_n_rows</span><span class="p">(</span>
+                <span class="n">filtered</span><span class="p">,</span> <span class="n">n_samples_per_sentiment</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Add the sentiment-specific samples to the list of</span>
+            <span class="c1"># sentiment-specific MyDataFrames</span>
+            <span class="n">sentiment_specific_my_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">filtered_and_reduced</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Join the 3 sentiment-specific MyDataFrames in one MyDataFrame</span>
+        <span class="n">balanced_my_df</span> <span class="o">=</span> <span class="n">sentiment_specific_my_dfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">do_with_row</span><span class="p">(</span>
+            <span class="s1">&#39;join&#39;</span><span class="p">,</span>
+            <span class="n">my_df_lst</span><span class="o">=</span><span class="n">sentiment_specific_my_dfs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="p">)</span>
+        <span class="c1"># Shuffle the samples in the resulting MyDataFrame</span>
+        <span class="n">balanced_my_df</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">balanced_my_df</span><span class="o">.</span><span class="n">do_with_row</span><span class="p">(</span><span class="s1">&#39;shuffle&#39;</span><span class="p">)</span>
+        <span class="n">balanced_my_df</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_dataset_name_for_language</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+        <span class="n">balanced_my_df</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">balanced_my_df</span></div>
+
+
+<div class="viewcode-block" id="BalancedSamplesProvider._get_other_balanced_samples">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.samples.html#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._get_other_balanced_samples">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_other_balanced_samples</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">reference_samples</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a balanced sample MyDataFrame based on an existing MyDataFrame.</span>
+
+<span class="sd">        Given a reference MyDataFrame in one language, another MyDataFrame</span>
+<span class="sd">        ist extracted from a data subset in another language, basing the</span>
+<span class="sd">        choice of rows on the indices of the reference MyDataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        reference_samples : MyDataFrame</span>
+<span class="sd">            The reference sample MyDataFrame to base the balance on.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            A balanced sample DataFrame with the same distribution as the</span>
+<span class="sd">            reference.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">man</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples_manager</span>
+
+        <span class="n">my_df</span> <span class="o">=</span> <span class="n">man</span><span class="o">.</span><span class="n">unbalanced_samples</span><span class="p">[</span><span class="n">language</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">my_df</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">my_df</span><span class="o">.</span><span class="n">do_with_row</span><span class="p">(</span>
+            <span class="s1">&#39;extract_rows_by_other_indices&#39;</span><span class="p">,</span>
+            <span class="n">other</span><span class="o">=</span><span class="n">reference_samples</span>
+        <span class="p">)</span>
+
+        <span class="n">my_df</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_dataset_name_for_language</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+
+        <span class="n">my_df</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">my_df</span></div>
+
+
+<div class="viewcode-block" id="BalancedSamplesProvider._reduce_to_max_n_rows">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.samples.html#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._reduce_to_max_n_rows">[docs]</a>
+    <span class="k">def</span> <span class="nf">_reduce_to_max_n_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">my_df</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">,</span> <span class="n">max_n_rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reduces the MyDataFrame to a specified maximum number of rows.</span>
+
+<span class="sd">        Reduces the DataFrame in the MyDataFrame to a specified maximum</span>
+<span class="sd">        number of rows.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        my_df : MyDataFrame</span>
+<span class="sd">           MyDataFrame containing the DataFrame to reduce.</span>
+
+<span class="sd">        max_n_rows : int</span>
+<span class="sd">           Maximum number of rows to retain.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">           The MyDataFrame with reduced DataFrame.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">local_my_df</span> <span class="o">=</span> <span class="n">my_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">local_my_df</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">local_my_df</span><span class="o">.</span><span class="n">do_with_row</span><span class="p">(</span>
+            <span class="s1">&#39;reduce_n_rows&#39;</span><span class="p">,</span>
+            <span class="n">max_n_rows</span><span class="o">=</span><span class="n">max_n_rows</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">local_my_df</span></div>
+
+
+<div class="viewcode-block" id="BalancedSamplesProvider._filter_by_sentiment">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.samples.html#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._filter_by_sentiment">[docs]</a>
+    <span class="k">def</span> <span class="nf">_filter_by_sentiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">my_df</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">,</span> <span class="n">sentiment</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts the rows with the given sentiment from all samples.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        my_df : MyDataFrame</span>
+<span class="sd">            A MyDataFrame with all sentiment-labeled samples.</span>
+
+<span class="sd">        sentiment : str</span>
+<span class="sd">            Sentiment by which to filter the MyDataFrame.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            The extracted sentiment-specific samples, in random order.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">local_my_df</span> <span class="o">=</span> <span class="n">my_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">local_my_df</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">local_my_df</span><span class="o">.</span><span class="n">do_with_row</span><span class="p">(</span>
+            <span class="s1">&#39;extract_rows_by_col_value&#39;</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="o">=</span><span class="s1">&#39;polarity&#39;</span><span class="p">,</span>
+            <span class="n">col_value</span><span class="o">=</span><span class="n">sentiment</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">local_my_df</span></div>
+
+
+<div class="viewcode-block" id="BalancedSamplesProvider._shuffle">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.samples.html#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider._shuffle">[docs]</a>
+    <span class="k">def</span> <span class="nf">_shuffle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">my_df</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Randomly shuffles the rows in the DataFrame in the MyDataFrame object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        my_df : MyDataFrame</span>
+<span class="sd">            MyDataFrame with the DataFrame to shuffle.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            The MyDataFrame with the shuffled DataFrame.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">local_my_df</span> <span class="o">=</span> <span class="n">my_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># Order the rows randomly</span>
+        <span class="n">local_my_df</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">local_my_df</span><span class="o">.</span><span class="n">do_with_row</span><span class="p">(</span><span class="s1">&#39;shuffle&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">local_my_df</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

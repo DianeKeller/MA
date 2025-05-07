@@ -1,0 +1,6 @@
+<map id="inheritance0ebb468371" name="inheritance0ebb468371">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="21,5,93,31"/>
+<area shape="rect" id="node3" title="SamplesProvider class." alt="" coords="157,31,288,56"/>
+<area shape="rect" id="node2" href="#SentimentAnalysis.src.sentiment_analysis.samples.balanced_samples_provider.BalancedSamplesProvider" target="_top" title="BalancedSamplesProvider class." alt="" coords="336,31,525,56"/>
+<area shape="rect" id="node4" title="LoggingMixin class." alt="" coords="5,55,109,80"/>
+</map>

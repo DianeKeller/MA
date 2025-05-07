@@ -6,6 +6,12 @@ Version 1.0, updated on 2025-05-06
 """
 
 from action import Action
+from src.sentiment_analysis.serverless_bloom_workflow import \
+    ServerlessBloomWorkflow
+
+# The ServerlessBloomWorkflow initiates the config with default settings
+# for the needs of the serverless use of BLOOM
+wf = ServerlessBloomWorkflow()
 
 
 def run_prototype(strategy_nr, action: Action, **kwargs) \

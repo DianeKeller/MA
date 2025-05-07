@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.utils.time_utils &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.utils.time_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.utils.time_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">time_utils.py</span>
+<span class="sd">---------</span>
+<span class="sd">Version 1.0, updated on 2024-09-12</span>
+
+<span class="sd">This module provides utility functions for managing and recording</span>
+<span class="sd">time and durations. It includes methods to start and stop time</span>
+<span class="sd">tracking, compute elapsed time in hours, minutes and seconds, and log</span>
+<span class="sd">or print this information. It also provides functionality to give audible</span>
+<span class="sd">notifications in case of significant time delays.</span>
+
+<span class="sd">Functions</span>
+<span class="sd">---------</span>
+<span class="sd">current_date_time() -&gt; str:</span>
+<span class="sd">    Returns the current date and time in a YYYY-MM-DD_HHhMM string format.</span>
+
+<span class="sd">trace() -&gt; None:</span>
+<span class="sd">    Prints information about the function that called the current function.</span>
+
+<span class="sd">beep() -&gt; None:</span>
+<span class="sd">    Plays a beep sound to notify users.</span>
+
+<span class="sd">time_in_hours_minutes_and_seconds(my_time: float) -&gt; str:</span>
+<span class="sd">    Converts the seconds of a time duration into hours, minutes and seconds.</span>
+
+<span class="sd">hours(n_hours: int) -&gt; str:</span>
+<span class="sd">    Returns the singular or plural form of &quot;hour&quot; depending on the input value.</span>
+
+<span class="sd">begin(descr: str = &#39;&#39;) -&gt; Tuple[float, str]:</span>
+<span class="sd">    Starts time recording and displays the start time.</span>
+
+<span class="sd">seconds(n_seconds: float, n_decimal_places: int = 0) -&gt; str:</span>
+<span class="sd">    Returns the singular or plural form of &quot;second&quot; depending on n_seconds.</span>
+
+<span class="sd">minutes(n_minutes: int) -&gt; str:</span>
+<span class="sd">    Returns the singular or plural form of &quot;minute&quot; depending on n_minutes.</span>
+
+<span class="sd">end(start: Tuple[float, str], custom_log=False) -&gt; Tuple[float, str]:</span>
+<span class="sd">    Stops time recording, displays the elapsed time and optionally logs it.</span>
+
+<span class="sd">See Also</span>
+<span class="sd">--------</span>
+<span class="sd">&#39;Duration&#39; decorator in the time_decorators module.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">floor</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">winsound</span>
+
+<span class="kn">from</span> <span class="nn">src.utils.print_utils</span> <span class="kn">import</span> <span class="n">SEPARATOR</span><span class="p">,</span> <span class="n">print_double_line</span>
+
+<span class="n">SIGNIFICANT_WAITING_TIME</span> <span class="o">=</span> <span class="mi">60</span>  <span class="c1"># seconds</span>
+<span class="n">FREQUENCY</span> <span class="o">=</span> <span class="mi">200</span>  <span class="c1"># Hertz</span>
+<span class="n">BEEP_DURATION</span> <span class="o">=</span> <span class="mi">300</span>  <span class="c1"># milliseconds</span>
+
+
+<div class="viewcode-block" id="hours">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.time_utils.hours">[docs]</a>
+<span class="k">def</span> <span class="nf">hours</span><span class="p">(</span><span class="n">n_hours</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the singular or plural form of &quot;hour&quot; depending on the input value.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_hours : int</span>
+<span class="sd">       The number of hours.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">       &quot;hour&quot; if n_hours is 1, &quot;hours&quot; otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">n_hours</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;hour&#39;</span>
+
+    <span class="k">return</span> <span class="s1">&#39;hours&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="beep">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.time_utils.beep">[docs]</a>
+<span class="k">def</span> <span class="nf">beep</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plays a beep sound to notify users.</span>
+
+<span class="sd">    The sound is played for a short duration with the frequency and</span>
+<span class="sd">    duration set by constants at the top of this module. It can be used to</span>
+<span class="sd">    signal significant waiting times or task completion.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">winsound</span><span class="o">.</span><span class="n">Beep</span><span class="p">(</span><span class="n">FREQUENCY</span><span class="p">,</span> <span class="n">BEEP_DURATION</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="begin">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.time_utils.begin">[docs]</a>
+<span class="k">def</span> <span class="nf">begin</span><span class="p">(</span><span class="n">descr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Starts time recording and displays the start time.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    descr : str, optional</span>
+<span class="sd">        A description of the task to display alongside the start time.</span>
+<span class="sd">        Default is an empty string.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[float, str]</span>
+<span class="sd">        A tuple containing the start time and the description.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="n">descr</span><span class="p">)</span>
+
+    <span class="c1"># Print current date and time</span>
+    <span class="k">if</span> <span class="n">descr</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Started (</span><span class="si">{</span><span class="n">descr</span><span class="si">}</span><span class="s1">): </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">.%m.%Y %H:%M:%S&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">...&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Started: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">.%m.%Y %H:%M:%S&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">...&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">start</span></div>
+
+
+
+<div class="viewcode-block" id="end">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.time_utils.end">[docs]</a>
+<span class="k">def</span> <span class="nf">end</span><span class="p">(</span><span class="n">start</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">custom_log</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stops time recording, displays the elapsed time and optionally logs it.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    start : Tuple[float, str]</span>
+<span class="sd">        Tuple with the start time and a description.</span>
+
+<span class="sd">    custom_log : bool</span>
+<span class="sd">        If True, this method will not output any logging message. Instead, it</span>
+<span class="sd">        is left to the caller to output a custom logging message using the</span>
+<span class="sd">        return value. If False, this method will log a standard logging</span>
+<span class="sd">        message. Default is False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[float, str]</span>
+<span class="sd">        A tuple with the elapsed seconds and a formatted string, with the</span>
+<span class="sd">        elapsed time in hours, minutes, and seconds, that can be used for</span>
+<span class="sd">        logging.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">my_start</span><span class="p">,</span> <span class="n">descr</span> <span class="o">=</span> <span class="n">start</span>
+    <span class="n">my_end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">elapsed_seconds</span> <span class="o">=</span> <span class="n">my_end</span> <span class="o">-</span> <span class="n">my_start</span>
+    <span class="n">elapsed_time_str</span> <span class="o">=</span> <span class="n">time_in_hours_minutes_and_seconds</span><span class="p">(</span><span class="n">elapsed_seconds</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">custom_log</span><span class="p">:</span>
+        <span class="n">print_double_line</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">SEPARATOR</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">descr</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Duration (</span><span class="si">{</span><span class="n">descr</span><span class="si">}</span><span class="s1">): </span><span class="si">{</span><span class="n">elapsed_time_str</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Duration: </span><span class="si">{</span><span class="n">elapsed_time_str</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">print_double_line</span><span class="p">()</span>
+
+        <span class="c1"># Only beep if there was significant waiting time.</span>
+        <span class="k">if</span> <span class="n">elapsed_seconds</span> <span class="o">&gt;</span> <span class="n">SIGNIFICANT_WAITING_TIME</span><span class="p">:</span>
+            <span class="n">beep</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">elapsed_seconds</span><span class="p">,</span> <span class="n">elapsed_time_str</span></div>
+
+
+
+<div class="viewcode-block" id="time_in_hours_minutes_and_seconds">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.time_utils.time_in_hours_minutes_and_seconds">[docs]</a>
+<span class="k">def</span> <span class="nf">time_in_hours_minutes_and_seconds</span><span class="p">(</span><span class="n">my_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts the seconds of a time duration into hours, minutes and seconds.</span>
+
+<span class="sd">    Converts a time duration in seconds into a string detailing hours, minutes</span>
+<span class="sd">    and seconds.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    my_time : float</span>
+<span class="sd">        The time in seconds to convert.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The time formatted in hours, minutes, and seconds.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">elapsed_time</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">elapsed_seconds</span> <span class="o">=</span> <span class="n">my_time</span>
+    <span class="k">if</span> <span class="n">my_time</span> <span class="o">&gt;</span> <span class="mi">60</span><span class="p">:</span>
+        <span class="n">elapsed_minutes</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">my_time</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="n">elapsed_seconds</span> <span class="o">=</span> <span class="n">my_time</span> <span class="o">%</span> <span class="mi">60</span>
+        <span class="k">if</span> <span class="n">elapsed_minutes</span> <span class="o">&gt;</span> <span class="mi">60</span><span class="p">:</span>
+            <span class="n">elapsed_hours</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">elapsed_minutes</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span>
+            <span class="n">elapsed_minutes</span> <span class="o">%=</span> <span class="mi">60</span>
+            <span class="n">elapsed_time</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">elapsed_hours</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">hours</span><span class="p">(</span><span class="n">elapsed_hours</span><span class="p">)</span><span class="si">}</span><span class="s1">, &#39;</span>
+        <span class="n">elapsed_time</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">elapsed_minutes</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">minutes</span><span class="p">(</span><span class="n">elapsed_minutes</span><span class="p">)</span><span class="si">}</span><span class="s1">, &#39;</span>
+    <span class="k">if</span> <span class="n">my_time</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">elapsed_time</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;%2.4f &#39;</span>
+                         <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">seconds</span><span class="p">(</span><span class="n">elapsed_seconds</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+                         <span class="p">)</span> <span class="o">%</span> <span class="n">elapsed_seconds</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">elapsed_time</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;%2.0f &#39;</span>
+                         <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">seconds</span><span class="p">(</span><span class="n">elapsed_seconds</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+                         <span class="p">)</span> <span class="o">%</span> <span class="n">elapsed_seconds</span>
+
+    <span class="k">return</span> <span class="n">elapsed_time</span></div>
+
+
+
+<div class="viewcode-block" id="minutes">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.time_utils.minutes">[docs]</a>
+<span class="k">def</span> <span class="nf">minutes</span><span class="p">(</span><span class="n">n_minutes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the singular or plural form of &quot;minute&quot; depending on n_minutes.</span>
+
+<span class="sd">    Returns the singular or plural form of &quot;minute&quot; depending on the</span>
+<span class="sd">    given number of minutes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_minutes : int</span>
+<span class="sd">        The number of minutes.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        &quot;minute&quot; if n_minutes is 1, &quot;minutes&quot; otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">n_minutes</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;minute&#39;</span>
+
+    <span class="k">return</span> <span class="s1">&#39;minutes&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="seconds">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.time_utils.seconds">[docs]</a>
+<span class="k">def</span> <span class="nf">seconds</span><span class="p">(</span><span class="n">n_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">n_decimal_places</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the singular or plural form of &quot;second&quot; depending on n_seconds.</span>
+
+<span class="sd">    Returns the singular or plural form of &quot;second&quot; depending on the number</span>
+<span class="sd">    of seconds.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_seconds : float</span>
+<span class="sd">        The number of seconds.</span>
+
+<span class="sd">    n_decimal_places : int, optional</span>
+<span class="sd">        The number of decimal places to round the seconds to, by default 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        &quot;second&quot; if n_seconds rounds to 1, &quot;seconds&quot; otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">round</span><span class="p">(</span><span class="n">n_seconds</span><span class="p">,</span> <span class="n">n_decimal_places</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;second&#39;</span>
+
+    <span class="k">return</span> <span class="s1">&#39;seconds&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="current_date_time">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.time_utils.current_date_time">[docs]</a>
+<span class="k">def</span> <span class="nf">current_date_time</span><span class="p">()</span> \
+        <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the current date and time in a YYYY-MM-DD_HHhMM string format.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The formatted current date and time.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">_%Hh%M&quot;</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="trace">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.time_utils.trace">[docs]</a>
+<span class="k">def</span> <span class="nf">trace</span><span class="p">()</span> \
+        <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prints information about the function that called the current function.</span>
+
+<span class="sd">    Prints the following information:</span>
+
+<span class="sd">    - File name of the calling function</span>
+<span class="sd">    - Line number of the calling function</span>
+<span class="sd">    - Method name of the calling function</span>
+<span class="sd">    - Code calling the current function</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">linenumber</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">call</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2"> Called from: </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">linenumber</span><span class="si">}</span><span class="s2">, </span><span class="se">\n</span><span class="s2">&quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2"> calling method:</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">, </span><span class="se">\n</span><span class="s2">&quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2"> call: </span><span class="si">{</span><span class="n">call</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

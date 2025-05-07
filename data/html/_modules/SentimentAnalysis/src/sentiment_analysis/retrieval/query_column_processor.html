@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">query_column_processor.py</span>
+<span class="sd">-------------------------</span>
+<span class="sd">Version 1.0, updated on 2024-12-25</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">floor</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.checkpoint_mixin</span> <span class="kn">import</span> <span class="n">CheckpointMixin</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_dataframe_factory</span> <span class="kn">import</span> <span class="n">MyDataFrameFactory</span>
+<span class="kn">from</span> <span class="nn">src.decorators.data_check_decorators</span> <span class="kn">import</span> <span class="n">parameters_not_empty</span>
+<span class="kn">from</span> <span class="nn">src.decorators.type_check_decorators</span> <span class="kn">import</span> <span class="n">enforce_input_types</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ChunkFinishedException</span><span class="p">,</span>
+    <span class="n">PromptInvalidException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.query_processor</span> <span class="kn">import</span> <span class="n">QueryProcessor</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_analysis_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SentimentAnalysisConfig</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.user_interaction_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ask_continue_without_saving</span><span class="p">,</span>
+    <span class="n">ask_save_and_continue</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="QueryColumnProcessor">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor">[docs]</a>
+<span class="k">class</span> <span class="nc">QueryColumnProcessor</span><span class="p">(</span><span class="n">LoggingMixin</span><span class="p">,</span> <span class="n">CheckpointMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    QueryColumnProcessor class.</span>
+
+<span class="sd">    This class handles query columns in batches, managing checkpoints,</span>
+<span class="sd">    validating prompts, and saving results. It supports robust handling</span>
+<span class="sd">    of interruptions and allows users to control how to proceed in case of</span>
+<span class="sd">    errors or invalid query results.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    answers_collection : set</span>
+<span class="sd">        A set to collect unique answers from processed queries, used to</span>
+<span class="sd">        validate prompts.</span>
+
+<span class="sd">    can_save : bool</span>
+<span class="sd">        Indicates whether the current results can be saved.</span>
+
+<span class="sd">    checkpoint : Checkpoint</span>
+<span class="sd">        The checkpoint.</span>
+
+<span class="sd">    chunk_size : int</span>
+<span class="sd">        The size of the chunk (i.e. the number of query columns), according to</span>
+<span class="sd">        the sentiment analysis configuration.</span>
+
+<span class="sd">    chunk_start_at_query_col_nr : int</span>
+<span class="sd">        The query column number with which to start a chunk.</span>
+
+<span class="sd">    config : SentimentAnalysisConfig</span>
+<span class="sd">        Configuration settings for the sentiment analysis.</span>
+
+<span class="sd">    language : str</span>
+<span class="sd">        The language code corresponding to the language of the samples to</span>
+<span class="sd">        process.</span>
+
+<span class="sd">    query_counter : int</span>
+<span class="sd">        Class-level counter to track the number of queries processed</span>
+<span class="sd">        across all instances.</span>
+
+<span class="sd">    samples : MyDataFrame</span>
+<span class="sd">        A MyDataFrame with the samples whose query columns to process.</span>
+
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    load_samples() -&gt; None:</span>
+<span class="sd">        Loads the samples if they are not already loaded.</span>
+
+<span class="sd">    process_query(payload: Dict[str, str]) -&gt; str | int:</span>
+<span class="sd">        No description available.</span>
+
+<span class="sd">    process_query_column(query_col_nr: int) -&gt; None:</span>
+<span class="sd">        Processes the specified query column.</span>
+
+<span class="sd">    process_query_columns() -&gt; None:</span>
+<span class="sd">        Processes the different query types in a chunk.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Query counter (class variable).</span>
+
+<span class="sd">    Use as &quot;QueryColumnProcessor.query_counter&quot; to keep it alive across</span>
+<span class="sd">    different instances of this class. This enables the user to see how many</span>
+<span class="sd">    queries in a row are sent to the LLM&#39;s API.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">query_counter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Used to keep track of the number of queries processed in a given query</span>
+    <span class="c1"># column.</span>
+    <span class="n">prompt_specific_query_counter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="QueryColumnProcessor.__init__">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor.__init__">[docs]</a>
+    <span class="nd">@parameters_not_empty</span><span class="p">()</span>
+    <span class="nd">@enforce_input_types</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">language</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">samples</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">,</span>
+            <span class="n">chunk_start_at_query_col_nr</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the QueryColumnProcessor with the specified parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">           Language code.</span>
+
+<span class="sd">        samples : MyDataFrame</span>
+<span class="sd">            The MyDataFrame with the samples whose query columns to process.</span>
+
+<span class="sd">        chunk_start_at_query_col_nr : int</span>
+<span class="sd">            Defines the query column number with which to start a chunk.</span>
+<span class="sd">            This number is needed to set the corresponding checkpoint and to</span>
+<span class="sd">            calculate the end of the range needed to iterate through the query</span>
+<span class="sd">            columns in the process_query_columns method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Initialize checkpoint with start query column number:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunk_start_at_query_col_nr</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">chunk_start_at_query_col_nr</span>
+
+        <span class="n">CheckpointMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">element_type</span><span class="o">=</span><span class="s2">&quot;batch&quot;</span><span class="p">,</span>
+            <span class="n">checkpoint_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">samples</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_query_col_checkpoint&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_checkpoint</span><span class="p">(</span><span class="n">chunk_start_at_query_col_nr</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">:</span> <span class="n">MyDataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">language</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span>
+
+        <span class="c1"># Configs used in this class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SentimentAnalysisConfig</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">)</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set to collect the different types of answers. </span>
+
+<span class="sd">        The number of collected items in this set enables to check the validity</span>
+<span class="sd">        of the prompt in the query column. The number of different </span>
+<span class="sd">        answers should be 3 (&#39;positive&#39;, &#39;negative&#39; and &#39;neutral&#39;). If this is</span>
+<span class="sd">        not the case after a sufficient amount of rows has been treated, </span>
+<span class="sd">        the prompt is rejected as invalid.  </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">answers_collection</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_chunk_nr</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">can_save</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">samples</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the samples to process in batches.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span>
+
+    <span class="nd">@samples</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the samples to process in batches.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="n">samples</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="QueryColumnProcessor.process_query_columns">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor.process_query_columns">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_query_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes the different query types in a chunk.</span>
+
+<span class="sd">        Creates a checkpoint at the end of each processed query type so that</span>
+<span class="sd">        the program can resume after an interruption where it left off.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">query_col_nr</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_start_query_col_nr</span><span class="p">(),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chunk_start_at_query_col_nr</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span>
+        <span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">can_save</span> <span class="o">=</span> <span class="kc">False</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_reset_answers_collection</span><span class="p">()</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">process_query_column</span><span class="p">(</span><span class="n">query_col_nr</span><span class="p">)</span>
+
+                <span class="c1"># After the current query type has been processed and</span>
+                <span class="c1"># saved successfully, the next query type number to start with</span>
+                <span class="c1"># is written into the checkpoint file.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_checkpoint</span><span class="p">(</span><span class="n">query_col_nr</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="n">ChunkFinishedException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Going to proceed with chunk </span><span class="si">%d</span><span class="s2"> ...&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_current_chunk_nr</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ChunkFinishedException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="c1"># Log and handle unexpected errors</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Error processing query column </span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">query_col_nr</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+                <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="QueryColumnProcessor.process_query_column">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor.process_query_column">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_query_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_col_nr</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes the specified query column.</span>
+
+<span class="sd">        Processes the specified query column by applying the query logic</span>
+<span class="sd">        to each row.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        query_col_nr : int</span>
+<span class="sd">            The number of the query column.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        PromptInvalidException</span>
+<span class="sd">            If the prompt in the column is deemed invalid.</span>
+
+<span class="sd">        ChunkFinishedException</span>
+<span class="sd">            If the &quot;try&quot; block raises a KeyError because all rows in the chunk</span>
+<span class="sd">            have been processed.</span>
+
+<span class="sd">        KeyError</span>
+<span class="sd">            If the specified column does not exist in the DataFrame.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="o">.</span><span class="n">df</span>
+        <span class="n">nr</span> <span class="o">=</span> <span class="n">query_col_nr</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Processing query column </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">nr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Apply the query method to each row in the DataFrame</span>
+            <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;answer_</span><span class="si">{</span><span class="n">nr</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">process_query</span><span class="p">({</span><span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;query_</span><span class="si">{</span><span class="n">nr</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]})</span>
+                <span class="p">),</span>
+                <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_report_failed_answers</span><span class="p">(</span><span class="n">query_col_nr</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_col_result</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">query_col_nr</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">PromptInvalidException</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Processing stopped for query column </span><span class="si">%d</span><span class="s2"> due to invalid &quot;</span>
+                   <span class="s2">&quot;prompt.&quot;</span> <span class="o">%</span> <span class="n">query_col_nr</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_current_chunk_nr</span><span class="p">(</span><span class="n">nr</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;All prompts of chunk </span><span class="si">%d</span><span class="s2"> processed!&quot;</span> <span class="o">%</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">_current_chunk_nr</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ChunkFinishedException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Unexpected error occured while processing the queries: &quot;</span>
+                   <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="QueryColumnProcessor.process_query">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor.process_query">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes a single query payload using the QueryProcessor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        payload : Dict[str, str]</span>
+<span class="sd">            The input data for the query.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str | int</span>
+<span class="sd">            The response from the QueryProcessor.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        PromptInvalidException</span>
+<span class="sd">            If the query is invalid when validation is performed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">query_processor</span> <span class="o">=</span> <span class="n">QueryProcessor</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="n">query_processor</span><span class="o">.</span><span class="n">process_query</span><span class="p">()</span>
+
+        <span class="c1"># Try to add the answer to the set of answers. If it is not</span>
+        <span class="c1"># contained in the set yet, it will be added.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">answers_collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_keep_track</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">answer</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+<div class="viewcode-block" id="QueryColumnProcessor._set_current_chunk_nr">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor._set_current_chunk_nr">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_current_chunk_nr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_col_nr</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the current chunk number based on the query column number.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        query_col_nr : int</span>
+<span class="sd">            The current query column number.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_chunk_nr</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">query_col_nr</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QueryColumnProcessor._keep_track">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor._keep_track">[docs]</a>
+    <span class="k">def</span> <span class="nf">_keep_track</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Outputs the number of the currently processed query in the console.</span>
+
+<span class="sd">        If validation is required (&#39;with_validation&#39; parameter in</span>
+<span class="sd">        SentimentAnalysisConfig is set to True), checks the validity of the</span>
+<span class="sd">        prompt used in the query column and stops the execution of</span>
+<span class="sd">        the query column processor if the prompt is revealed to be</span>
+<span class="sd">        invalid.</span>
+
+<span class="sd">        The prompt is esteemed to be invalid if, after a given amount</span>
+<span class="sd">        of processed rows, the number of different answers in the answers</span>
+<span class="sd">        set of the class is insufficient:</span>
+<span class="sd">            - only one answer type after 50 rows</span>
+<span class="sd">            - only two answer types after 100 rows</span>
+
+<span class="sd">        In case the prompt is found to be invalid, its answers are</span>
+<span class="sd">        not saved to the DataFrame.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        PromptInvalidException</span>
+<span class="sd">            If validation is required and the prompt is found to be</span>
+<span class="sd">            invalid.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The _validate_batch_result and the _validate_half_batch methods only</span>
+<span class="sd">        perform validation attempts if self.config.get(&#39;with_validation&#39;) is</span>
+<span class="sd">        set to True.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;batch_size&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_query_counter</span><span class="p">()</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">QueryColumnProcessor</span><span class="o">.</span><span class="n">query_counter</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">QueryColumnProcessor</span><span class="o">.</span><span class="n">prompt_specific_query_counter</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">%</span> <span class="n">batch_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="si">}</span><span class="s2"> completed&quot;</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_validate_batch_result</span><span class="p">()</span>
+                <span class="n">QueryColumnProcessor</span><span class="o">.</span><span class="n">prompt_specific_query_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">except</span> <span class="n">PromptInvalidException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">QueryColumnProcessor</span><span class="o">.</span><span class="n">prompt_specific_query_counter</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">raise</span> <span class="n">PromptInvalidException</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+
+        <span class="k">if</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">m</span> <span class="o">%</span> <span class="mi">1000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1000</span><span class="p">)</span><span class="si">}</span><span class="s2"> k completed!&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">50</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_validate_half_batch</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">PromptInvalidException</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PromptInvalidException</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">answers_collection</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Probably invalid query!&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QueryColumnProcessor._validate_half_batch">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor._validate_half_batch">[docs]</a>
+    <span class="k">def</span> <span class="nf">_validate_half_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks the validity of the prompt half-way through the batch.</span>
+
+<span class="sd">        If validation is required, the batch results are verified in mid-batch.</span>
+<span class="sd">        Results must have produced at least two different sentiment </span>
+<span class="sd">        classes. Otherwise, the prompt is discarded.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        PromptInvalidException</span>
+<span class="sd">            If validation is required and the prompt is found to be</span>
+<span class="sd">            invalid.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The check in this method takes into account that answers may also be</span>
+<span class="sd">        empty strings if no sentiment could be extracted from the LLM&#39;s</span>
+<span class="sd">        response. If the answers include empty strings, the required number of</span>
+<span class="sd">        answer categories must be increased by one</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;with_validation&#39;</span><span class="p">):</span>
+
+            <span class="n">threshold</span> <span class="o">=</span> <span class="mi">2</span>
+
+            <span class="c1"># If empty strings are included in the answers: require at least</span>
+            <span class="c1"># 3 different answers (increase the threshold by 1) </span>
+            <span class="k">if</span> <span class="s2">&quot;&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">answers_collection</span><span class="p">:</span>
+                <span class="n">threshold</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">answers_collection</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">threshold</span><span class="p">:</span>
+                <span class="n">lst</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">answers_collection</span><span class="p">)</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;Prompt is invalid as it only produces &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lst</span><span class="si">}</span><span class="s2"> answers! &quot;</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+                <span class="c1"># Skip the rest of the rows</span>
+                <span class="n">QueryColumnProcessor</span><span class="o">.</span><span class="n">query_counter</span> <span class="o">+=</span> <span class="mi">50</span>
+
+                <span class="k">raise</span> <span class="n">PromptInvalidException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QueryColumnProcessor._validate_batch_result">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor._validate_batch_result">[docs]</a>
+    <span class="k">def</span> <span class="nf">_validate_batch_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks the validity of the prompt at the end of the batch.</span>
+
+<span class="sd">        If validation is required, the batch results are verified.</span>
+<span class="sd">        Results must have produced all three different sentiment</span>
+<span class="sd">        classes. Otherwise, the prompt is discarded.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        PromptInvalidException</span>
+<span class="sd">            If validation is required and the prompt is found to be</span>
+<span class="sd">            invalid.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The check in this method takes into account that answers may also be</span>
+<span class="sd">        empty strings if no sentiment could be extracted from the LLM&#39;s</span>
+<span class="sd">        response. If the answers include empty strings, the required number of</span>
+<span class="sd">        answer categories must be increased by one.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;with_validation&#39;</span><span class="p">):</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="mi">3</span>
+
+            <span class="c1"># If empty strings are included in the answers: require at least</span>
+            <span class="c1"># 4 different answers (increase the threshold by 1)</span>
+            <span class="k">if</span> <span class="s2">&quot;&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">answers_collection</span><span class="p">:</span>
+                <span class="n">threshold</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">answers_collection</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">threshold</span><span class="p">:</span>
+                <span class="n">lst</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">answers_collection</span><span class="p">)</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;Prompt is invalid as it only produces &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lst</span><span class="si">}</span><span class="s2"> answers! &quot;</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">PromptInvalidException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QueryColumnProcessor._update_query_counter">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor._update_query_counter">[docs]</a>
+    <span class="k">def</span> <span class="nf">_update_query_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Increments the query counters by 1.</span>
+
+<span class="sd">        Increments the query counters by 1 and outputs the overall</span>
+<span class="sd">        query_counter to the console, thus monitoring the progress of the</span>
+<span class="sd">        program.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">QueryColumnProcessor</span><span class="o">.</span><span class="n">prompt_specific_query_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">QueryColumnProcessor</span><span class="o">.</span><span class="n">query_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">QueryColumnProcessor</span><span class="o">.</span><span class="n">query_counter</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Starting at query </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">QueryColumnProcessor</span><span class="o">.</span><span class="n">query_counter</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">QueryColumnProcessor</span><span class="o">.</span><span class="n">query_counter</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QueryColumnProcessor._reset_answers_collection">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor._reset_answers_collection">[docs]</a>
+    <span class="k">def</span> <span class="nf">_reset_answers_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets the answers_collection set.</span>
+
+<span class="sd">        Resets the answers_collection set that collects unique answers from</span>
+<span class="sd">        the queries.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">answers_collection</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="QueryColumnProcessor._report_failed_answers">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor._report_failed_answers">[docs]</a>
+    <span class="k">def</span> <span class="nf">_report_failed_answers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_nr</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reports any failed answers occured.</span>
+
+<span class="sd">        Reports any failed answers occured during the processing of a query</span>
+<span class="sd">        column.</span>
+
+<span class="sd">        If the query column produced failed answers, the user is asked to</span>
+<span class="sd">        decide whether to proceed and save the column result, to continue</span>
+<span class="sd">        without saving or to stop the program altogether.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        query_nr : int</span>
+<span class="sd">            The number of the query column.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">failed_answers</span> <span class="o">=</span> <span class="n">QueryProcessor</span><span class="o">.</span><span class="n">flush_failed_answers</span><span class="p">()</span>
+
+        <span class="n">n_failed</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">failed_answers</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_failed</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">n_failed</span><span class="p">)</span><span class="si">}</span><span class="s2"> unexpected answers to &quot;</span>
+                   <span class="sa">f</span><span class="s2">&quot;query </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">query_nr</span><span class="p">)</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">)</span>
+
+            <span class="n">pprint</span><span class="p">(</span><span class="n">failed_answers</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ask_continue</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">can_save</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="QueryColumnProcessor._get_start_query_col_nr">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor._get_start_query_col_nr">[docs]</a>
+    <span class="k">def</span> <span class="nf">_get_start_query_col_nr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the query column number from which to start.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The query column number.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QueryColumnProcessor._extract_chunk_nr_from_checkpoint_name">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor._extract_chunk_nr_from_checkpoint_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">_extract_chunk_nr_from_checkpoint_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts and returns the chunk number from the checkpoint&#39;s name.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The chunk number</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Regex to find the number between underscores after &quot;chunk&quot;</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;chunk_(\d+)_&#39;</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">chunk_nr</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">chunk_nr</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QueryColumnProcessor._ask_continue">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor._ask_continue">[docs]</a>
+    <span class="k">def</span> <span class="nf">_ask_continue</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Asks the user if and how the program should continue.</span>
+
+<span class="sd">        Asks the user to decide whether to proceed and save the column</span>
+<span class="sd">        result, to continue without saving or to stop the program altogether.</span>
+<span class="sd">        If the user decides to discard the column result, the can_save</span>
+<span class="sd">        property of this class is set to false, otherwise to True.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">ask_save_and_continue</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">can_save</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ask_continue_without_saving</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">can_save</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please interrupt the execution of this program &quot;</span>
+                      <span class="s2">&quot;manually!&quot;</span><span class="p">)</span>
+                <span class="c1"># Wait 24 hours before continuing so that the user has the</span>
+                <span class="c1"># opportunity to check the program status and stop its</span>
+                <span class="c1"># execution.</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">24</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QueryColumnProcessor._save_col_result">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_column_processor.QueryColumnProcessor._save_col_result">[docs]</a>
+    <span class="k">def</span> <span class="nf">_save_col_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">query_nr</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves the results of the processed query column to the DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : DataFrame</span>
+<span class="sd">            The DataFrame containing the results to save.</span>
+
+<span class="sd">        query_nr : int</span>
+<span class="sd">            The number of the query column.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_save</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">can_save</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Result of query column </span><span class="si">%s</span><span class="s2"> is discarded.&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">query_nr</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

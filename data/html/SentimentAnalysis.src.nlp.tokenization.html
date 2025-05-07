@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.nlp.tokenization package &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9bcbadda"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SentimentAnalysis.src.sentiment_analysis package" href="SentimentAnalysis.src.sentiment_analysis.html" />
+    <link rel="prev" title="SentimentAnalysis.src.nlp.results package" href="SentimentAnalysis.src.nlp.results.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">SentimentAnalysis</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="SentimentAnalysis.html">SentimentAnalysis package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="SentimentAnalysis.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="SentimentAnalysis.src.html">SentimentAnalysis.src package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.action">SentimentAnalysis.action module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.constants">SentimentAnalysis.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#sentimentanalysis-logger-module">SentimentAnalysis.logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.main">SentimentAnalysis.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.settings">SentimentAnalysis.settings module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.setup">SentimentAnalysis.setup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.type_aliases">SentimentAnalysis.type_aliases module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.view_log">SentimentAnalysis.view_log module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">SentimentAnalysis</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.html">SentimentAnalysis package</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.src.html">SentimentAnalysis.src package</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.src.nlp.html">SentimentAnalysis.src.nlp package</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.nlp.tokenization package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/SentimentAnalysis.src.nlp.tokenization.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sentimentanalysis-src-nlp-tokenization-package">
+<h1>SentimentAnalysis.src.nlp.tokenization package<a class="headerlink" href="#sentimentanalysis-src-nlp-tokenization-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-SentimentAnalysis.src.nlp.tokenization.sentence_strategy">
+<span id="sentimentanalysis-src-nlp-tokenization-sentence-strategy-module"></span><h2>SentimentAnalysis.src.nlp.tokenization.sentence_strategy module<a class="headerlink" href="#module-SentimentAnalysis.src.nlp.tokenization.sentence_strategy" title="Link to this heading"></a></h2>
+<section id="sentence-strategy-py">
+<h3>sentence_strategy.py<a class="headerlink" href="#sentence-strategy-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, validated on 2024-09-14</p>
+<p>This module contains classes for sentence tokenization, namely the
+SentenceStrategy base class and concrete sentence strategy subclasses.</p>
+</section>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>SentenceStrategy(TokenizationStrategy, LoggingMixin)</dt><dd><p>Base class for sentence tokenization.</p>
+</dd>
+<dt>NltkSentenceStrategy(SentenceStrategy)</dt><dd><p>Sentence tokenization strategy using the standard NLTK sentence tokenizer.</p>
+</dd>
+<dt>RegexWithColonsSentenceStrategy(SentenceStrategy)</dt><dd><p>Sentence tokenization strategy using a regex that considers colons to be
+end-of-sentence characters to identify sentences within the input
+string.</p>
+</dd>
+</dl>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.NltkSentenceStrategy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.sentence_strategy.</span></span><span class="sig-name descname"><span class="pre">NltkSentenceStrategy</span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_strategy.html#NltkSentenceStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.NltkSentenceStrategy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" title="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">SentenceStrategy</span></code></a></p>
+<p>This sentence tokenization strategy uses the standard NLTK sentence
+tokenizer.</p>
+<div class="graphviz"><img src="_images/inheritance-bddfea16f4525d5d4ddcce8be66d664955014a81.png" alt="Inheritance diagram of SentimentAnalysis.src.nlp.tokenization.sentence_strategy.NltkSentenceStrategy" usemap="#inheritance941d58ad68" class="inheritance graphviz" /></div>
+<map id="inheritance941d58ad68" name="inheritance941d58ad68">
+<area shape="rect" id="node3" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.NltkSentenceStrategy" target="_top" title="This sentence tokenization strategy uses the standard NLTK sentence" alt="" coords="549,31,712,56"/>
+<area shape="rect" id="node4" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" target="_top" title="SentenceStrategy class." alt="" coords="363,31,501,56"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.NltkSentenceStrategy.tokenize">
+<span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_strategy.html#NltkSentenceStrategy.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.NltkSentenceStrategy.tokenize" title="Link to this definition"></a></dt>
+<dd><p>Split into sentences using NLTK sent_tokenize method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_string</strong> (<em>str</em>) – The text to split into sentences.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The resulting list of sentences.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.RegexWithColonsSentenceStrategy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.sentence_strategy.</span></span><span class="sig-name descname"><span class="pre">RegexWithColonsSentenceStrategy</span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_strategy.html#RegexWithColonsSentenceStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.RegexWithColonsSentenceStrategy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" title="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">SentenceStrategy</span></code></a></p>
+<p>This sentence tokenization strategy uses a custom regular expression
+to split the text into sentences.</p>
+<p>It considers colons to be end-of-sentence characters.</p>
+<div class="graphviz"><img src="_images/inheritance-28151fd7d47af201132660a389cb33c1807606b4.png" alt="Inheritance diagram of SentimentAnalysis.src.nlp.tokenization.sentence_strategy.RegexWithColonsSentenceStrategy" usemap="#inheritancef119c5acd6" class="inheritance graphviz" /></div>
+<map id="inheritancef119c5acd6" name="inheritancef119c5acd6">
+<area shape="rect" id="node3" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.RegexWithColonsSentenceStrategy" target="_top" title="This sentence tokenization strategy uses a custom regular expression" alt="" coords="526,29,763,54"/>
+<area shape="rect" id="node4" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" target="_top" title="SentenceStrategy class." alt="" coords="348,29,480,54"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.RegexWithColonsSentenceStrategy.tokenize">
+<span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_strategy.html#RegexWithColonsSentenceStrategy.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.RegexWithColonsSentenceStrategy.tokenize" title="Link to this definition"></a></dt>
+<dd><p>Splits a string into sentences using a custom regular expression.</p>
+<p>Keeps the punctuation marks.</p>
+<p>This strategy considers colons to be end-of-sentence characters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_string</strong> (<em>str</em>) – The text to split into sentences.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The resulting list of sentences.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The split into sentences is done by matching the text with a regular
+expression and not by a split at end-of-sentence characters or
+character sequences, as this way the punctuation information (Question,
+exclamation, etc.) is preserved.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.sentence_strategy.</span></span><span class="sig-name descname"><span class="pre">SentenceStrategy</span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_strategy.html#SentenceStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TokenizationStrategy</span></code></p>
+<p>SentenceStrategy class.</p>
+<p>The SentenceStrategy interface declares operations common to all supported
+sentence tokenization strategies.</p>
+<p>The Context uses this interface to call the algorithm defined by concrete
+strategies.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy.clean_and_log_result">
+<span class="sig-name descname"><span class="pre">clean_and_log_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List[str]:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_strategy.html#SentenceStrategy.clean_and_log_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy.clean_and_log_result" title="Link to this definition"></a></dt>
+<dd><p>Removes leading and trailing whitespace from the sentences.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy.log_tokenization_result">
+<span class="sig-name descname"><span class="pre">log_tokenization_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentences</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_strategy.html#SentenceStrategy.log_tokenization_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy.log_tokenization_result" title="Link to this definition"></a></dt>
+<dd><p>Logs the tokenization result if the verbose property is set to True.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy.tokenize_by_regex">
+<span class="sig-name descname"><span class="pre">tokenize_by_regex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">re.Pattern</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List[str]:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_strategy.html#SentenceStrategy.tokenize_by_regex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy.tokenize_by_regex" title="Link to this definition"></a></dt>
+<dd><p>Tokenizes the input string into sentences using the given regex.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Abstract</span> <span class="pre">Methods</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">----------------</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy.tokenize">
+<span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_string:</span> <span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List[str]:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_strategy.html#SentenceStrategy.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy.tokenize" title="Link to this definition"></a></dt>
+<dd><p>Tokenizes the input string.</p>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-6ae0e615ecdea783dc3eb8086a330a5be3f2a9af.png" alt="Inheritance diagram of SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" usemap="#inheritance239b6a1f08" class="inheritance graphviz" /></div>
+<map id="inheritance239b6a1f08" name="inheritance239b6a1f08">
+<area shape="rect" id="node3" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" target="_top" title="SentenceStrategy class." alt="" coords="363,31,501,56"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">clean_and_log_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sentences</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_strategy.html#SentenceStrategy.clean_and_log_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd><p>Removes leading and trailing whitespace from the sentences.</p>
+<p>Removes leading and trailing whitespace from the sentences and
+calls the log_tokenization_result method to log the sentences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sentences</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – The list of sentences.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The list of sentences stripped of leading and trailing whitespace
+whitespace.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">log_tokenization_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sentences</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_strategy.html#SentenceStrategy.log_tokenization_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<dd><p>Logs the tokenization result if the verbose property is set to True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sentences</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – The sentences the inputs string has been tokenized into.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id2">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_strategy.html#SentenceStrategy.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<dd><p>Tokenizes the input string.</p>
+<p>Abstract method that needs to be implemented by the concrete
+sentence strategy class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_string</strong> (<em>str</em>) – The string to tokenize into sentences.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The sentences extracted by the tokenizer from the input_string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – If the concrete sentence strategy class has not implemented this
+    abstract method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">tokenize_by_regex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Pattern</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_strategy.html#SentenceStrategy.tokenize_by_regex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
+<dd><p>Tokenizes the input string into sentences using the given regex.</p>
+<p>Tokenizes the input string into sentences using the given regular
+expression. Cleans the sentences from unwished whitespace before
+returning them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_string</strong> (<em>str</em>) – The string to tokenize into sentences.</p></li>
+<li><p><strong>regex</strong> (<em>re.Pattern</em>) – The regular expression to use to identify a sentence.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The resulting list of cleaned sentences.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.nlp.tokenization.sentence_tokenization_factory">
+<span id="sentimentanalysis-src-nlp-tokenization-sentence-tokenization-factory-module"></span><h2>SentimentAnalysis.src.nlp.tokenization.sentence_tokenization_factory module<a class="headerlink" href="#module-SentimentAnalysis.src.nlp.tokenization.sentence_tokenization_factory" title="Link to this heading"></a></h2>
+<section id="sentence-tokenization-factory-py">
+<h3>sentence_tokenization_factory.py<a class="headerlink" href="#sentence-tokenization-factory-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, validated on 2024-12-04</p>
+<p>This module provides a function to create a sentence tokenizer that uses a
+given tokenization strategy.</p>
+</section>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>get_sentence_tokenizer(strategy_name: str) -&gt; SentenceTokenizer:</dt><dd><p>Returns a SentenceTokenizer using the specified tokenization strategy.</p>
+</dd>
+</dl>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_tokenization_factory._get_sentence_tokenization_strategy">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.sentence_tokenization_factory.</span></span><span class="sig-name descname"><span class="pre">_get_sentence_tokenization_strategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strategy_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" title="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy"><span class="pre">SentenceStrategy</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_tokenization_factory.html#_get_sentence_tokenization_strategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_tokenization_factory._get_sentence_tokenization_strategy" title="Link to this definition"></a></dt>
+<dd><p>Returns an instance of the specified sentence tokenization strategy.</p>
+<p>Dynamically creates and returns an instance of the sentence tokenization
+strategy that corresponds to the specified strategy name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>strategy_name</strong> (<em>str</em>) – A string designing the strategy. This is supposed to be the first
+part of the name of the sentence strategy to use, e.g. ‘Nltk’ for
+NltkSentenceStrategy.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of the specified strategy class.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException"><strong>CriticalException</strong></a> – If the specified strategy was not found.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>It is important that the strategy name given is written exactly the
+same as the name of the strategy class, since upper and lower case
+letters cannot be predicted programmatically.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_tokenization_factory.get_sentence_tokenizer">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.sentence_tokenization_factory.</span></span><span class="sig-name descname"><span class="pre">get_sentence_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strategy_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer" title="SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer"><span class="pre">SentenceTokenizer</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_tokenization_factory.html#get_sentence_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_tokenization_factory.get_sentence_tokenizer" title="Link to this definition"></a></dt>
+<dd><p>Returns a SentenceTokenizer using the specified tokenization strategy.</p>
+<p>Dynamically creates and returns an instance of the SentenceTokenizer
+class using the specified sentence tokenization strategy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>strategy_name</strong> (<em>str</em>) – A string designing the strategy. This is supposed to be the first
+part of the name of the sentence strategy to use, e.g. ‘Nltk’ for
+NltkSentenceStrategy.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of the SentenceTokenizer class that uses the specified
+sentence tokenization strategy.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer" title="SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer">SentenceTokenizer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.nlp.tokenization.sentence_tokenization_regex">
+<span id="sentimentanalysis-src-nlp-tokenization-sentence-tokenization-regex-module"></span><h2>SentimentAnalysis.src.nlp.tokenization.sentence_tokenization_regex module<a class="headerlink" href="#module-SentimentAnalysis.src.nlp.tokenization.sentence_tokenization_regex" title="Link to this heading"></a></h2>
+<section id="sentence-tokenization-regex-py">
+<h3>sentence_tokenization_regex.py<a class="headerlink" href="#sentence-tokenization-regex-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-09-17</p>
+<p>This module provides regular expressions that can be used for different
+sentence tokenization strategies.</p>
+</section>
+<section id="id4">
+<h3>Functions<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>regex_with_colons() -&gt; Pattern[str]:</dt><dd><p>Regex for identifying sentences by end-of-sentence characters or colons.</p>
+</dd>
+</dl>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_tokenization_regex.regex_with_colons">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.sentence_tokenization_regex.</span></span><span class="sig-name descname"><span class="pre">regex_with_colons</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Pattern</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_tokenization_regex.html#regex_with_colons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_tokenization_regex.regex_with_colons" title="Link to this definition"></a></dt>
+<dd><p>Regex for identifying sentences by end-of-sentence characters or colons.</p>
+<p>This regex considers colons as end-of-sentence characters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Compiled regex pattern for sentence tokenization.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pattern[str]</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Explanation of the regex per line:</p>
+<p>[1] Set x flag to allow comments at the end of the lines.
+[2] At least one character that is not an end-of-sentence character.
+[3] Optionally followed by one or more dots without whitespace.
+[4] [2]-[3] must be found at least once.
+[5] Followed by any number of any end-of-sentence characters, followed</p>
+<blockquote>
+<div><p>optionally by any number of white spaces, or the end of the string.</p>
+</div></blockquote>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer">
+<span id="sentimentanalysis-src-nlp-tokenization-sentence-tokenizer-module"></span><h2>SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer module<a class="headerlink" href="#module-SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer" title="Link to this heading"></a></h2>
+<section id="sentence-tokenizer-py">
+<h3>sentence_tokenizer.py<a class="headerlink" href="#sentence-tokenizer-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2025-05-01</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.</span></span><span class="sig-name descname"><span class="pre">SentenceTokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" title="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy"><span class="pre">SentenceStrategy</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_tokenizer.html#SentenceTokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Tokenizer</span></code></p>
+<p>SentenceTokenizer class.</p>
+<p>This class implements the Tokenizer base class for sentence tokenization.
+It serves as the context in a strategy pattern, which allows you to
+dynamically choose a sentence tokenization strategy at runtime.</p>
+<p>The class works with any of the sentence tokenization strategies that
+implement the SentenceStrategy interface. It gives access to the tokenize
+method of the given sentence tokenization strategy.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer.my_strategy">
+<span class="sig-name descname"><span class="pre">my_strategy</span></span><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer.my_strategy" title="Link to this definition"></a></dt>
+<dd><p>The sentence tokenization strategy to be used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" title="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy">SentenceStrategy</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Static</span> <span class="pre">Methods</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">--------------</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer.default_strategy">
+<span class="sig-name descname"><span class="pre">default_strategy</span></span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" title="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy"><span class="pre">SentenceStrategy</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_tokenizer.html#SentenceTokenizer.default_strategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer.default_strategy" title="Link to this definition"></a></dt>
+<dd><p>Returns the default sentence tokenization strategy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer.tokenize">
+<span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List[str]:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_tokenizer.html#SentenceTokenizer.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer.tokenize" title="Link to this definition"></a></dt>
+<dd><p>Tokenizes the given string into sentences.</p>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-ed7a666a120158305e44c83a5da60e9e55659c8b.png" alt="Inheritance diagram of SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer" usemap="#inheritancea721ff07f0" class="inheritance graphviz" /></div>
+<map id="inheritancea721ff07f0" name="inheritancea721ff07f0">
+<area shape="rect" id="node3" href="#SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer" target="_top" title="SentenceTokenizer class." alt="" coords="288,31,432,56"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" title="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy"><span class="pre">SentenceStrategy</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_tokenizer.html#SentenceTokenizer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer.__init__" title="Link to this definition"></a></dt>
+<dd><p>Constructor.</p>
+<p>Sets the sentence tokenization strategy which is supposed to be used
+for sentence tokenization. If no strategy is specified when the
+SentenceTokenizer is called, a default sentence tokenization
+strategy is used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>my_strategy</strong> (<a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" title="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy"><em>SentenceStrategy</em></a><em> | </em><em>None</em>) – The sentence tokenization strategy to be used. Default value: None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id5">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">default_strategy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" title="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy"><span class="pre">SentenceStrategy</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_tokenizer.html#SentenceTokenizer.default_strategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
+<dd><p>Returns the default sentence tokenization strategy.</p>
+<p>As default, NltkSentenceStrategy is used. It is the standard
+sentence tokenization method of the nltk library and works reasonably
+well.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The sentence tokenization strategy.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" title="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy">SentenceStrategy</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This static method is used instead of a class constant to ensure lazy
+instantiation. This approach avoids the overhead of creating a default
+strategy object until it is actually needed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/sentence_tokenizer.html#SentenceTokenizer.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
+<dd><p>Tokenizes the given string into sentences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_string</strong> (<em>str</em>) – The string to tokenize.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The list of sentences extracted from the input string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.nlp.tokenization.tokenization_mixin">
+<span id="sentimentanalysis-src-nlp-tokenization-tokenization-mixin-module"></span><h2>SentimentAnalysis.src.nlp.tokenization.tokenization_mixin module<a class="headerlink" href="#module-SentimentAnalysis.src.nlp.tokenization.tokenization_mixin" title="Link to this heading"></a></h2>
+<section id="tokenization-mixin-py">
+<h3>tokenization_mixin.py<a class="headerlink" href="#tokenization-mixin-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, validated on 2024-09-17</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.</span></span><span class="sig-name descname"><span class="pre">TokenizationMixin</span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/tokenization_mixin.html#TokenizationMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>TokenizationMixin class.</p>
+<p>This mixin provides tokenization capabilities for text data.</p>
+<p>It provides getters and setters for different types of tokenizers (word
+tokenizer, sentence tokenizer, …), which can be set to use different
+tokenization strategies (nltk, custom strategies, …).</p>
+<p>It also provides default strategies for the different types of tokenizers.
+The default strategy is ‘NoPunctuation’ for word tokenization and ‘nltk’
+for sentence tokenization.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin.DEFAULT_SENTENCE_STRATEGY">
+<span class="sig-name descname"><span class="pre">DEFAULT_SENTENCE_STRATEGY</span></span><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin.DEFAULT_SENTENCE_STRATEGY" title="Link to this definition"></a></dt>
+<dd><p>The name of the default sentence strategy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin.DEFAULT_WORD_STRATEGY">
+<span class="sig-name descname"><span class="pre">DEFAULT_WORD_STRATEGY</span></span><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin.DEFAULT_WORD_STRATEGY" title="Link to this definition"></a></dt>
+<dd><p>The name of the default word strategy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin.sentence_tokenizer">
+<span class="sig-name descname"><span class="pre">sentence_tokenizer</span></span><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin.sentence_tokenizer" title="Link to this definition"></a></dt>
+<dd><p>The sentence tokenizer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer" title="SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer">SentenceTokenizer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin.word_tokenizer">
+<span class="sig-name descname"><span class="pre">word_tokenizer</span></span><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin.word_tokenizer" title="Link to this definition"></a></dt>
+<dd><p>The word tokenizer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer" title="SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer">WordTokenizer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin.set_sentence_tokenizer">
+<span class="sig-name descname"><span class="pre">set_sentence_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenization_strategy_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/tokenization_mixin.html#TokenizationMixin.set_sentence_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin.set_sentence_tokenizer" title="Link to this definition"></a></dt>
+<dd><p>Sets the sentence tokenizer using the specified strategy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin.set_word_tokenizer">
+<span class="sig-name descname"><span class="pre">set_word_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenization_strategy_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/tokenization_mixin.html#TokenizationMixin.set_word_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin.set_word_tokenizer" title="Link to this definition"></a></dt>
+<dd><p>Sets the word tokenizer using the specified strategy.</p>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-d9b788baa2943cdd894a82a4e0ed600a070338cb.png" alt="Inheritance diagram of SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin" usemap="#inheritance57be58a648" class="inheritance graphviz" /></div>
+<map id="inheritance57be58a648" name="inheritance57be58a648">
+<area shape="rect" id="node1" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin" target="_top" title="TokenizationMixin class." alt="" coords="5,5,140,31"/>
+</map><dl class="py attribute">
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">DEFAULT_SENTENCE_STRATEGY</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Nltk'</span></em><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id8">
+<span class="sig-name descname"><span class="pre">DEFAULT_WORD_STRATEGY</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'NoPunctuation'</span></em><a class="headerlink" href="#id8" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id9">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sentence_tokenizer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer" title="SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer"><span class="pre">SentenceTokenizer</span></a></em><a class="headerlink" href="#id9" title="Link to this definition"></a></dt>
+<dd><p>Gets the sentence tokenizer.</p>
+<p>If no sentence tokenizer has been set, a default sentence strategy is
+used to set it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The sentence tokenizer.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer" title="SentimentAnalysis.src.nlp.tokenization.sentence_tokenizer.SentenceTokenizer">SentenceTokenizer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id10">
+<span class="sig-name descname"><span class="pre">set_sentence_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenization_strategy_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/tokenization_mixin.html#TokenizationMixin.set_sentence_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id10" title="Link to this definition"></a></dt>
+<dd><p>Sets the sentence tokenizer using the specified strategy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tokenization_strategy_name</strong> (<em>str</em>) – The name of the tokenization strategy to use.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id11">
+<span class="sig-name descname"><span class="pre">set_word_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenization_strategy_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/tokenization_mixin.html#TokenizationMixin.set_word_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id11" title="Link to this definition"></a></dt>
+<dd><p>Sets the word tokenizer using the specified strategy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tokenization_strategy_name</strong> (<em>str</em>) – The name of the tokenization strategy to use.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id12">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">word_tokenizer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer" title="SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer"><span class="pre">WordTokenizer</span></a></em><a class="headerlink" href="#id12" title="Link to this definition"></a></dt>
+<dd><p>Gets the word tokenizer.</p>
+<p>If no word tokenizer has been set, the default word tokenization
+strategy is used to set it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The word tokenizer.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer" title="SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer">WordTokenizer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.nlp.tokenization.tokenization_strategy">
+<span id="sentimentanalysis-src-nlp-tokenization-tokenization-strategy-module"></span><h2>SentimentAnalysis.src.nlp.tokenization.tokenization_strategy module<a class="headerlink" href="#module-SentimentAnalysis.src.nlp.tokenization.tokenization_strategy" title="Link to this heading"></a></h2>
+<section id="tokenization-strategy-py">
+<h3>tokenization_strategy.py<a class="headerlink" href="#tokenization-strategy-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2025-05-01</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.</span></span><span class="sig-name descname"><span class="pre">TokenizationStrategy</span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/tokenization_strategy.html#TokenizationStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">LoggingMixin</span></code></p>
+<p>TokenizationStrategy class.</p>
+<p>The TokenizationStrategy interface declares operations common to all
+supported tokenization strategies.</p>
+<p>The Context uses this interface to call the algorithm defined by concrete
+Strategies.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy.logger">
+<span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy.logger" title="Link to this definition"></a></dt>
+<dd><p>A Logger instance for logging messages related to the operations
+performed by the class and its subclasses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Logger</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy.verbose">
+<span class="sig-name descname"><span class="pre">verbose</span></span><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy.verbose" title="Link to this definition"></a></dt>
+<dd><p>Whether the tokenized elements should be printed to the
+console.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Abstract</span> <span class="pre">Methods</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">----------------</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">tokenize(self,</span> <span class="pre">input_string</span></span></dt>
+<dd><p>Tokenizes the input string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str) -&gt; List[str]:</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-43b1a570b48f11b427db06ef6634149bdf5a88cb.png" alt="Inheritance diagram of SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy" usemap="#inheritance1c7352c355" class="inheritance graphviz" /></div>
+<map id="inheritance1c7352c355" name="inheritance1c7352c355">
+<area shape="rect" id="node3" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy" target="_top" title="TokenizationStrategy class." alt="" coords="157,31,315,56"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy.tokenize">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/tokenization_strategy.html#TokenizationStrategy.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy.tokenize" title="Link to this definition"></a></dt>
+<dd><p>Tokenizes the input string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_string</strong> (<em>str</em>) – The string to tokenize.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of strings (sentences, words, characters) the input string
+was tokenized into.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id13">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">verbose</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id13" title="Link to this definition"></a></dt>
+<dd><p>Indicates whether the tokenized elements should be printed.</p>
+<p>Indicates whether the tokenized elements should be printed to
+the console.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.nlp.tokenization.tokenizer">
+<span id="sentimentanalysis-src-nlp-tokenization-tokenizer-module"></span><h2>SentimentAnalysis.src.nlp.tokenization.tokenizer module<a class="headerlink" href="#module-SentimentAnalysis.src.nlp.tokenization.tokenizer" title="Link to this heading"></a></h2>
+<section id="tokenizer-py">
+<h3>tokenizer.py<a class="headerlink" href="#tokenizer-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-04</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.tokenizer.Tokenizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.tokenizer.</span></span><span class="sig-name descname"><span class="pre">Tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy" title="SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy"><span class="pre">TokenizationStrategy</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/tokenizer.html#Tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.tokenizer.Tokenizer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">LoggingMixin</span></code></p>
+<p>Tokenizer class.</p>
+<p>This class defines the interface for applying different tokenization
+strategies to input strings. It acts as a context for the
+TokenizationStrategy and enforces that any subclass must implement the
+‘tokenize’ method.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.tokenizer.Tokenizer.strategy">
+<span class="sig-name descname"><span class="pre">strategy</span></span><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.tokenizer.Tokenizer.strategy" title="Link to this definition"></a></dt>
+<dd><p>The tokenization strategy to use for tokenizing input strings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy" title="SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy">TokenizationStrategy</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Abstract</span> <span class="pre">Methods</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">----------------</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">tokenize(self,</span> <span class="pre">input_string</span></span></dt>
+<dd><p>Tokenizes the input string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str) -&gt; List[str]:</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-a8d441187eb00e1723de9454039edc62fa02b7ab.png" alt="Inheritance diagram of SentimentAnalysis.src.nlp.tokenization.tokenizer.Tokenizer" usemap="#inheritance1047feb20c" class="inheritance graphviz" /></div>
+<map id="inheritance1047feb20c" name="inheritance1047feb20c">
+<area shape="rect" id="node3" href="#SentimentAnalysis.src.nlp.tokenization.tokenizer.Tokenizer" target="_top" title="Tokenizer class." alt="" coords="157,31,240,56"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.tokenizer.Tokenizer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy" title="SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy"><span class="pre">TokenizationStrategy</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/tokenizer.html#Tokenizer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.tokenizer.Tokenizer.__init__" title="Link to this definition"></a></dt>
+<dd><p>Constructor.</p>
+<p>Initializes the Tokenizer with a specific tokenization strategy.
+If no strategy is provided, an error is logged, and a ValueError
+is raised.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>my_strategy</strong> (<a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy" title="SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy"><em>TokenizationStrategy</em></a><em> | </em><em>None</em>) – The tokenization strategy to use. If not provided, a ValueError
+is raised.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException"><strong>CriticalException</strong></a> – If no tokenization strategy is provided.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id14">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">strategy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy" title="SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy"><span class="pre">TokenizationStrategy</span></a></em><a class="headerlink" href="#id14" title="Link to this definition"></a></dt>
+<dd><p>Returns the current tokenization strategy used by the tokenizer.</p>
+<p>The strategy follows the Strategy design pattern, allowing the
+Tokenizer to work with different tokenization strategies through
+a common interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current tokenization strategy.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy" title="SentimentAnalysis.src.nlp.tokenization.tokenization_strategy.TokenizationStrategy">TokenizationStrategy</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.tokenizer.Tokenizer.tokenize">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/tokenizer.html#Tokenizer.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.tokenizer.Tokenizer.tokenize" title="Link to this definition"></a></dt>
+<dd><p>Tokenizes the input string.</p>
+<p>Abstract method that must be implement by subclasses. Takes a
+string and returns a list of tokens based on the specific
+tokenization strategy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_string</strong> (<em>str</em>) – The input string to tokenize.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>List[str]</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of tokens generated from the input string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.nlp.tokenization.word_strategy">
+<span id="sentimentanalysis-src-nlp-tokenization-word-strategy-module"></span><h2>SentimentAnalysis.src.nlp.tokenization.word_strategy module<a class="headerlink" href="#module-SentimentAnalysis.src.nlp.tokenization.word_strategy" title="Link to this heading"></a></h2>
+<section id="word-strategy-py">
+<h3>word_strategy.py<a class="headerlink" href="#word-strategy-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-09-18</p>
+<p>This module contains classes for word tokenization, namely the
+WordStrategy base class and concrete word strategy subclasses.</p>
+</section>
+<section id="id15">
+<h3>Classes<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>WordStrategy(TokenizationStrategy, LoggingMixin)</dt><dd><p>Base class for word tokenization.</p>
+</dd>
+<dt>NoPunctuationStrategy(WordStrategy)</dt><dd><p>Word tokenization strategy that eliminates the punctuation.</p>
+</dd>
+</dl>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.word_strategy.NoPunctuationStrategy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.word_strategy.</span></span><span class="sig-name descname"><span class="pre">NoPunctuationStrategy</span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_strategy.html#NoPunctuationStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.NoPunctuationStrategy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy" title="SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">WordStrategy</span></code></a></p>
+<p>This word tokenization strategy eliminates punctuation marks.</p>
+<div class="graphviz"><img src="_images/inheritance-7e98e55761b363c0cf408130c87130b94fb9f583.png" alt="Inheritance diagram of SentimentAnalysis.src.nlp.tokenization.word_strategy.NoPunctuationStrategy" usemap="#inheritancece5c351091" class="inheritance graphviz" /></div>
+<map id="inheritancece5c351091" name="inheritancece5c351091">
+<area shape="rect" id="node3" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.NoPunctuationStrategy" target="_top" title="This word tokenization strategy eliminates punctuation marks." alt="" coords="520,31,691,56"/>
+<area shape="rect" id="node4" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy" target="_top" title="WordStrategy class." alt="" coords="363,31,472,56"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.word_strategy.NoPunctuationStrategy.tokenize">
+<span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_strategy.html#NoPunctuationStrategy.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.NoPunctuationStrategy.tokenize" title="Link to this definition"></a></dt>
+<dd><p>Splits string into words.</p>
+<p>Splits string into words only, throws away the punctuation.
+Preserves</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>abbreviations</p></li>
+<li><p>hyphened words</p></li>
+<li><p>floats</p></li>
+<li><p>currency and percent, together with number</p></li>
+<li><p>ellipses.</p></li>
+</ul>
+</div></blockquote>
+<p>Split examples:</p>
+<p>‘the idea is good. but that u.s.a. poster-print costs $12.40…’
+=&gt; [‘the’, ‘idea’, ‘is’, ‘good’, ‘but’, ‘that’, ‘u.s.a.’,</p>
+<blockquote>
+<div><p>‘poster-print’, ‘costs’, ‘$12.40’, ‘…’]),</p>
+</div></blockquote>
+<p>‘This is a - very short but nice - little text. It contains but 2 ‘         ‘sentences.’
+=&gt; [‘this’, ‘is’, ‘a’, ‘very’, ‘short’, ‘but’, ‘nice’, ‘little’,</p>
+<blockquote>
+<div><p>‘text’, ‘it’, ‘contains’, ‘but’, ‘2’, ‘sentences’]</p>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.word_strategy.</span></span><span class="sig-name descname"><span class="pre">WordStrategy</span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_strategy.html#WordStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TokenizationStrategy</span></code></p>
+<p>WordStrategy class.</p>
+<p>The WordStrategy interface declares operations common to all supported word
+tokenization strategies.</p>
+<p>The Context uses this interface to call the algorithm defined by Concrete
+Strategies.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy.log_tokenization_result">
+<span class="sig-name descname"><span class="pre">log_tokenization_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_strategy.html#WordStrategy.log_tokenization_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy.log_tokenization_result" title="Link to this definition"></a></dt>
+<dd><p>Logs the tokenization result if the verbose property is set to True.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Abstract</span> <span class="pre">Methods</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">----------------</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy.tokenize">
+<span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_string:</span> <span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List[str]:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_strategy.html#WordStrategy.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy.tokenize" title="Link to this definition"></a></dt>
+<dd><p>Tokenizes the input string.</p>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-cd7b47a43e96895bebc4248e212ab779aa688225.png" alt="Inheritance diagram of SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy" usemap="#inheritancebc88e01ba0" class="inheritance graphviz" /></div>
+<map id="inheritancebc88e01ba0" name="inheritancebc88e01ba0">
+<area shape="rect" id="node4" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy" target="_top" title="WordStrategy class." alt="" coords="363,31,472,56"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="id16">
+<span class="sig-name descname"><span class="pre">log_tokenization_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_strategy.html#WordStrategy.log_tokenization_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id16" title="Link to this definition"></a></dt>
+<dd><p>Logs the tokenization result if the verbose property is set to True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>words</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – The words the inputs string has been tokenized into.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id17">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_strategy.html#WordStrategy.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id17" title="Link to this definition"></a></dt>
+<dd><p>Tokenizes the input string.</p>
+<p>Abstract method that needs to be implemented by the concrete
+sentence strategy class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_string</strong> (<em>str</em>) – The string to tokenize into words.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The words extracted by the tokenizer from the input_string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – If the concrete sentence strategy class has not implemented this
+    abstract method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.nlp.tokenization.word_tokenization_factory">
+<span id="sentimentanalysis-src-nlp-tokenization-word-tokenization-factory-module"></span><h2>SentimentAnalysis.src.nlp.tokenization.word_tokenization_factory module<a class="headerlink" href="#module-SentimentAnalysis.src.nlp.tokenization.word_tokenization_factory" title="Link to this heading"></a></h2>
+<section id="word-tokenization-factory-py">
+<h3>word_tokenization_factory.py<a class="headerlink" href="#word-tokenization-factory-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, validated on 2024-12-04</p>
+<p>This module provides a function to create a word tokenizer that uses a
+given tokenization strategy.</p>
+</section>
+<section id="id18">
+<h3>Functions<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>get_word_tokenizer(strategy_name: str) -&gt; WordTokenizer:</dt><dd><p>Returns a WordTokenizer using the specified tokenization strategy.</p>
+</dd>
+</dl>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.word_tokenization_factory._get_word_tokenization_strategy">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.word_tokenization_factory.</span></span><span class="sig-name descname"><span class="pre">_get_word_tokenization_strategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strategy_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy" title="SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy"><span class="pre">WordStrategy</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_tokenization_factory.html#_get_word_tokenization_strategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.word_tokenization_factory._get_word_tokenization_strategy" title="Link to this definition"></a></dt>
+<dd><p>Returns an instance of the specified word tokenization strategy.</p>
+<p>Dynamically creates and returns an instance of the word
+strategy that corresponds to the specified strategy name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>strategy_name</strong> (<em>str</em>) – A string designing the strategy. This is supposed to be the first
+part of the name of the word strategy to use, e.g. ‘NoPunctuation’
+for NoPunctuationStrategy.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of the specified strategy class.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException"><strong>CriticalException</strong></a> – If the specified strategy was not found.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>It is important that the strategy name given is written exactly the
+same as the name of the strategy class, since upper and lower case
+letters cannot be predicted programmatically.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.word_tokenization_factory.get_word_tokenizer">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.word_tokenization_factory.</span></span><span class="sig-name descname"><span class="pre">get_word_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strategy_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer" title="SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer"><span class="pre">WordTokenizer</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_tokenization_factory.html#get_word_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.word_tokenization_factory.get_word_tokenizer" title="Link to this definition"></a></dt>
+<dd><p>Dynamically creates and returns an instance of the WordTokenizer
+class using the specified word tokenization strategy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>strategy_name</strong> (<em>str</em>) – A string designing the strategy. This is supposed to be the first
+part of the name of the word strategy to use, e.g. ‘NoPunctuation’
+for NoPunctuationStrategy.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of the WordTokenizer class that uses the specified
+word tokenization strategy.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer" title="SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer">WordTokenizer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.nlp.tokenization.word_tokenization_regex">
+<span id="sentimentanalysis-src-nlp-tokenization-word-tokenization-regex-module"></span><h2>SentimentAnalysis.src.nlp.tokenization.word_tokenization_regex module<a class="headerlink" href="#module-SentimentAnalysis.src.nlp.tokenization.word_tokenization_regex" title="Link to this heading"></a></h2>
+<section id="word-tokenization-regex-py">
+<h3>word_tokenization_regex.py<a class="headerlink" href="#word-tokenization-regex-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, validated on 2024-09-18</p>
+<p>This module provides regular expressions that can be used for different
+word tokenization strategies.</p>
+</section>
+<section id="id19">
+<h3>Functions<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>regex_penn_treebank_wo_punctuation -&gt; Pattern[str]</dt><dd><p>Regex for Penn Treebank identification of words without punctuation
+marks.</p>
+</dd>
+</dl>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.word_tokenization_regex.regex_penn_treebank_wo_punctuation">
+<span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.word_tokenization_regex.</span></span><span class="sig-name descname"><span class="pre">regex_penn_treebank_wo_punctuation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_tokenization_regex.html#regex_penn_treebank_wo_punctuation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.word_tokenization_regex.regex_penn_treebank_wo_punctuation" title="Link to this definition"></a></dt>
+<dd><p>Regex for Penn Treebank word tokenization but without including
+punctuation and similar characters.</p>
+<p>The Penn Treebank word tokenization rules were established by:
+Mitchell P. Marcus, Beatrice Santorini, and Mary Ann Marcinkiewicz,
+“Building a Large Annotated Corpus of English: The Penn Treebank,”
+International Conference on Computational Logic, 1993. [Online]. Available:
+&lt;<a class="reference external" href="https://www.semanticscholar.org/paper/Building-a-Large-Annotated-Corpus">https://www.semanticscholar.org/paper/Building-a-Large-Annotated-Corpus</a>
+-of-English%3A-The-Marcus-Santorini
+/0b44fcbeea9415d400c5f5789d6b892b6f98daff&gt;</p>
+<p>Aiming at the tagging of the parts of speech in the Penn Treebank
+corpus, the authors treat punctuation, brackets, quotation marks, currency
+symbols etc., and compounds like “won’t” or “children’s”.</p>
+<p>This regular expression is originally based on the Penn Treebank
+tokenization principles and taken from page 19 of:
+D. Jurafsky and J. H. Martin, Speech and Language Processing: An
+Introduction to Natural Language Processing, Computational Linguistics,
+and Speech Recognition, 2023. Accessed: Nov. 17 2023. [Online]. Available:
+<a class="reference external" href="https://web.stanford.edu/~jurafsky/slp3/">https://web.stanford.edu/~jurafsky/slp3/</a></p>
+<p>It has been slightly modified for the current needs, especially by
+removing the line including punctuation, brackets and similar characters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>regex</strong> – Compiled regex pattern for Penn Treebank tokenization without
+punctuation marks.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pattern[str]</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Explanation of the regex per line:</p>
+<p>[1] Set x flag to allow comments at the end of the lines.
+[2] Abbreviations, e.g. “U.S.A.”.
+[3] Words with optional internal hyphens, e.g. “or-so”.
+[4] Currency and percentages, e.g. “$12.40”, “82%”, “82 %”.
+[5] Ellipsis (”…”).</p>
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.nlp.tokenization.word_tokenizer">
+<span id="sentimentanalysis-src-nlp-tokenization-word-tokenizer-module"></span><h2>SentimentAnalysis.src.nlp.tokenization.word_tokenizer module<a class="headerlink" href="#module-SentimentAnalysis.src.nlp.tokenization.word_tokenizer" title="Link to this heading"></a></h2>
+<section id="word-tokenizer-py">
+<h3>word_tokenizer.py<a class="headerlink" href="#word-tokenizer-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2025-05-01</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.nlp.tokenization.word_tokenizer.</span></span><span class="sig-name descname"><span class="pre">WordTokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy" title="SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy"><span class="pre">WordStrategy</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_tokenizer.html#WordTokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Tokenizer</span></code></p>
+<p>WordTokenizer class.</p>
+<p>This class implements the Tokenizer base class for word tokenization.
+It serves as the context in a strategy pattern, which allows you to
+dynamically choose a word tokenization strategy at runtime.</p>
+<p>The class works with any of the word tokenization strategies that implement
+the WordStrategy interface. It gives access to the tokenize method of
+the given word tokenization strategy.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer.strategy">
+<span class="sig-name descname"><span class="pre">strategy</span></span><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer.strategy" title="Link to this definition"></a></dt>
+<dd><p>The word tokenization strategy to be used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy" title="SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy">WordStrategy</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Static</span> <span class="pre">Methods</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">--------------</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer.default_strategy">
+<span class="sig-name descname"><span class="pre">default_strategy</span></span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy" title="SentimentAnalysis.src.nlp.tokenization.sentence_strategy.SentenceStrategy"><span class="pre">SentenceStrategy</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_tokenizer.html#WordTokenizer.default_strategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer.default_strategy" title="Link to this definition"></a></dt>
+<dd><p>Returns the default sentence tokenization strategy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer.tokenize">
+<span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List[str]:</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_tokenizer.html#WordTokenizer.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer.tokenize" title="Link to this definition"></a></dt>
+<dd><p>Tokenizes the given string into sentences.</p>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-b7388f69be130beab4d9394c02d5fd326476092f.png" alt="Inheritance diagram of SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer" usemap="#inheritance4078bc1e34" class="inheritance graphviz" /></div>
+<map id="inheritance4078bc1e34" name="inheritance4078bc1e34">
+<area shape="rect" id="node4" href="#SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer" target="_top" title="WordTokenizer class." alt="" coords="288,31,403,56"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy" title="SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy"><span class="pre">WordStrategy</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_tokenizer.html#WordTokenizer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.nlp.tokenization.word_tokenizer.WordTokenizer.__init__" title="Link to this definition"></a></dt>
+<dd><p>Constructor.</p>
+<p>Sets the word tokenization strategy which is supposed to be used for
+word tokenization. If no strategy is specified when the
+WordTokenizer is called, a default word tokenization strategy is
+used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>my_strategy</strong> (<a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy" title="SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy"><em>WordStrategy</em></a><em> | </em><em>None</em>) – The word tokenization strategy to be used. Default value: None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id20">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">default_strategy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy" title="SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy"><span class="pre">WordStrategy</span></a></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_tokenizer.html#WordTokenizer.default_strategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id20" title="Link to this definition"></a></dt>
+<dd><p>Returns the default word tokenization strategy.</p>
+<p>As default, NoPunctuationStrategy is used. Its result corresponds to
+the intuitive way of splitting text into words, throwing away any
+punctuation marks but keeping hyphened words as one word and
+currency symbols together with their numbers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The word tokenization strategy.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy" title="SentimentAnalysis.src.nlp.tokenization.word_strategy.WordStrategy">WordStrategy</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This method is used instead of a class constant to ensure lazy
+instantiation. This approach avoids the overhead of creating a default
+strategy object until it is actually needed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id21">
+<span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/nlp/tokenization/word_tokenizer.html#WordTokenizer.tokenize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id21" title="Link to this definition"></a></dt>
+<dd><p>Tokenizes the given string into words.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_string</strong> (<em>str</em>) – The string to tokenize.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The list of words extracted from the input string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.nlp.tokenization">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-SentimentAnalysis.src.nlp.tokenization" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="SentimentAnalysis.src.nlp.results.html" class="btn btn-neutral float-left" title="SentimentAnalysis.src.nlp.results package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SentimentAnalysis.src.sentiment_analysis.html" class="btn btn-neutral float-right" title="SentimentAnalysis.src.sentiment_analysis package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

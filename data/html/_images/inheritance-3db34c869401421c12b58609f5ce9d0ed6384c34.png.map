@@ -1,0 +1,9 @@
+<map id="inheritance3d80bc5239" name="inheritance3d80bc5239">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="203,5,275,31"/>
+<area shape="rect" id="node4" title="DataSourceSuite class." alt="" coords="387,80,518,105"/>
+<area shape="rect" id="node2" title="DataSourceStatsMixin class." alt="" coords="157,55,321,80"/>
+<area shape="rect" id="node3" title="LoggingMixin class." alt="" coords="5,80,109,105"/>
+<area shape="rect" id="node7" href="#SentimentAnalysis.src.data_sources.mad_tsc_suite.MadTscSuite" target="_top" title="MadTscSuite class." alt="" coords="584,105,687,131"/>
+<area shape="rect" id="node5" title="Abstract base class for generic types." alt="" coords="203,156,275,181"/>
+<area shape="rect" id="node6" title="MadTscFactSheetMixin class." alt="" coords="369,129,536,155"/>
+</map>

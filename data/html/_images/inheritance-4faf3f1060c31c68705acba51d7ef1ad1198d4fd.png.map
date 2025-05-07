@@ -1,0 +1,12 @@
+<map id="inheritanceaa03be0dc7" name="inheritanceaa03be0dc7">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="21,5,93,31"/>
+<area shape="rect" id="node2" title="Abstract base class for different data collection structures. It defines" alt="" coords="181,55,296,80"/>
+<area shape="rect" id="node6" title="Abstract base class for data source strategies." alt="" coords="162,5,315,31"/>
+<area shape="rect" id="node9" title="MyData class." alt="" coords="415,105,487,131"/>
+<area shape="rect" id="node3" title="Abstract base class for generic types." alt="" coords="21,104,93,129"/>
+<area shape="rect" id="node5" title="DataSerializationMixin class." alt="" coords="157,104,320,129"/>
+<area shape="rect" id="node4" title="LoggingMixin class." alt="" coords="5,55,109,80"/>
+<area shape="rect" id="node8" title="MadTscStrategy class." alt="" coords="583,56,708,81"/>
+<area shape="rect" id="node7" title="MadTscFactSheetMixin class." alt="" coords="368,56,535,81"/>
+<area shape="rect" id="node10" title="TokenizationMixin class." alt="" coords="171,153,306,179"/>
+</map>

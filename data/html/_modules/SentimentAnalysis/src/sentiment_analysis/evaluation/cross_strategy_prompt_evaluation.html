@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.evaluation.cross_strategy_prompt_evaluation &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.evaluation.cross_strategy_prompt_evaluation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.evaluation.cross_strategy_prompt_evaluation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">cross_strategy_prompt_evaluation.py</span>
+<span class="sd">-----------------------------------</span>
+<span class="sd">Version 1.0, updated on 2025-01-02</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.evaluation.prompt_evaluation</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PromptEvaluation</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.chunk</span> <span class="kn">import</span> <span class="n">Chunk</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.chunk_loader</span> <span class="kn">import</span> <span class="n">ChunkLoader</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.prompt_engineering.prompt_engineer_factory</span> \
+    <span class="kn">import</span> <span class="nn">get_prompt_engineer</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.query</span> <span class="kn">import</span> <span class="n">Query</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">src.utils.dict_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">convert_keys_to_consecutive_str_numbers</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.string_utils</span> <span class="kn">import</span> <span class="n">StringUtils</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">PromptsDictType</span>
+
+
+<div class="viewcode-block" id="CrossStrategyPromptEvaluation">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.cross_strategy_prompt_evaluation.CrossStrategyPromptEvaluation">[docs]</a>
+<span class="k">class</span> <span class="nc">CrossStrategyPromptEvaluation</span><span class="p">(</span><span class="n">PromptEvaluation</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    CrossStrategyPromptEvaluation class.</span>
+
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Initialize data structures to manage prompts and prompt</span>
+        <span class="c1"># ingredients</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">overall_best_prompts</span><span class="p">:</span> <span class="n">PromptsDictType</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">overall_best_prompt_ingredients_sets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Chunk-specific variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">overall_chunk</span><span class="p">:</span> <span class="n">Chunk</span> <span class="o">=</span> <span class="n">Chunk</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chunk_col_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># region --- Properties</span>
+    
+    <span class="c1"># endregion --- Properties</span>
+    
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="CrossStrategyPromptEvaluation.join_best_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.cross_strategy_prompt_evaluation.CrossStrategyPromptEvaluation.join_best_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">join_best_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">versions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Joins the best prompts from multiple prompt set versions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        versions : List[str]</span>
+<span class="sd">            List of versions the best prompts are to be collected from.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - The collected best prompts are not returned from this method but</span>
+<span class="sd">          saved so that they can be retrieved in later runs of the program.</span>
+
+<span class="sd">        - The prompt engineering and optimization having been performed on</span>
+<span class="sd">          English samples only, the language targeted in this method is also</span>
+<span class="sd">          English.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;en&#39;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">versions</span><span class="p">):</span>
+            <span class="n">versions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;01&#39;</span><span class="p">,</span> <span class="s1">&#39;02&#39;</span><span class="p">,</span> <span class="s1">&#39;03&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">version</span> <span class="ow">in</span> <span class="n">versions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">)</span>
+
+            <span class="n">processor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">language_results_processor</span>
+
+            <span class="n">best_query_nrs</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">get_best_query_nrs</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_extract_best_prompts</span><span class="p">(</span><span class="n">best_query_nrs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_extract_best_prompt_ingredients_sets</span><span class="p">(</span><span class="n">best_query_nrs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_extract_to_overall_chunk</span><span class="p">(</span><span class="n">best_query_nrs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_align_query_nrs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_best_prompts</span><span class="p">()</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Best prompts have been joined and saved. You might want to &quot;</span>
+               <span class="sa">f</span><span class="s2">&quot;proceed with the prompt evaluation for language </span><span class="si">{</span><span class="n">language</span><span class="si">}</span><span class="s2"> &quot;</span>
+               <span class="s2">&quot;Do not forget to set the version to </span><span class="si">{self.version}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span></div>
+
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+    
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="CrossStrategyPromptEvaluation._align_query_nrs">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.cross_strategy_prompt_evaluation.CrossStrategyPromptEvaluation._align_query_nrs">[docs]</a>
+    <span class="k">def</span> <span class="nf">_align_query_nrs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Aligns query numbers across all best prompts.</span>
+
+<span class="sd">        Ensures that query numbers in the &#39;overall_best_prompts`</span>
+<span class="sd">        and the corresponding columns in the &#39;overall_chunk&#39; are renumbered</span>
+<span class="sd">        consecutively. The renumbering facilitates consistency and subsequent</span>
+<span class="sd">        analysis.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - Updates &#39;chunk_col_map&#39; to reflect the renumbered columns.</span>
+
+<span class="sd">        - Renames and reorders columns in &#39;overall_chunk&#39; to match the updated</span>
+<span class="sd">          query numbers</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">prompts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">overall_best_prompts</span>
+
+        <span class="n">new_prompts</span><span class="p">:</span> <span class="n">PromptsDictType</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">query_key_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">counter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">prompts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">query_key_map</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">counter</span><span class="p">)</span>
+            <span class="n">new_prompts</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">counter</span><span class="p">)]</span> <span class="o">=</span> <span class="n">val</span>
+
+            <span class="n">current_query_nr</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+                <span class="n">StringUtils</span><span class="o">.</span><span class="n">get_int_behind_last_underscore</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">target_query_nr</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">counter</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_map_overall_chunk_columns</span><span class="p">(</span>
+                <span class="n">current_query_nr</span><span class="p">,</span> <span class="n">target_query_nr</span>
+            <span class="p">)</span>
+        <span class="c1"># Use completed chunk column map to rename the overall chunk columns</span>
+        <span class="n">chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">overall_chunk</span>
+
+        <span class="n">chunk</span><span class="o">.</span><span class="n">rename_cols</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk_col_map</span><span class="p">)</span>
+        <span class="n">chunk</span><span class="o">.</span><span class="n">reorder_cols</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CrossStrategyPromptEvaluation._map_overall_chunk_columns">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.cross_strategy_prompt_evaluation.CrossStrategyPromptEvaluation._map_overall_chunk_columns">[docs]</a>
+    <span class="k">def</span> <span class="nf">_map_overall_chunk_columns</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">current_query_nr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">target_query_nr</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Maps the current overall_chunk column name to a new column name.</span>
+
+<span class="sd">        Adds a current column name/target column name pair to the</span>
+<span class="sd">        chunk_col_map dictionary of this class. When completed, the dictionary</span>
+<span class="sd">        is used to replace the current column names by the target</span>
+<span class="sd">        column names.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        current_query_nr : str</span>
+<span class="sd">            The current query identifier appended to a &quot;query_&quot; or &quot;answer_&quot;</span>
+<span class="sd">            column in the overall_chunk.</span>
+
+<span class="sd">        target_query_nr : str</span>
+<span class="sd">            The new query identifier by which to replace the current</span>
+<span class="sd">            identifier to build the new column name.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">col_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;query_&#39;</span><span class="p">,</span> <span class="s1">&#39;answer_&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">col_type</span> <span class="ow">in</span> <span class="n">col_types</span><span class="p">:</span>
+            <span class="n">target_col_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col_type</span><span class="si">}{</span><span class="nb">str</span><span class="p">(</span><span class="n">target_query_nr</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># Find column names that match the current column type and</span>
+            <span class="c1"># the current query number:</span>
+            <span class="n">col_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">overall_chunk</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                <span class="s2">&quot;get_col_names_by_substring&quot;</span><span class="p">,</span>
+                <span class="n">substring</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col_type</span><span class="si">}{</span><span class="n">current_query_nr</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">col_names</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                    <span class="s2">&quot;No column names with substring &#39;</span><span class="si">%s</span><span class="s2">&#39; found&quot;</span> <span class="o">%</span>
+                    <span class="n">current_query_nr</span>
+                <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_to_chunk_col_map</span><span class="p">(</span><span class="n">col_names</span><span class="p">,</span> <span class="n">target_col_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CrossStrategyPromptEvaluation._add_to_chunk_col_map">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.cross_strategy_prompt_evaluation.CrossStrategyPromptEvaluation._add_to_chunk_col_map">[docs]</a>
+    <span class="k">def</span> <span class="nf">_add_to_chunk_col_map</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">col_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">target_col_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds or maps column names to a new target column name.</span>
+
+<span class="sd">        Handles the renaming of columns in &#39;overall_chunk&#39; by adding entries to</span>
+<span class="sd">        &#39;chunk_col_map&#39; or processing duplicate column names.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_names : List[str]</span>
+<span class="sd">            List of current column names to be mapped.</span>
+
+<span class="sd">        target_col_name : str</span>
+<span class="sd">            New column name to which the current names will be mapped.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            If more than two identical query column names are encountered.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">col_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">col_name</span> <span class="o">=</span> <span class="n">col_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chunk_col_map</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">target_col_name</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">col_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_handle_double_col_names_in_overall_chunk</span><span class="p">(</span>
+                <span class="n">col_names</span><span class="p">,</span> <span class="n">target_col_name</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;There are more than 2 identical query names in the &quot;</span>
+                   <span class="s2">&quot;chunk. This case has not been implemented yet.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CrossStrategyPromptEvaluation._handle_double_col_names_in_overall_chunk">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.cross_strategy_prompt_evaluation.CrossStrategyPromptEvaluation._handle_double_col_names_in_overall_chunk">[docs]</a>
+    <span class="k">def</span> <span class="nf">_handle_double_col_names_in_overall_chunk</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">col_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">target_col_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resolves duplicate column names in the overall chunk.</span>
+
+<span class="sd">        Handles cases where the same query appears multiple times (e.g.,</span>
+<span class="sd">        as &#39;_x&#39; and &#39;_y&#39; suffixes) and renames or maps them accordingly. If</span>
+<span class="sd">        unexpected cases arise, applies a fallback renaming strategy.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_names : List[str]</span>
+<span class="sd">            List of duplicate column names.</span>
+
+<span class="sd">        target_col_name : str</span>
+<span class="sd">            Target column name to resolve the duplicates against.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - Renames columns in the &#39;overall_chunk&#39; DataFrame to avoid conflicts.</span>
+<span class="sd">        - Updates &#39;chunk_col_map&#39; with resolved column mappings.</span>
+<span class="sd">        - Applies a fallback strategy for unexpected cases.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If an unresolvable case is encountered during renaming.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">fallback_suffix</span> <span class="o">=</span> <span class="s2">&quot;_fallback&quot;</span>
+
+        <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">col_names</span><span class="p">:</span>
+            <span class="c1"># Find out which query column corresponds to which query</span>
+            <span class="c1"># variant: The column that corresponds to the current</span>
+            <span class="c1"># variant is marked with &#39;_x&#39;:</span>
+            <span class="k">if</span> <span class="n">col_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_x&#39;</span><span class="p">):</span>
+                <span class="n">new_col_name</span> <span class="o">=</span> <span class="n">col_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="s1">&#39;_x&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">new_col_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_col_map</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">overall_chunk</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+                        <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col_name</span><span class="p">:</span> <span class="n">new_col_name</span><span class="p">},</span>
+                        <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">chunk_col_map</span><span class="p">[</span><span class="n">new_col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">target_col_name</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Handle case where the new column name already exists</span>
+                    <span class="n">fallback_name</span> <span class="o">=</span> <span class="n">new_col_name</span> <span class="o">+</span> <span class="n">fallback_suffix</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">overall_chunk</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+                        <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col_name</span><span class="p">:</span> <span class="n">fallback_name</span><span class="p">},</span>
+                        <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">chunk_col_map</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">target_col_name</span>
+
+            <span class="c1"># Process &#39;_y&#39; suffix columns</span>
+            <span class="k">elif</span> <span class="n">col_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_y&#39;</span><span class="p">):</span>
+                <span class="n">new_col_name</span> <span class="o">=</span> <span class="n">col_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_y&#39;</span><span class="p">,</span> <span class="s1">&#39;_x&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">overall_chunk</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+                    <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col_name</span><span class="p">:</span> <span class="n">new_col_name</span><span class="p">},</span>
+                    <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Fallback for unexpected cases</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Generate a unique fallback column name</span>
+                <span class="n">fallback_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}{</span><span class="n">fallback_suffix</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">overall_chunk</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+                    <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col_name</span><span class="p">:</span> <span class="n">fallback_name</span><span class="p">},</span>
+                    <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chunk_col_map</span><span class="p">[</span><span class="n">fallback_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">target_col_name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Unexpected column name &#39;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}</span><span class="s2">&#39; encountered. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Renamed to &#39;</span><span class="si">{</span><span class="n">fallback_name</span><span class="si">}</span><span class="s2">&#39; using fallback strategy.&quot;</span><span class="p">,</span>
+                    <span class="n">level</span><span class="o">=</span><span class="s1">&#39;warning&#39;</span>
+                <span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_extract_best_prompt_ingredients_sets</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">best_query_nrs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">best_prompt_ingredients_sets</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompt_ingredients_sets</span><span class="o">.</span><span class="n">data</span><span class="p">[</span>
+                <span class="n">StringUtils</span><span class="o">.</span><span class="n">get_int_behind_last_underscore</span><span class="p">(</span><span class="n">query_nr</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="p">]</span>
+            <span class="k">for</span> <span class="n">query_nr</span> <span class="ow">in</span> <span class="n">best_query_nrs</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">overall_best_prompt_ingredients_sets</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">overall_best_prompt_ingredients_sets</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">best_prompt_ingredients_sets</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">overall_best_prompt_ingredients_sets</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">overall_best_prompt_ingredients_sets</span> <span class="o">+</span>
+                    <span class="n">best_prompt_ingredients_sets</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="CrossStrategyPromptEvaluation._extract_best_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.cross_strategy_prompt_evaluation.CrossStrategyPromptEvaluation._extract_best_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">_extract_best_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">best_query_nrs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts the specified best queries from all queries.</span>
+
+<span class="sd">        Extracts the specified best queries from all queries and assembles</span>
+<span class="sd">        them in the overall_best_prompts dictionary of this class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        best_query_nrs : List[str]</span>
+<span class="sd">            List of column names of the best prompts.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -------</span>
+<span class="sd">        This method does not return the extracted queries. Instead,</span>
+<span class="sd">        it stores them in the overall_best_prompts dictionary of this</span>
+<span class="sd">        class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">prompt_engineer</span> <span class="o">=</span> <span class="n">get_prompt_engineer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)))</span>
+
+        <span class="n">all_prompts</span><span class="p">:</span> <span class="n">PromptsDictType</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">prompt_engineer</span><span class="o">.</span><span class="n">get_prompts</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="n">best_prompts</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">query_nr</span> <span class="ow">in</span> <span class="n">best_query_nrs</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="n">col_name</span><span class="o">=</span><span class="n">query_nr</span><span class="p">)</span>
+            <span class="n">best_prompts</span><span class="p">[</span><span class="n">q</span><span class="o">.</span><span class="n">nr_with_version</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_prompts</span><span class="p">[</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">nr</span><span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">overall_best_prompts</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">overall_best_prompts</span> <span class="o">=</span> <span class="n">best_prompts</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">overall_best_prompts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">best_prompts</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">overall_best_prompts</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_extract_to_overall_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">best_query_nrs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">chunk_loader</span> <span class="o">=</span> <span class="n">ChunkLoader</span><span class="p">(</span>
+            <span class="n">language</span><span class="o">=</span><span class="s1">&#39;en&#39;</span>
+        <span class="p">)</span>
+        <span class="n">chunk</span> <span class="o">=</span> <span class="n">chunk_loader</span><span class="o">.</span><span class="n">extract_best_queries</span><span class="p">(</span><span class="n">best_query_nrs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">overall_chunk</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">overall_chunk</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Drop columns that are not query or answer columns</span>
+            <span class="n">chunk</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                <span class="s1">&#39;drop_columns&#39;</span><span class="p">,</span>
+                <span class="n">col_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">non_query_cols</span>
+            <span class="p">)</span>
+            <span class="c1"># Add the remaining columns to the existing overall chunk</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">overall_chunk</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span><span class="s1">&#39;merge&#39;</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="n">chunk</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_save_best_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="c1"># Get new version from last version used, augmenting it by 1 and</span>
+        <span class="c1"># prefixing it with 0</span>
+        <span class="n">new_version</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;0</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Set properties needed for saving the best prompts files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="n">new_version</span><span class="p">)</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;serverless_bloom_retrieval_best_validated_queries_v_&quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">new_version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_engineering</span> <span class="o">=</span> <span class="n">PromptEngineering</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_overall_best_prompts</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_overall_best_prompt_ingredients_sets</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_overall_chunk</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CrossStrategyPromptEvaluation._save_overall_best_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.cross_strategy_prompt_evaluation.CrossStrategyPromptEvaluation._save_overall_best_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">_save_overall_best_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves the overall best prompts re-indexing the dictionary.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+
+<span class="sd">        &quot;Re-indexes&quot; the overall_best_prompts dictionary to match the</span>
+<span class="sd">        positional index of the elements in</span>
+<span class="sd">        overall_best_prompt_ingredients_sets.</span>
+<span class="sd">        The keys in the overall_best_prompts dictionary correspond to</span>
+<span class="sd">        the index numbers + 1 in the overall_best_prompt_ingredients list.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># &quot;Re-index&quot; the overall_best_prompts dictionary.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">overall_best_prompts</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">convert_keys_to_consecutive_str_numbers</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">overall_best_prompts</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_engineering</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">overall_best_prompts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_engineering</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CrossStrategyPromptEvaluation._save_overall_best_prompt_ingredients_sets">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.cross_strategy_prompt_evaluation.CrossStrategyPromptEvaluation._save_overall_best_prompt_ingredients_sets">[docs]</a>
+    <span class="k">def</span> <span class="nf">_save_overall_best_prompt_ingredients_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves the overall best prompt ingredients sets.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_engineering</span><span class="o">.</span><span class="n">prompt_sets_history</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">history</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Prompt sets history already exists! &quot;</span>
+                   <span class="s2">&quot;Overall_best_prompt_ingredients_sets does not need &quot;</span>
+                   <span class="s2">&quot;saving.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">overall_best_prompt_ingredients_sets</span><span class="p">:</span>
+                <span class="n">history</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+            <span class="n">history</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CrossStrategyPromptEvaluation._save_overall_chunk">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.cross_strategy_prompt_evaluation.CrossStrategyPromptEvaluation._save_overall_chunk">[docs]</a>
+    <span class="k">def</span> <span class="nf">_save_overall_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves the combined chunk of best queries.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">overall_chunk</span>
+
+        <span class="n">chunk</span><span class="o">.</span><span class="n">set_directory</span><span class="p">()</span>
+        <span class="n">chunk</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.utils.method_utils &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.utils.method_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.utils.method_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">method_utils.py</span>
+<span class="sd">---------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">This module provides functions to analyze and handle methods and functions.</span>
+
+<span class="sd">Functions</span>
+<span class="sd">---------</span>
+<span class="sd">dynamic_import(module_name: str):</span>
+<span class="sd">    Dynamically imports a module given its module name as a string.</span>
+
+<span class="sd">extract_method_names(module_name: str) -&gt; List[str]:</span>
+<span class="sd">    Extracts all method names from a given module.</span>
+
+<span class="sd">find_unused_methods_in_project(module_name: str, project_path: str)</span>
+<span class="sd">        -&gt; List[str]:</span>
+<span class="sd">    Finds unused methods in the specified module.</span>
+
+<span class="sd">get_module_file_path(module_name: str) -&gt; str:</span>
+<span class="sd">    Dynamically retrieves the file path of a module from its module name.</span>
+
+<span class="sd">search_method_in_project(method_name: str, project_path: str,</span>
+<span class="sd">        exclude_module: str) -&gt; bool:</span>
+<span class="sd">    Searches usages of the specified method in the files of the project path.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">ModuleType</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.utils.string_utils</span> <span class="kn">import</span> <span class="n">StringUtils</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">LoggingMixin</span><span class="p">()</span><span class="o">.</span><span class="n">log</span>
+
+
+<div class="viewcode-block" id="dynamic_import">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.method_utils.dynamic_import">[docs]</a>
+<span class="k">def</span> <span class="nf">dynamic_import</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">ModuleType</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dynamically imports a module given its module name as a string.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module_name : str</span>
+<span class="sd">        The full name of the module to import (e.g., &#39;src.utils.my_module&#39;).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    module : ModuleType | None</span>
+<span class="sd">        The imported module.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Import the module dynamically</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">module</span>
+
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error importing module </span><span class="si">{</span><span class="n">module_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="update_module">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.method_utils.update_module">[docs]</a>
+<span class="k">def</span> <span class="nf">update_module</span><span class="p">(</span><span class="n">module</span><span class="p">:</span> <span class="n">ModuleType</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Updates the module in the cache to get up-to-date information.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module : ModuleType</span>
+<span class="sd">        The module to update.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">module</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="extract_method_names">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.method_utils.extract_method_names">[docs]</a>
+<span class="k">def</span> <span class="nf">extract_method_names</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts all public method and function names from a given module.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module_name : str</span>
+<span class="sd">        The name of the module to extract method names from.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[str]</span>
+<span class="sd">        A list of public method and function names found in the module.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Import the module dynamically using importlib</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+    <span class="n">method_names</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Extract module-level functions</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">func</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">==</span> <span class="n">module</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+            <span class="n">method_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="c1"># Extract methods from classes</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">==</span> <span class="n">module</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>  <span class="c1"># Ensuring it&#39;s a public method</span>
+                    <span class="n">method_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">method_names</span></div>
+
+
+
+<div class="viewcode-block" id="get_module_file_path">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.method_utils.get_module_file_path">[docs]</a>
+<span class="k">def</span> <span class="nf">get_module_file_path</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dynamically retrieves the file path of a module from its module name.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module_name : str</span>
+<span class="sd">        The name of the module (e.g., &quot;src.utils.list_utils&quot;).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The absolute file path of the module.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Import the module dynamically using importlib</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+
+    <span class="c1"># Get the file path of the module using the __file__ attribute</span>
+    <span class="n">module_file_path</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="vm">__file__</span>
+
+    <span class="c1"># Convert it to an absolute path for consistent comparison</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">module_file_path</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="search_method_in_project">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.method_utils.search_method_in_project">[docs]</a>
+<span class="k">def</span> <span class="nf">search_method_in_project</span><span class="p">(</span>
+        <span class="n">method_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">project_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">exclude_module</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Searches usages of the specified method in the files of the project path.</span>
+
+<span class="sd">    Searches for a method name in all Python files within the project</span>
+<span class="sd">    directory, excluding the file where the method is implemented.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    method_name : str</span>
+<span class="sd">        The name of the method to search for.</span>
+
+<span class="sd">    project_path : str</span>
+<span class="sd">        The path to the root directory of the project.</span>
+
+<span class="sd">    exclude_module : str</span>
+<span class="sd">        The name of the module where the method is implemented. It is</span>
+<span class="sd">        excluded from the search.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the method is found somewhere in the project, False otherwise.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Define a regex pattern to match the method name</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">rf</span><span class="s1">&#39;\b</span><span class="si">{</span><span class="n">method_name</span><span class="si">}</span><span class="s1">\b&#39;</span><span class="p">)</span>
+    <span class="n">exclude_file</span> <span class="o">=</span> <span class="n">get_module_file_path</span><span class="p">(</span><span class="n">exclude_module</span><span class="p">)</span>
+
+    <span class="c1"># Traverse the entire project directory to search for the method</span>
+    <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">project_path</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">):</span>  <span class="c1"># Only search Python files</span>
+                <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+                <span class="n">test_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">)</span>
+                <span class="n">x_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;x_&#39;</span><span class="p">)</span>
+
+                <span class="c1"># Skip the file where the method is implemented</span>
+                <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">test_path</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="n">file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">x_path</span><span class="p">)</span>
+                        <span class="ow">or</span> <span class="n">file_path</span> <span class="o">==</span> <span class="n">exclude_file</span>
+                <span class="p">):</span>
+                    <span class="k">continue</span>
+
+                <span class="c1"># Search the method name in the content of the file</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                    <span class="c1"># If the pattern is found in the file, return True</span>
+                    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="find_methods">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.method_utils.find_methods">[docs]</a>
+<span class="k">def</span> <span class="nf">find_methods</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieves all public and abstract methods of a class, along with their</span>
+<span class="sd">    signatures and descriptions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cls : type</span>
+<span class="sd">        The class from which to extract methods.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dict[str, Tuple[str, str]]</span>
+<span class="sd">        A dictionary where keys are method names and values are tuples</span>
+<span class="sd">        containing the method signature and description.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">methods</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Get public methods (excluding those starting with &#39;_&#39;)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+            <span class="n">methods</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">extract_method_info</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+
+    <span class="c1"># Get abstract methods (if applicable)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="n">inspect</span><span class="o">.</span><span class="n">isabstract</span>
+        <span class="p">):</span>
+            <span class="c1"># Add if not already present</span>
+            <span class="n">methods</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">extract_method_info</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">methods</span></div>
+
+
+
+<div class="viewcode-block" id="extract_method_info">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.method_utils.extract_method_info">[docs]</a>
+<span class="k">def</span> <span class="nf">extract_method_info</span><span class="p">(</span><span class="n">method</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts the method signature and description.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    method : Callable</span>
+<span class="sd">        The method from which to extract the signature and description.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[str, str]</span>
+<span class="sd">        A tuple containing the method signature and the first sentence of</span>
+<span class="sd">        the description.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">signature</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">StringUtils</span><span class="o">.</span><span class="n">get_first_sentence</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span> <span class="k">if</span> <span class="n">doc</span> \
+        <span class="k">else</span> <span class="s2">&quot;No description available.&quot;</span>
+    <span class="k">return</span> <span class="n">signature</span><span class="p">,</span> <span class="n">description</span></div>
+
+
+
+<div class="viewcode-block" id="find_unused_methods_in_project">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.utils.html#SentimentAnalysis.src.utils.method_utils.find_unused_methods_in_project">[docs]</a>
+<span class="k">def</span> <span class="nf">find_unused_methods_in_project</span><span class="p">(</span>
+        <span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">project_path</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds unused methods in the specified module.</span>
+
+<span class="sd">    Finds methods in the specified module that are not used anywhere else</span>
+<span class="sd">    in the project.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module_name : str</span>
+<span class="sd">        The name of the module to extract method names from.</span>
+
+<span class="sd">    project_path : str</span>
+<span class="sd">        The path to the root directory of the project.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[str]</span>
+<span class="sd">        A list of method names that are not found anywhere else in the project.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">unused_methods</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">method_names</span> <span class="o">=</span> <span class="n">extract_method_names</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">method_names</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">search_method_in_project</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">project_path</span><span class="p">,</span> <span class="n">module_name</span><span class="p">):</span>
+            <span class="n">unused_methods</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">unused_methods</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

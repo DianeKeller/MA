@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.nlp.tokenization.tokenization_mixin &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.nlp.tokenization.tokenization_mixin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.nlp.tokenization.tokenization_mixin</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">tokenization_mixin.py</span>
+<span class="sd">---------------------</span>
+<span class="sd">Version 1.0, validated on 2024-09-17</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">src.nlp.tokenization.sentence_tokenization_factory</span> <span class="kn">import</span> \
+    <span class="n">get_sentence_tokenizer</span>
+<span class="kn">from</span> <span class="nn">src.nlp.tokenization.sentence_tokenizer</span> <span class="kn">import</span> <span class="n">SentenceTokenizer</span>
+<span class="kn">from</span> <span class="nn">src.nlp.tokenization.word_tokenization_factory</span> <span class="kn">import</span> <span class="n">get_word_tokenizer</span>
+<span class="kn">from</span> <span class="nn">src.nlp.tokenization.word_tokenizer</span> <span class="kn">import</span> <span class="n">WordTokenizer</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+
+
+<div class="viewcode-block" id="TokenizationMixin">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.nlp.tokenization.html#SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin">[docs]</a>
+<span class="k">class</span> <span class="nc">TokenizationMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TokenizationMixin class.</span>
+
+<span class="sd">    This mixin provides tokenization capabilities for text data.</span>
+
+<span class="sd">    It provides getters and setters for different types of tokenizers (word</span>
+<span class="sd">    tokenizer, sentence tokenizer, ...), which can be set to use different</span>
+<span class="sd">    tokenization strategies (nltk, custom strategies, ...).</span>
+
+<span class="sd">    It also provides default strategies for the different types of tokenizers.</span>
+<span class="sd">    The default strategy is &#39;NoPunctuation&#39; for word tokenization and &#39;nltk&#39;</span>
+<span class="sd">    for sentence tokenization.</span>
+
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    DEFAULT_SENTENCE_STRATEGY : str</span>
+<span class="sd">        The name of the default sentence strategy.</span>
+
+<span class="sd">    DEFAULT_WORD_STRATEGY : str</span>
+<span class="sd">        The name of the default word strategy.</span>
+
+<span class="sd">    sentence_tokenizer : SentenceTokenizer</span>
+<span class="sd">        The sentence tokenizer.</span>
+
+<span class="sd">    word_tokenizer : WordTokenizer</span>
+<span class="sd">        The word tokenizer.</span>
+
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    set_sentence_tokenizer(tokenization_strategy_name: str = &#39;&#39;) -&gt; None:</span>
+<span class="sd">        Sets the sentence tokenizer using the specified strategy.</span>
+
+<span class="sd">    set_word_tokenizer(tokenization_strategy_name: str = &#39;&#39;) -&gt; None:</span>
+<span class="sd">        Sets the word tokenizer using the specified strategy.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">DEFAULT_SENTENCE_STRATEGY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Nltk&#39;</span>
+
+    <span class="c1"># The nltk &quot;word_tokenize&quot; function counts punctuation as separate</span>
+    <span class="c1"># words. Therefore, this class chooses to use the &#39;NoPunctuation&#39; word</span>
+    <span class="c1"># tokenization strategy by default.</span>
+
+    <span class="n">DEFAULT_WORD_STRATEGY</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;NoPunctuation&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sentence_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">SentenceTokenizer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the sentence tokenizer.</span>
+
+<span class="sd">        If no sentence tokenizer has been set, a default sentence strategy is</span>
+<span class="sd">        used to set it.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        SentenceTokenizer</span>
+<span class="sd">            The sentence tokenizer.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_sentence_tokenizer&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_sentence_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_SENTENCE_STRATEGY</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_sentence_tokenizer&#39;</span><span class="p">,</span> <span class="n">SentenceTokenizer</span><span class="p">())</span>
+
+    <span class="nd">@sentence_tokenizer</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">sentence_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">:</span> <span class="n">SentenceTokenizer</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the sentence tokenizer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_sentence_tokenizer&#39;</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">word_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">WordTokenizer</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the word tokenizer.</span>
+
+<span class="sd">        If no word tokenizer has been set, the default word tokenization</span>
+<span class="sd">        strategy is used to set it.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        WordTokenizer</span>
+<span class="sd">            The word tokenizer.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_word_tokenizer&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_word_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_WORD_STRATEGY</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_word_tokenizer&#39;</span><span class="p">,</span> <span class="n">WordTokenizer</span><span class="p">())</span>
+
+    <span class="nd">@word_tokenizer</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">word_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">:</span> <span class="n">WordTokenizer</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the word tokenizer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_word_tokenizer&#39;</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TokenizationMixin.set_word_tokenizer">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.nlp.tokenization.html#SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin.set_word_tokenizer">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_word_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenization_strategy_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the word tokenizer using the specified strategy.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tokenization_strategy_name : str</span>
+<span class="sd">            The name of the tokenization strategy to use.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">tokenization_strategy_name</span><span class="p">):</span>
+            <span class="n">tokenization_strategy_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_WORD_STRATEGY</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">word_tokenizer</span> <span class="o">=</span> <span class="n">get_word_tokenizer</span><span class="p">(</span><span class="n">tokenization_strategy_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TokenizationMixin.set_sentence_tokenizer">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.nlp.tokenization.html#SentimentAnalysis.src.nlp.tokenization.tokenization_mixin.TokenizationMixin.set_sentence_tokenizer">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_sentence_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenization_strategy_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the sentence tokenizer using the specified strategy.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tokenization_strategy_name : str</span>
+<span class="sd">            The name of the tokenization strategy to use.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">tokenization_strategy_name</span><span class="p">):</span>
+            <span class="n">tokenization_strategy_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_SENTENCE_STRATEGY</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sentence_tokenizer</span> <span class="o">=</span> <span class="n">get_sentence_tokenizer</span><span class="p">(</span>
+            <span class="n">tokenization_strategy_name</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

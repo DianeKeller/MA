@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.data_sources.mad_tsc_workflow &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.data_sources.mad_tsc_workflow</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.data_sources.mad_tsc_workflow</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">mad_tsc_workflow.py</span>
+<span class="sd">-----------------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">no_type_check</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">src.data_sources.data_source_workflow</span> <span class="kn">import</span> <span class="n">DataSourceWorkflow</span>
+<span class="kn">from</span> <span class="nn">src.data_sources.mad_tsc_strategy</span> <span class="kn">import</span> <span class="n">MadTscStrategy</span>
+<span class="kn">from</span> <span class="nn">src.data_sources.mad_tsc_suite</span> <span class="kn">import</span> <span class="n">MadTscSuite</span>
+<span class="kn">from</span> <span class="nn">src.data_sources.mentions</span> <span class="kn">import</span> <span class="n">Mentions</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.str_series</span> <span class="kn">import</span> <span class="n">StrSeries</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">src.utils.string_utils</span> <span class="kn">import</span> <span class="n">StringUtils</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+
+
+<div class="viewcode-block" id="MadTscWorkflow">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_workflow.MadTscWorkflow">[docs]</a>
+<span class="k">class</span> <span class="nc">MadTscWorkflow</span><span class="p">(</span><span class="n">DataSourceWorkflow</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    MadTscWorkflow class.</span>
+
+<span class="sd">    This class implements the DataSourceWorkflow base class. It provides easy</span>
+<span class="sd">    access to the functionalities of the MadTscSuite and the classes</span>
+<span class="sd">    associated with the MAD-TSC data source, facilitating the loading,</span>
+<span class="sd">    analysis and comparison of its subsets.</span>
+
+<span class="sd">    It&#39;s main functionality is the &quot;execute&quot; method.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    POLARITY_COL_NAME : str</span>
+<span class="sd">        Name of the column containing polarity data.</span>
+
+<span class="sd">    MENTION_COL_NAME : str</span>
+<span class="sd">        Name of the column containing mention data.</span>
+
+<span class="sd">    N_SENTENCES_COL_NAME : str</span>
+<span class="sd">        Name of the column containing the number of sentences.</span>
+
+<span class="sd">    TEXT_COL_NAME : str</span>
+<span class="sd">        Name of the column containing the normalized sentence text.</span>
+
+<span class="sd">    chosen_subset : MadTscStrategy</span>
+<span class="sd">       The currently selected subset strategy.</span>
+
+<span class="sd">    mentions : Mentions</span>
+<span class="sd">        The &quot;mentions&quot; column of the chosen subset, wrapped in a Mentions</span>
+<span class="sd">        object. Computed property without setter.</span>
+
+<span class="sd">    mentions_and_polarities : MyDataFrame</span>
+<span class="sd">        The combined dataframe of mentions and polarities.</span>
+
+<span class="sd">    mentions_comparison : MyDataFrame</span>
+<span class="sd">        The comparison of mentions across the subsets. (read-only)</span>
+
+<span class="sd">    n_sentences_comparison : MyDataFrame</span>
+<span class="sd">        The comparison of the number of sentences across the subsets.</span>
+
+<span class="sd">    stats : MyDataFrame</span>
+<span class="sd">        The statistics of the MAD-TSC suite. (read-only)</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    analyze_content() -&gt; None:</span>
+<span class="sd">        Analyzes the MAD-TSC subsets.</span>
+
+<span class="sd">    combine_subsets() -&gt; MadTscStrategy:</span>
+<span class="sd">        Combines all subsets in one single subset.</span>
+
+<span class="sd">    combined_feature(feature: str) -&gt; MadTscStrategy:</span>
+<span class="sd">        Returns the specified feature extracted from the combined subsets.</span>
+
+<span class="sd">    combined_split_feature(split: str, feature: str) -&gt; MadTscStrategy:</span>
+<span class="sd">        Returns the specified feature extracted from the combined split</span>
+<span class="sd">        subsets.</span>
+
+<span class="sd">    compute_statistics() -&gt; None:</span>
+<span class="sd">        Computes the complete MAD-TSC statistics.</span>
+
+<span class="sd">    compare_n_sentences() -&gt; None:</span>
+<span class="sd">        Compares the number of sentences across the subsets and prints</span>
+<span class="sd">        whether they are identical or differ.</span>
+
+<span class="sd">    compare_mentions_freq_diagrams(languages: List[str]) -&gt; None:</span>
+<span class="sd">        Prints mention frequency diagrams for the specified languages.</span>
+
+<span class="sd">    compare_mentions() -&gt; None:</span>
+<span class="sd">        Compares the mentions across the subsets and prints whether they</span>
+<span class="sd">        are identical or differ.</span>
+
+<span class="sd">    compare_polarities() -&gt; None:</span>
+<span class="sd">        Compares the polarities across the subsets and prints whether they</span>
+<span class="sd">        are identical or differ.</span>
+
+<span class="sd">    choose_subset(language: str = &#39;en&#39;) -&gt; None:</span>
+<span class="sd">        Sets the chosen_subset property to the specified language subset.</span>
+
+<span class="sd">    execute() -&gt; None:</span>
+<span class="sd">        Defines and runs the operations the MAD-TSC workflow needs to execute.</span>
+
+<span class="sd">    mentions_freq_diagram(min_freq: int = 2, max_n: int = 30) -&gt; None:</span>
+<span class="sd">        Displays a frequency diagram of the mentions based on the specified</span>
+<span class="sd">        parameters.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">POLARITY_COL_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;polarity&quot;</span>
+    <span class="n">MENTION_COL_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mention&quot;</span>
+    <span class="n">N_SENTENCES_COL_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;n_sentences&quot;</span>
+    <span class="n">TEXT_COL_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;sentence_normalized&quot;</span>
+
+<div class="viewcode-block" id="MadTscWorkflow.__init__">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_workflow.MadTscWorkflow.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a new instance of the MadTscWorkflow class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">MadTscSuite</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chosen_subset</span> <span class="o">=</span> <span class="n">MadTscStrategy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mentions_and_polarities</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_sentences_comparison</span><span class="p">:</span> <span class="n">MyDataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mentions_comparison</span><span class="p">:</span> <span class="n">MyDataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">chosen_subset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MadTscStrategy</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the currently selected subset strategy.</span>
+
+<span class="sd">        If currently there is no subset strategy selected, the choose_subset</span>
+<span class="sd">        method is called letting it set a default subset.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chosen_subset</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Currently, no subset is chosen. Choosing default subset...&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">choose_subset</span><span class="p">()</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Default subset chosen: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chosen_subset</span><span class="o">.</span><span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chosen_subset</span>
+
+    <span class="nd">@chosen_subset</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">chosen_subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">MadTscStrategy</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the currently selected subset strategy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chosen_subset</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the suite&#39;s statistics.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">stats</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mentions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Mentions</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the entire &quot;mentions&quot; column of the chosen subset.</span>
+
+<span class="sd">        Gets the entire &quot;mentions&quot; column of the currently chosen</span>
+<span class="sd">        subset and returns it as a Mentions object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chosen_subset</span>
+        <span class="n">mentions</span> <span class="o">=</span> <span class="n">StrSeries</span><span class="p">(</span>
+            <span class="n">subset</span><span class="o">.</span><span class="n">get_col</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MENTION_COL_NAME</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;Mentions in Subset &#39;&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">StringUtils</span><span class="o">.</span><span class="n">first_char_to_upper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chosen_subset</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">Mentions</span><span class="p">(</span><span class="n">mentions</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mentions_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a MyDataFrame showing the differences between mentions.</span>
+
+<span class="sd">        Gets a MyDataFrame showing the differences between mentions across</span>
+<span class="sd">        subsets.</span>
+
+<span class="sd">        If the comparison has not been previously computed, it is calculated</span>
+<span class="sd">        by comparing the mention columns across the subsets.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">           A dataframe showing the comparison of mentions across subsets.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mentions_comparison</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mentions_comparison</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">show_compare_cols</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">MENTION_COL_NAME</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mentions_comparison</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mentions_and_polarities</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the mentions and polarities MyDataFrame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mentions_and_polarities</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;The mentions and polarities first need to be extracted. &quot;</span>
+                <span class="s2">&quot;Run the &#39;extract_mentions_and_polarities&#39; method before &quot;</span>
+                <span class="s2">&quot;re-trying this operation.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mentions_and_polarities</span>
+
+    <span class="nd">@mentions_and_polarities</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">mentions_and_polarities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the mentions and polarities MyDataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : MyDataFrame</span>
+<span class="sd">            The mentions and polarities MyDataFrame.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mentions_and_polarities</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_sentences_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the comparison of the number of sentences across the subsets.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_sentences_comparison</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_n_sentences_comparison</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">show_compare_cols</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">N_SENTENCES_COL_NAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TEXT_COL_NAME</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_sentences_comparison</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Methods</span>
+
+<div class="viewcode-block" id="MadTscWorkflow.combine_subsets">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_workflow.MadTscWorkflow.combine_subsets">[docs]</a>
+    <span class="k">def</span> <span class="nf">combine_subsets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MadTscStrategy</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combines all subsets in one single subset.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MadTscStrategy</span>
+<span class="sd">            An instance of MadTscStrategy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">combine_subsets</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MadTscWorkflow.combined_feature">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_workflow.MadTscWorkflow.combined_feature">[docs]</a>
+    <span class="k">def</span> <span class="nf">combined_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MadTscStrategy</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns extracted feature columns from combined subsets.</span>
+
+<span class="sd">        Extracts the specified feature from the combined subsets and returns</span>
+<span class="sd">        the corresponding subset strategy.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        feature : str</span>
+<span class="sd">            The feature to be extracted.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MadTscStrategy</span>
+<span class="sd">            An instance of MadTscStrategy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Set the column names for the columns that are to be extracted</span>
+        <span class="n">col_names</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">languages</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Extract the columns</span>
+        <span class="n">extracted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">combined_subsets</span><span class="o">.</span><span class="n">extract_columns</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">col_names</span>
+        <span class="p">)</span>
+
+        <span class="c1"># In the extracted data, rename the columns</span>
+        <span class="n">extracted</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">languages</span>
+
+        <span class="k">return</span> <span class="n">extracted</span></div>
+
+
+<div class="viewcode-block" id="MadTscWorkflow.combined_split_feature">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_workflow.MadTscWorkflow.combined_split_feature">[docs]</a>
+    <span class="k">def</span> <span class="nf">combined_split_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">feature</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MadTscStrategy</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns extracted feature columns from combined split subsets.</span>
+<span class="sd">        </span>
+<span class="sd">        Extracts the specified feature from the combined split subsets and</span>
+<span class="sd">        returns the corresponding subset strategy.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        split : str</span>
+<span class="sd">            The split identifier for the subsets.</span>
+<span class="sd">        </span>
+<span class="sd">        feature : str</span>
+<span class="sd">            The feature to be extracted.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MadTscStrategy</span>
+<span class="sd">            An instance of MadTscStrategy with the extracted feature.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Set the column names for the columns that are to be extracted</span>
+        <span class="n">col_names</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">languages</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Extract the columns</span>
+        <span class="n">combined_split_subsets</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">combined_subsets</span><span class="o">.</span><span class="n">filter_by_split</span><span class="p">(</span><span class="n">split</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">extracted</span> <span class="o">=</span> <span class="n">combined_split_subsets</span><span class="o">.</span><span class="n">extract_columns</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">col_names</span>
+        <span class="p">)</span>
+
+        <span class="c1"># In the extracted data, rename the columns</span>
+        <span class="n">extracted</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">languages</span>
+
+        <span class="k">return</span> <span class="n">extracted</span></div>
+
+
+<div class="viewcode-block" id="MadTscWorkflow.compute_statistics">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_workflow.MadTscWorkflow.compute_statistics">[docs]</a>
+    <span class="nd">@no_type_check</span>
+    <span class="k">def</span> <span class="nf">compute_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the complete MAD-TSC statistics.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">compute_all_stats</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MadTscWorkflow.compare_n_sentences">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_workflow.MadTscWorkflow.compare_n_sentences">[docs]</a>
+    <span class="k">def</span> <span class="nf">compare_n_sentences</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compares the number of sentences across the subsets.</span>
+
+<span class="sd">        Compares the numbers of sentences across the subsets and simply</span>
+<span class="sd">        prints whether the columns are identical or differ.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The numbers of sentences are expected to differ across languages</span>
+<span class="sd">        for various reasons:</span>
+
+<span class="sd">        - Translation from one language to another does not respect sentence</span>
+<span class="sd">          boundaries as, in different languages, there might be different</span>
+<span class="sd">          conventions as to what sentence length is acceptable for a reader</span>
+<span class="sd">          and what information can conveniently be joined in one sentence</span>
+<span class="sd">          and what has better be packed in a new sentence. So, one sentence</span>
+<span class="sd">          in one language can correspond, e.g., to half a sentence in</span>
+<span class="sd">          another language or even to several sentences in yet another</span>
+<span class="sd">          language.</span>
+
+<span class="sd">        - Punctuation marks used in abbreviations, dates, etc. may cause</span>
+<span class="sd">          the tokenizer to incorrectly set the sentence boundaries in one</span>
+<span class="sd">          language, whilst correctly identifying them in another</span>
+<span class="sd">          language.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        n_sentences_comparison : MyDataFrame</span>
+<span class="sd">            A MyDataFrame object providing insights into how samples</span>
+<span class="sd">            presenting different numbers of sentences across languages look</span>
+<span class="sd">            like.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">compare_cols</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N_SENTENCES_COL_NAME</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscWorkflow.compare_mentions">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_workflow.MadTscWorkflow.compare_mentions">[docs]</a>
+    <span class="k">def</span> <span class="nf">compare_mentions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compares the mentions across the subsets.</span>
+
+<span class="sd">        Compares the mentions across the subsets and prints whether</span>
+<span class="sd">        the columns are identical or differ.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        For the MAD-TSC suite, the mention columns are expected to differ</span>
+<span class="sd">        across the subsets, due to the different character sets the</span>
+<span class="sd">        different languages use. The same person&#39;s name may be written</span>
+<span class="sd">        differently in different languages.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        mentions_comparison : MyDataFrame</span>
+<span class="sd">            A MyDataFrame object providing insights into the differences</span>
+<span class="sd">            between mentions in the different languages.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">compare_cols</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MENTION_COL_NAME</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscWorkflow.compare_polarities">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_workflow.MadTscWorkflow.compare_polarities">[docs]</a>
+    <span class="k">def</span> <span class="nf">compare_polarities</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compares the polarities across the subsets.</span>
+
+<span class="sd">        Compares the polarities across the subsets and prints whether the</span>
+<span class="sd">        columns are identical or differ.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        For the MAD-TSC suite, the polority columns should be the same</span>
+<span class="sd">        across all subsets.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">compare_cols</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">POLARITY_COL_NAME</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscWorkflow.choose_subset">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_workflow.MadTscWorkflow.choose_subset">[docs]</a>
+    <span class="k">def</span> <span class="nf">choose_subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;en&#39;</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the chosen_subset property.</span>
+
+<span class="sd">        Selects the subset with the specified language and sets the</span>
+<span class="sd">        &quot;chosen_subset&quot; property accordingly.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        language : str</span>
+<span class="sd">            The language of the subset. Defaults to &#39;en&#39;.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The selected subset is not returned but used to set the</span>
+<span class="sd">        chosen_subset property of this class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">chosen_subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">choose_subset</span><span class="p">(</span><span class="n">language</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscWorkflow.mentions_freq_diagram">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_workflow.MadTscWorkflow.mentions_freq_diagram">[docs]</a>
+    <span class="k">def</span> <span class="nf">mentions_freq_diagram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_freq</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays a frequency diagram of the mentions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        min_freq : int</span>
+<span class="sd">            The minimum frequency to display. Default is 2.</span>
+
+<span class="sd">        max_n : int</span>
+<span class="sd">            The maximum number of mentions to display. Default is 30.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mentions</span><span class="o">.</span><span class="n">frequency_diagram</span><span class="p">(</span>
+            <span class="n">min_freq</span><span class="o">=</span><span class="n">min_freq</span><span class="p">,</span>
+            <span class="n">max_n</span><span class="o">=</span><span class="n">max_n</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MadTscWorkflow.compare_mentions_freq_diagrams">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_workflow.MadTscWorkflow.compare_mentions_freq_diagrams">[docs]</a>
+    <span class="k">def</span> <span class="nf">compare_mentions_freq_diagrams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">languages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints mention frequency diagrams for the specified languages.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        languages : List [str]</span>
+<span class="sd">            List of language codes for the languages to include in the</span>
+<span class="sd">            comparison.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">language</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">choose_subset</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mentions_freq_diagram</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MadTscWorkflow.execute">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_workflow.MadTscWorkflow.execute">[docs]</a>
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Defines and runs the operations the MAD-TSC workflow needs to execute.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_subsets</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="MadTscWorkflow.analyze_content">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.mad_tsc_workflow.MadTscWorkflow.analyze_content">[docs]</a>
+    <span class="k">def</span> <span class="nf">analyze_content</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Analyzes the MAD-TSC subsets.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_subsets</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compare_polarities</span><span class="p">()</span>
+        <span class="c1"># self.compare_mentions()</span>
+
+        <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;en&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;es&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fr&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pt&quot;</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compare_mentions_freq_diagrams</span><span class="p">(</span><span class="n">languages</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">compare_n_sentences</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_sentences_comparison</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_statistics</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">get_sentiment_distributions</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Methods</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads the MAD-TSC datasets.</span>
+<span class="sd">    </span>
+<span class="sd">    Usage</span>
+<span class="sd">    -----</span>
+<span class="sd">    From a command line in the SentimenAnalysis directory:</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; python -m src.data_sources.mad_tsc_workflow</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">wf</span> <span class="o">=</span> <span class="n">MadTscWorkflow</span><span class="p">()</span>
+    <span class="n">wf</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

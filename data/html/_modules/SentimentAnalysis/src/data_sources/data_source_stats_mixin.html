@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.data_sources.data_source_stats_mixin &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.data_sources.data_source_stats_mixin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.data_sources.data_source_stats_mixin</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">data_source_stats_mixin.py</span>
+<span class="sd">--------------------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">no_type_check</span>
+
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+
+<span class="kn">from</span> <span class="nn">constants</span> <span class="kn">import</span> <span class="n">INT</span><span class="p">,</span> <span class="n">FLOAT</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_dataframe_factory</span> <span class="kn">import</span> <span class="n">MyDataFrameFactory</span>
+<span class="kn">from</span> <span class="nn">src.decorators.ensure_implements_decorator</span> <span class="kn">import</span> <span class="n">ensure_implements</span>
+<span class="kn">from</span> <span class="nn">src.decorators.execution_time_decorator</span> <span class="kn">import</span> <span class="n">execution_time</span>
+<span class="kn">from</span> <span class="nn">src.loggable</span> <span class="kn">import</span> <span class="n">Loggable</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+
+
+<div class="viewcode-block" id="DataSourceStatsMixin">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_stats_mixin.DataSourceStatsMixin">[docs]</a>
+<span class="k">class</span> <span class="nc">DataSourceStatsMixin</span><span class="p">(</span><span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    DataSourceStatsMixin class.</span>
+
+<span class="sd">    Mixin class for handling statistics-related functionalities for the</span>
+<span class="sd">    data source suites.</span>
+
+<span class="sd">    This class provides properties and methods for computing, storing,</span>
+<span class="sd">    and retrieving various statistics for data subsets within a data source</span>
+<span class="sd">    suite.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    COL_DTYPES : Dict[str, type]</span>
+<span class="sd">        A dictionary mapping column names to their respective data types</span>
+<span class="sd">        (e.g., INT, FLOAT). This is used to assign appropriate data types to</span>
+<span class="sd">        the columns of the statistics DataFrame.</span>
+
+<span class="sd">    stats : MyDataFrame</span>
+<span class="sd">        The computed statistics.</span>
+
+<span class="sd">    transposed_stats : MyDataFrame | None</span>
+<span class="sd">        A MyDataFrame containing a transposed version of the stats MyDataFrame.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    get_stats(category: str = &#39;&#39;) -&gt; MyDataFrame:</span>
+<span class="sd">        Returns the statistics for the specified category.</span>
+
+<span class="sd">    compute_all_stats()-&gt; None:</span>
+<span class="sd">        Computes the statistics for all loaded data subsets.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Classes that use this mixin are expected to have the following</span>
+    <span class="c1"># attributes:</span>
+    <span class="n">_subsets</span><span class="p">:</span> <span class="nb">dict</span>
+
+    <span class="c1"># Dtypes for the different stats columns:</span>
+    <span class="n">COL_DTYPES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;n_elements&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;min_length&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;max_length&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;mean_length&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;median_length&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;std_dev_length&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;min_words&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;max_words&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;mean_words&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;median_words&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;std_dev_words&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;min_sentences&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;max_sentences&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;mean_sentences&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;median_sentences&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;std_dev_sentences&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;min_confidence&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;max_confidence&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;mean_confidence&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;median_confidence&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;min_polarity&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;max_polarity&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;mean_polarity&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;median_polarity&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;std_dev_polarity&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;unique_polarity&#39;</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+        <span class="s1">&#39;n_positive&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;n_negative&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;n_neutral&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;n_other&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;%_positive&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;%_negative&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;%_neutral&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;%_other&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;n_unique_elements&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;n_most_frequent_unique_elements&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;n_least_frequent_unique_elements&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;most_frequent_unique_elements&#39;</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+        <span class="s1">&#39;least_frequent_unique_elements&#39;</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+        <span class="s1">&#39;max_frequency&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;min_frequency&#39;</span><span class="p">:</span> <span class="n">INT</span><span class="p">,</span>
+        <span class="s1">&#39;mean_frequency&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;median_frequency&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;std_dev_frequency&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;max_percentage_of_occurrences&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;min_percentage_of_occurrences&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;mean_percentage_of_occurrences&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;median_percentage_of_occurrences&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;std_dev_percentage_of_occurrences&#39;</span><span class="p">:</span> <span class="n">FLOAT</span><span class="p">,</span>
+
+    <span class="p">}</span>
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the statistics MyDataFrame.</span>
+
+<span class="sd">        If the statistics have not yet been computed and set, the</span>
+<span class="sd">        compute_all_stats method is called to compute them.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_stats&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compute_all_stats</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_stats&#39;</span><span class="p">,</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">())</span>
+
+    <span class="nd">@stats</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the stats property and resets the transposed_stats to None.</span>
+
+<span class="sd">        Sets the stats property ensuring that the MyDataFrame columns</span>
+<span class="sd">        are assigned the appropriate dtypes defined in the COL_DTYPES</span>
+<span class="sd">        dictionary and resets the transposed_stats property to None so that</span>
+<span class="sd">        it has to be recomputed when it is accessed to ensure the transposed</span>
+<span class="sd">        data always matches the newest state of stats.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_stats&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assign_dtypes</span><span class="p">(</span><span class="n">stats</span><span class="p">))</span>
+
+        <span class="c1"># Reset transposed stats property to None.</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_transposed_stats&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">transposed_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the MyDataFrame containing a transposed statistics DataFrame.</span>
+
+<span class="sd">        If the transposed DataFrame has not been set yet or has been reset</span>
+<span class="sd">        to None, the _transpose_stats_copy method is called to create a</span>
+<span class="sd">        transposed DataFrame from a copy of the normal statistics DataFrame.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_transposed_stats&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_transpose_stats_copy</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_transposed_stats&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@transposed_stats</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">transposed_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t_stats</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_transposed_stats&#39;</span><span class="p">,</span> <span class="n">t_stats</span><span class="p">)</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+<div class="viewcode-block" id="DataSourceStatsMixin.get_stats">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_stats_mixin.DataSourceStatsMixin.get_stats">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the stats for the specified stats category.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            The stats DataFrame.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">selected_col_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">col_names</span> <span class="k">if</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+        <span class="n">selected_col_names</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;n_elements&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">category</span> <span class="o">==</span> <span class="s1">&#39;polarity&#39;</span><span class="p">:</span>
+            <span class="n">additional_col_names</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s1">&#39;n_positive&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;n_negative&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;n_neutral&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;%_positive&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;%_negative&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;%_neutral&#39;</span>
+            <span class="p">]</span>
+            <span class="n">selected_col_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">additional_col_names</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">MyDataFrame</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">selected_col_names</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="DataSourceStatsMixin.compute_all_stats">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_stats_mixin.DataSourceStatsMixin.compute_all_stats">[docs]</a>
+    <span class="nd">@execution_time</span>
+    <span class="k">def</span> <span class="nf">compute_all_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the statistics for all loaded data subsets.</span>
+
+<span class="sd">        Calls the _compute_stats method to compute all statistics for the</span>
+<span class="sd">        loaded data subsets, telling the method which method to execute to</span>
+<span class="sd">        get the relevant statistics.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method is called automatically if the stats property is being</span>
+<span class="sd">        accessed without having been set previously, but it can also be</span>
+<span class="sd">        called from the outside, e.g. via the compute_statistics method of the</span>
+<span class="sd">        data set&#39;s workflow.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from src.data_sources.mad_tsc_workflow import MadTscWorkflow</span>
+
+<span class="sd">        # Via the compute_statistics method of the workflow:</span>
+<span class="sd">        &gt;&gt;&gt; wf = MadTscWorkflow()</span>
+<span class="sd">        &gt;&gt;&gt; wf.load_subsets()</span>
+<span class="sd">        &gt;&gt;&gt; wf.compute_statistics()</span>
+
+<span class="sd">        # Direct call after initialization of the Workflow</span>
+<span class="sd">        &gt;&gt;&gt; wf = MadTscWorkflow()</span>
+<span class="sd">        &gt;&gt;&gt; wf.suite.compute_all_stats()</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_stats</span><span class="p">(</span>
+            <span class="n">compute_method</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subset_stats_instance</span><span class="p">:</span>
+            <span class="n">subset_stats_instance</span><span class="o">.</span><span class="n">compute_all_subset_stats</span><span class="p">()</span>
+        <span class="p">)</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="DataSourceStatsMixin._compute_stats">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_stats_mixin.DataSourceStatsMixin._compute_stats">[docs]</a>
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@ensure_implements</span><span class="p">(</span><span class="n">Loggable</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compute_method</span><span class="p">:</span> <span class="nb">callable</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes statistics for all loaded data subsets.</span>
+
+<span class="sd">        Contains the common logic of the compute_all_stats and the</span>
+<span class="sd">        _compute_col_stats methods.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        compute_method : callable</span>
+<span class="sd">            A method that takes a subset_stats_instance and performs the</span>
+<span class="sd">            specific stats computation.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - This method does not return anything. Instead, it sets the stats</span>
+<span class="sd">          property with the computed statistics.</span>
+
+<span class="sd">        - The different subset stats consist of multiple rows, and a single</span>
+<span class="sd">          column containing the data for the respective subset. When the</span>
+<span class="sd">          different subset stats DataFrames are joined, the resulting DataFrame</span>
+<span class="sd">          maintains this structure, the columns corresponding to the different</span>
+<span class="sd">          subsets and the data in the columns being of different kinds. For</span>
+<span class="sd">          this reason, the DataFrame is transposed at the end, so that the</span>
+<span class="sd">          columns contain the same kind of data across all rows and can be</span>
+<span class="sd">          assigned the appropriate data types.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Create empty MyDataFrame instance</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="n">MyDataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">subset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subsets</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">subset_stats_instance</span> <span class="o">=</span> <span class="n">subset</span><span class="o">.</span><span class="n">create_subset_stats_instance</span><span class="p">()</span>
+            <span class="n">compute_method</span><span class="p">(</span><span class="n">subset_stats_instance</span><span class="p">)</span>
+            <span class="n">subset_stats</span> <span class="o">=</span> <span class="n">subset_stats_instance</span><span class="o">.</span><span class="n">subset_stats</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Adding statistics for </span><span class="si">{</span><span class="n">subset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> ...&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">stats</span><span class="p">):</span>
+                <span class="n">stats</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                    <span class="s2">&quot;add_column&quot;</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">subset_stats</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">col_name</span><span class="o">=</span><span class="n">subset_stats</span><span class="o">.</span><span class="n">col_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">stats</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">T</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">stats</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                    <span class="s2">&quot;add_column&quot;</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">subset_stats</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">T</span>
+                <span class="p">)</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Statistics added successfully for </span><span class="si">{</span><span class="n">subset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;All statistics added successfully.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Transpose the DataFrame in the MyDataFrame object</span>
+        <span class="n">stats</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+        <span class="c1"># Set the stats property</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="n">stats</span></div>
+
+
+<div class="viewcode-block" id="DataSourceStatsMixin._compute_col_stats">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_stats_mixin.DataSourceStatsMixin._compute_col_stats">[docs]</a>
+    <span class="k">def</span> <span class="nf">_compute_col_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes statistics for the given column.</span>
+
+<span class="sd">        Calls the _compute_stats method to compute statistics for the given</span>
+<span class="sd">        column of all loaded data subsets, telling the method which</span>
+<span class="sd">        method to execute to get the column statistics.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_stats</span><span class="p">(</span>
+            <span class="n">compute_method</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subset_stats_instance</span><span class="p">:</span>
+            <span class="n">subset_stats_instance</span><span class="o">.</span><span class="n">compute_col_stats</span><span class="p">(</span><span class="n">col_name</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataSourceStatsMixin._transpose_stats_copy">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_stats_mixin.DataSourceStatsMixin._transpose_stats_copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">_transpose_stats_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transposes a copy of the &#39;stats&#39; property.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">t_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">t_stats</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_transposed_stats&#39;</span><span class="p">,</span> <span class="n">t_stats</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataSourceStatsMixin._assign_dtypes">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_sources.html#SentimentAnalysis.src.data_sources.data_source_stats_mixin.DataSourceStatsMixin._assign_dtypes">[docs]</a>
+    <span class="k">def</span> <span class="nf">_assign_dtypes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assigns the appropriate dtypes to the columns in the stats DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        stats : MyDataFrame</span>
+<span class="sd">            The stats DataFrame to assign dtypes to.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            The stats DataFrame with the appropriate dtypes assigned.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">stats</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+            <span class="s1">&#39;assign_dtypes&#39;</span><span class="p">,</span>
+            <span class="n">col_type_map</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">COL_DTYPES</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">stats</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

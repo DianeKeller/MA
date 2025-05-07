@@ -1,0 +1,54 @@
+SentimentAnalysis.src.authentication package
+============================================
+
+Submodules
+----------
+
+SentimentAnalysis.src.authentication.authentication\_strategy module
+--------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.authentication.authentication_strategy
+   :no-index:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.authentication.authenticator module
+---------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.authentication.authenticator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.authentication.hugging\_face\_strategy module
+-------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.authentication.hugging_face_strategy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.authentication.local\_strategy module
+-----------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.authentication.local_strategy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.authentication.no\_authentication\_strategy module
+------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.authentication.no_authentication_strategy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: SentimentAnalysis.src.authentication
+   :members:
+   :undoc-members:
+   :show-inheritance:

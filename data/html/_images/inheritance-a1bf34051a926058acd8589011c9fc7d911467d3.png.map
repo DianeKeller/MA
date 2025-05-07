@@ -1,0 +1,6 @@
+<map id="inheritance4410ebdcdc" name="inheritance4410ebdcdc">
+<area shape="rect" id="node1" title="Create a collection of name/value pairs." alt="" coords="5,5,77,31"/>
+<area shape="rect" id="node4" title="Only changes the repr(), leaving str() and format() to the mixed&#45;in type." alt="" coords="125,5,213,31"/>
+<area shape="rect" id="node2" href="#SentimentAnalysis.src.serialization.file_extension.FileExtension" target="_top" title="FileExtension class." alt="" coords="388,5,493,31"/>
+<area shape="rect" id="node3" title="Enum where members are also (and must be) strings" alt="" coords="261,5,340,31"/>
+</map>

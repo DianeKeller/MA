@@ -1,0 +1,5 @@
+<map id="inheritance7f03c7d67b" name="inheritance7f03c7d67b">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="21,5,93,31"/>
+<area shape="rect" id="node3" href="#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.prompts_and_ingredients_provider.PromptsAndIngredientsProvider" target="_top" title="PromptsAndIngredientsProvider class." alt="" coords="157,31,381,56"/>
+<area shape="rect" id="node2" title="LoggingMixin class." alt="" coords="5,55,109,80"/>
+</map>

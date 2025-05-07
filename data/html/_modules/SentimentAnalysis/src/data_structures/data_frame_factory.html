@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.data_structures.data_frame_factory &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.data_structures.data_frame_factory</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.data_structures.data_frame_factory</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">data_frame_factory.py</span>
+<span class="sd">---------------------</span>
+<span class="sd">Version 1.0, validated on 2024-12-04</span>
+
+<span class="sd">This module provides a generic interface that dynamically selects the</span>
+<span class="sd">appropriate method for constructing a DataFrame based on the type of input</span>
+<span class="sd">data provided. It consists of the DataFrameFactory class and several functions</span>
+<span class="sd">that form a single-dispatch mechanism.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.dict_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">is_dict_of_list_of_str_int_tuples</span><span class="p">,</span>
+    <span class="n">is_dict_of_dicts</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.list_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">are_all_of_the_same_type</span><span class="p">,</span> <span class="n">is_subset</span><span class="p">,</span>
+    <span class="n">have_intersection</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.type_utils</span> <span class="kn">import</span> <span class="n">is_int</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">DictOfLists</span><span class="p">,</span> <span class="n">OrderedDictOfLists</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">LoggingMixin</span><span class="p">()</span><span class="o">.</span><span class="n">log</span>
+
+
+<div class="viewcode-block" id="create_dataframe">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_factory.create_dataframe">[docs]</a>
+<span class="nd">@singledispatch</span>
+<span class="k">def</span> <span class="nf">create_dataframe</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">DictOfLists</span> <span class="o">|</span>
+              <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span>
+              <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span>
+              <span class="n">List</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span>
+              <span class="n">DataFrame</span> <span class="o">|</span>
+              <span class="n">OrderedDictOfLists</span> <span class="o">|</span>
+              <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span>
+              <span class="kc">None</span><span class="p">,</span>
+        <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">row_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">index_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generic function to create a pandas DataFrame from various types of</span>
+<span class="sd">    input data. This function is the entry point for the singledispatch</span>
+<span class="sd">    mechanism, which, based on the type of &#39;data&#39;, dynamically</span>
+<span class="sd">    selects which of the following implementations to execute.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data :  DictOfLists |</span>
+<span class="sd">            List[List[int | float | str]] |</span>
+<span class="sd">            List[Dict[str, int | float | str]] |</span>
+<span class="sd">            List[int | float | str] |</span>
+<span class="sd">            DataFrame |</span>
+<span class="sd">            OrderedDictOfLists |</span>
+<span class="sd">            Tuple[Any, Any] |</span>
+<span class="sd">            None</span>
+<span class="sd">        The data to populate the DataFrame. The specific type of this argument</span>
+<span class="sd">        determines which implementation of the function is called. Defaults</span>
+<span class="sd">        to None.</span>
+
+<span class="sd">    col_names : list[str] | None</span>
+<span class="sd">        A list of column names for the DataFrame. If provided, it</span>
+<span class="sd">        overrides the column names in the given data. Defaults to None.</span>
+
+<span class="sd">    row_names : list[str] | None</span>
+<span class="sd">        A list of row names for the DataFrame. Defaults to None.</span>
+
+<span class="sd">    index_column : str | None</span>
+<span class="sd">        The name of the index column. Defaults to None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataFrame</span>
+<span class="sd">        A pandas DataFrame populated with the provided data.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    NotImplementedError</span>
+<span class="sd">        If the data type of &#39;data&#39; is not supported.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creation from </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is not supported. &quot;</span>
+           <span class="sa">f</span><span class="s2">&quot;Data must be one of the supported data types&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Dummy if condition followed by return statement to make the code</span>
+    <span class="c1"># checkers happy:</span>
+    <span class="k">if</span> <span class="n">msg</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">DataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></div>
+
+
+
+<span class="nd">@create_dataframe</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span>
+        <span class="n">_data</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">row_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">index_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implementation for creating an empty pandas DataFrame, executed when the</span>
+<span class="sd">    data is None.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _data : None</span>
+<span class="sd">        No data provided.</span>
+
+<span class="sd">    For the other parameters, see the create_dataframe function.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    Creating an empty DataFrame with predefined column names:</span>
+
+<span class="sd">    &gt;&gt;&gt; df = DataFrameFactory.create(col_names=[&#39;name&#39;, &#39;nr&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; print(df)</span>
+<span class="sd">    Empty DataFrame</span>
+<span class="sd">    Columns: [name, nr]</span>
+<span class="sd">    Index: []</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">row_names</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">col_names</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">row_names</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">col_names</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">set_index</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">index_column</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<span class="nd">@create_dataframe</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">DictOfLists</span><span class="p">,</span>
+        <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">row_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">index_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implementation for creating a DataFrame from a dictionary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : DictOfLists</span>
+<span class="sd">        A dictionary of lists where the keys are column names and the values</span>
+<span class="sd">        lists of column data.</span>
+
+<span class="sd">    For the other parameters, see the create_dataframe function.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
+<span class="sd">    Creating a DataFrame from a dictionary</span>
+<span class="sd">    (Note that each dictionary entry consists of a column name and a</span>
+<span class="sd">    list of values representing the column&#39;s data):</span>
+
+<span class="sd">    &gt;&gt;&gt; from src.data_structures.my_dataframe_factory import MyDataFrameFactory</span>
+
+<span class="sd">    &gt;&gt;&gt; ex_data = {&#39;name&#39;: [&#39;nnn&#39;, &#39;lll&#39;], &#39;nr&#39;: [30, 24]}</span>
+<span class="sd">    &gt;&gt;&gt; ex_df = DataFrameFactory.create(ex_data)</span>
+<span class="sd">    &gt;&gt;&gt; print(ex_df)</span>
+<span class="sd">       name  nr</span>
+<span class="sd">    0  nnn   30</span>
+<span class="sd">    1  lll   24</span>
+
+
+<span class="sd">   &quot;&quot;&quot;</span>
+
+    <span class="c1"># Check whether the ordered dictionary contains scalar values instead of</span>
+    <span class="c1"># lists of values (This is the case if only one row is passed to create a</span>
+    <span class="c1"># DataFrame):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">is_dict_of_list_of_str_int_tuples</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="c1"># Convert into dictionary of dictionaries</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="k">if</span> <span class="n">is_dict_of_dicts</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">row_names</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">col_names</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">row_names</span><span class="p">)</span> \
+            <span class="k">if</span> <span class="n">col_names</span> \
+            <span class="k">else</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">row_names</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">col_names</span><span class="p">)</span> \
+            <span class="k">if</span> <span class="n">col_names</span> \
+            <span class="k">else</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">set_index</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">index_column</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<span class="nd">@create_dataframe</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">OrderedDictOfLists</span><span class="p">,</span>
+        <span class="n">col_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">row_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">index_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implementation for creating a DataFrame from an ordered dictionary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : OrderedDictOfLists</span>
+<span class="sd">        An ordered dictionary of lists where the keys are column names and</span>
+<span class="sd">        the values lists of column data.</span>
+
+<span class="sd">    For the other parameters, see the create_dataframe function.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
+<span class="sd">    Creating a MyDataFrame from an ordered dictionary</span>
+<span class="sd">    (Note that each dictionary entry consists of a column name and a</span>
+<span class="sd">    list of values representing the column&#39;s data):</span>
+<span class="sd">    &gt;&gt;&gt; o_dict = OrderedDict ({</span>
+<span class="sd">    ...     &#39;b&#39;: &quot;1bcd&quot;,</span>
+<span class="sd">    ...     &#39;f&#39;: &quot;3fgh&quot;,</span>
+<span class="sd">    ...     &#39;e&#39;: &quot;11def&quot;</span>
+<span class="sd">    ... })</span>
+<span class="sd">    &gt;&gt;&gt; ex_df = DataFrameFactory().create(</span>
+<span class="sd">    ...     o_dict,</span>
+<span class="sd">    ...     col_names=[&#39;values&#39;]</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; print(ex_df)</span>
+
+<span class="sd">   &quot;&quot;&quot;</span>
+    <span class="c1"># Check whether the ordered dictionary contains scalar values instead of</span>
+    <span class="c1"># lists of values (This is the case if only one row is passed to create a</span>
+    <span class="c1"># DataFrame):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">row_names</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">col_names</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">row_names</span><span class="p">)</span> \
+            <span class="k">if</span> <span class="n">col_names</span> \
+            <span class="k">else</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">row_names</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">col_names</span><span class="p">)</span> \
+            <span class="k">if</span> <span class="n">col_names</span> \
+            <span class="k">else</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">set_index</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">index_column</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<span class="nd">@create_dataframe</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+<span class="nd">@create_dataframe</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">tuple</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">row_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">index_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implementation for creating a DataFrame from a list or tuple.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : List[Any] | Tuple[Any]</span>
+<span class="sd">        A list or tuple to convert into a DataFrame. The list or tuple can</span>
+<span class="sd">        contain</span>
+<span class="sd">        - dictionaries (each representing a row),</span>
+<span class="sd">        - lists of values (each list representing a row),</span>
+<span class="sd">        - or a single list of values (representing a single row).</span>
+
+<span class="sd">    For the other parameters, see the create_dataframe function.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Creating a MyDataFrame from a list and specifying column names (Note</span>
+<span class="sd">    that each inner list represents a row):</span>
+
+<span class="sd">    &gt;&gt;&gt; ex_data = [[&#39;nnn&#39;, 30], [&#39;lll&#39;, 24]]</span>
+<span class="sd">    &gt;&gt;&gt; ex_df = DataFrameFactory.create(</span>
+<span class="sd">    ...     data=ex_data, col_names=[&#39;name&#39;, &#39;nr&#39;]</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; print(ex_df)</span>
+<span class="sd">       name  nr</span>
+<span class="sd">    0  nnn   30</span>
+<span class="sd">    1  lll   24</span>
+
+<span class="sd">    Creating a MyDataFrame from a list of values and specifying a column</span>
+<span class="sd">    name (Note that the list of values represents the values of the</span>
+<span class="sd">    column):</span>
+
+<span class="sd">    &gt;&gt;&gt; ex_data = [&#39;nnn&#39;, &#39;lll&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; ex_col_names = [&#39;name&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; ex_df = DataFrameFactory.create(data=ex_data, col_names=ex_col_names)</span>
+<span class="sd">    &gt;&gt;&gt; print(ex_df)</span>
+<span class="sd">       name</span>
+<span class="sd">    0  nnn</span>
+<span class="sd">    1  lll</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check if the list contains dictionaries, each representing a row</span>
+    <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="c1"># Check if the list is a simple list of values forming a single</span>
+    <span class="c1"># column or row.</span>
+    <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">are_all_of_the_same_type</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="c1"># The data are all have the same type. It is therefore assumed</span>
+            <span class="c1"># that the values represent the content of a single column.</span>
+
+            <span class="n">column</span> <span class="o">=</span> <span class="n">col_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">col_names</span> <span class="k">else</span> <span class="s1">&#39;Column_0&#39;</span>
+            <span class="k">return</span> <span class="n">DataFrame</span><span class="p">({</span><span class="n">column</span><span class="p">:</span> <span class="n">data</span><span class="p">},</span> <span class="n">columns</span><span class="o">=</span><span class="n">col_names</span><span class="p">)</span>
+
+        <span class="c1"># The data have different types. It is therefore assumed that</span>
+        <span class="c1"># they need to go into different columns, representing a</span>
+        <span class="c1"># row with the given column names.</span>
+
+        <span class="k">return</span> <span class="n">DataFrame</span><span class="p">([</span><span class="n">data</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="n">col_names</span><span class="p">)</span>
+
+    <span class="c1"># Check if the list contains lists, each representing a row</span>
+    <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">col_names</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">col_names</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+        <span class="n">Logger</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(),</span>
+        <span class="s2">&quot;Unsupported list format for MyDataFrame creation.&quot;</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="_">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_factory._">[docs]</a>
+<span class="nd">@create_dataframe</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">row_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">index_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implementation for handling a data input of type DataFrame.</span>
+
+<span class="sd">    Implementation for handling the case that a DataFrame is passed to the</span>
+<span class="sd">    factory.</span>
+
+<span class="sd">    In case col_names is provided, this method checks whether the specified</span>
+<span class="sd">    columns match the columns in the given DataFrame. If not, the columns in</span>
+<span class="sd">    the DataFrame are switched to the new column names and a warning is</span>
+<span class="sd">    issued and logged.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : DataFrame</span>
+<span class="sd">        A DataFrame.</span>
+
+<span class="sd">    For the other parameters, see the create_dataframe function.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">col_names</span> <span class="ow">and</span> <span class="n">col_names</span> <span class="o">!=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Column names of the DataFrame and specified columns &quot;</span>
+               <span class="sa">f</span><span class="s2">&quot;differ: DataFrame: </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="s2">, specified: &quot;</span>
+               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col_names</span><span class="si">}</span><span class="s2">. Column names set to the specified columns.&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;warning&quot;</span><span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">col_names</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+
+<div class="viewcode-block" id="set_index">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_factory.set_index">[docs]</a>
+<span class="k">def</span> <span class="nf">set_index</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">index_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sets the index in the provided DataFrame using the specified column.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : DataFrame</span>
+<span class="sd">        The DataFrame whose index to set.</span>
+
+<span class="sd">    index_column : str | None</span>
+<span class="sd">        The name of the column to use as the index.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataFrame</span>
+<span class="sd">        The modified DataFrame.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">index_column</span><span class="p">:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">index_column</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;No index column provided for DataFrame. You may want to &quot;</span>
+               <span class="s2">&quot;set an index manually.&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="s1">&#39;set_index_manually&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="DataFrameFactory">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_factory.DataFrameFactory">[docs]</a>
+<span class="k">class</span> <span class="nc">DataFrameFactory</span><span class="p">(</span><span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    DataFrameFactory class.</span>
+
+<span class="sd">    Factory class for creating pandas DataFrames.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="DataFrameFactory.create">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_factory.DataFrameFactory.create">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">DictOfLists</span> <span class="o">|</span>
+                  <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span>
+                  <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span>
+                  <span class="n">List</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span>
+                  <span class="n">DataFrame</span> <span class="o">|</span>
+                  <span class="n">OrderedDictOfLists</span> <span class="o">|</span>
+                  <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span>
+                  <span class="kc">None</span><span class="p">,</span>
+            <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">row_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">index_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Factory method to create a pandas DataFrame. This method delegates</span>
+<span class="sd">        to the create_dataframe function, utilizing the singledispatch</span>
+<span class="sd">        mechanism to handle different types of input data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : DictOfLists |</span>
+<span class="sd">              List[List[int | float | str]] |</span>
+<span class="sd">              List[Dict[str, int | float | str]] |</span>
+<span class="sd">              List[int | float | str] |</span>
+<span class="sd">              DataFrame |</span>
+<span class="sd">              OrderedDictOfLists |</span>
+<span class="sd">              Tuple[Any, Any] |</span>
+<span class="sd">              None</span>
+<span class="sd">            The data to populate the DataFrame. The specific type of this</span>
+<span class="sd">            argument determines which implementation of the create_dataframe</span>
+<span class="sd">            function is called.</span>
+
+<span class="sd">        col_names : list[str] | None</span>
+<span class="sd">            A list of column names for the DataFrame. If provided,</span>
+<span class="sd">            the column names will be used to name the columns instead of</span>
+<span class="sd">            assigning column numbers or keeping potentially automatically</span>
+<span class="sd">            created column names, provided that the data does not already</span>
+<span class="sd">            contain custom column names. See the &#39;notes&#39; section for more</span>
+<span class="sd">            information about the behavior of this parameter.</span>
+
+<span class="sd">        row_names : list[str] | None</span>
+<span class="sd">            A list of row names for the DataFrame. Should be provided when</span>
+<span class="sd">            only one row is passed to the factory and none of the columns</span>
+<span class="sd">            can be used as an index column. Defaults to None.</span>
+
+<span class="sd">        index_column : str | None</span>
+<span class="sd">            The name of the index column. Should be provided when</span>
+<span class="sd">            only one row is passed to the factory and one of the columns</span>
+<span class="sd">            is to be used as an index column. Defaults to None.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            A pandas DataFrame populated with the provided data.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Note the special behavior pandas DataFrames have if column names</span>
+<span class="sd">        are specified when a DataFrame is created and the data already contains</span>
+<span class="sd">        column names:</span>
+
+<span class="sd">        - The additionally provided column names define the order of the</span>
+<span class="sd">          matching existing columns. If the order does not match the</span>
+<span class="sd">          existing order, the columns will be reordered.</span>
+
+<span class="sd">        - Column names that are specified but not present in the data create</span>
+<span class="sd">          new columns with empty values.</span>
+
+<span class="sd">        - Existing columns which are not present in the specified column names</span>
+<span class="sd">          will be dropped.</span>
+
+<span class="sd">        - If the data already contains column names but none of them is in the</span>
+<span class="sd">          specified column names, none of the data columns will be preserved</span>
+<span class="sd">          and the specified column names will be used to label completely</span>
+<span class="sd">          empty columns, i.e. the data will contain no rows.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from src.data_structures.my_dataframe_factory import (</span>
+<span class="sd">        ...     MyDataFrameFactory</span>
+<span class="sd">        ... )</span>
+
+<span class="sd">        # Data to create the DataFrame</span>
+<span class="sd">        &gt;&gt;&gt; data = {</span>
+<span class="sd">        ...     &#39;name&#39;: [&#39;nnn&#39;, &#39;lll&#39;],  # Index column values</span>
+<span class="sd">        ...     &#39;url&#39;: [&#39;nnn_url&#39;, &#39;lll_url&#39;]  # Column values</span>
+<span class="sd">        ... }</span>
+
+<span class="sd">        # Create MyDataFrame with &#39;name&#39; as the index column</span>
+<span class="sd">        &gt;&gt;&gt; my_df = MyDataFrameFactory.create(</span>
+<span class="sd">        ...     data=data,</span>
+<span class="sd">        ...     index_column=&#39;name&#39;</span>
+<span class="sd">        ... )</span>
+
+<span class="sd">        &gt;&gt;&gt; print(my_df)</span>
+<span class="sd">                url</span>
+<span class="sd">        name</span>
+<span class="sd">        nnn     n_url</span>
+<span class="sd">        lll   lll_url</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Delegate to the singledispatch function</span>
+        <span class="k">if</span> <span class="n">col_names</span><span class="p">:</span>
+            <span class="c1"># Compare the existing column names with the specified column names</span>
+            <span class="k">if</span> <span class="n">DataFrameFactory</span><span class="o">.</span><span class="n">check_column_names</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">col_names</span><span class="p">):</span>
+                <span class="c1"># The column names basically match but might be reordered or</span>
+                <span class="c1"># new columns might be added when the DataFrame is created.</span>
+                <span class="k">if</span> <span class="n">row_names</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">create_dataframe</span><span class="p">(</span>
+                        <span class="n">data</span><span class="p">,</span>
+                        <span class="n">col_names</span><span class="o">=</span><span class="n">col_names</span><span class="p">,</span>
+                        <span class="n">row_names</span><span class="o">=</span><span class="n">row_names</span><span class="p">,</span>
+                        <span class="n">index_column</span><span class="o">=</span><span class="n">index_column</span>
+                    <span class="p">)</span>
+
+                <span class="k">return</span> <span class="n">create_dataframe</span><span class="p">(</span>
+                    <span class="n">data</span><span class="p">,</span>
+                    <span class="n">col_names</span><span class="o">=</span><span class="n">col_names</span><span class="p">,</span>
+                    <span class="n">index_column</span><span class="o">=</span><span class="n">index_column</span>
+                <span class="p">)</span>
+
+            <span class="c1"># If the column check fails, do not change the columns. The</span>
+            <span class="c1"># DataFrameFactory is not intended to be used for this kind of</span>
+            <span class="c1"># operation and will not try to silently infer the intended</span>
+            <span class="c1"># operation. Users should choose another, more explicit way to</span>
+            <span class="c1"># manipulate the data according to their needs.</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="n">create_dataframe</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">,</span>
+                <span class="n">row_names</span><span class="o">=</span><span class="n">row_names</span><span class="p">,</span>
+                <span class="n">index_column</span><span class="o">=</span><span class="n">index_column</span>
+            <span class="p">)</span> <span class="k">if</span> <span class="n">row_names</span> \
+                <span class="k">else</span> <span class="n">create_dataframe</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">,</span>
+                <span class="n">index_column</span><span class="o">=</span><span class="n">index_column</span>
+            <span class="p">)</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;DataFrame created without changes to the data.&quot;</span>
+            <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;warning&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">df</span>
+
+        <span class="c1"># The column names are not specified</span>
+
+        <span class="k">return</span> <span class="n">create_dataframe</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="n">row_names</span><span class="o">=</span><span class="n">row_names</span><span class="p">,</span>
+            <span class="n">index_column</span><span class="o">=</span><span class="n">index_column</span>
+        <span class="p">)</span> <span class="k">if</span> <span class="n">row_names</span> <span class="k">else</span> <span class="n">create_dataframe</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">index_column</span><span class="o">=</span><span class="n">index_column</span>
+        <span class="p">)</span></div>
+
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="DataFrameFactory.check_column_names">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_factory.DataFrameFactory.check_column_names">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">check_column_names</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the provided column names match the column names in the data.</span>
+
+<span class="sd">        Converts the data to a temporary DataFrame without using the specified</span>
+<span class="sd">        column names to be able to check for column names. The method then</span>
+<span class="sd">        checks whether the temporary DataFrame has automatically assigned or</span>
+<span class="sd">        custom column names and if the latter is the case, if they match the</span>
+<span class="sd">        specified column names or can otherwise be safely applied to the</span>
+<span class="sd">        target DataFrame the DataFrameFactory is about to create.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Any</span>
+<span class="sd">            The data whose column names are to be checked and compared with</span>
+<span class="sd">            the specified column names.</span>
+
+<span class="sd">        col_names : list[str]</span>
+<span class="sd">            The specified column names that are to be compared with the</span>
+<span class="sd">            existing column names</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the specified column names can safely be applied when</span>
+<span class="sd">            creating the DataFrame, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">existing_col_names</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">existing_col_names</span> <span class="o">==</span> <span class="n">col_names</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">DataFrameFactory</span><span class="o">.</span><span class="n">_check_for_auto_col_identifiers</span><span class="p">(</span>
+                <span class="n">existing_col_names</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># For custom column names:</span>
+        <span class="k">return</span> <span class="n">DataFrameFactory</span><span class="o">.</span><span class="n">check_custom_col_names</span><span class="p">(</span>
+            <span class="n">existing_col_names</span><span class="p">,</span>
+            <span class="n">col_names</span>
+        <span class="p">)</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="DataFrameFactory._check_for_auto_col_identifiers">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_factory.DataFrameFactory._check_for_auto_col_identifiers">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_check_for_auto_col_identifiers</span><span class="p">(</span><span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks for automatically assigned column identifiers.</span>
+
+<span class="sd">        Checks whether the provided column names were automatically assigned.</span>
+<span class="sd">        If so, they can be column numbers or column names starting with</span>
+<span class="sd">        &quot;Column_&quot;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_names : list[str | int]</span>
+<span class="sd">            The column names to check.</span>
+
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the column names were automatically assigned,</span>
+<span class="sd">            False otherwise.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        When the DataFrameFactory constructs a DataFrame from a list having no</span>
+<span class="sd">        custom column names, the column names are set to a string starting with</span>
+<span class="sd">        &quot;Column_&quot;, followed by the column number. In this case, the user will</span>
+<span class="sd">        probably want to replace the column names with custom column names.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check whether the DataFrame has only column numbers:</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">is_int</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">col_names</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># Check whether the DataFrame has column names starting with &quot;Column_&quot;:</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Column_&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">col_names</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="DataFrameFactory.check_custom_col_names">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_factory.DataFrameFactory.check_custom_col_names">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">check_custom_col_names</span><span class="p">(</span>
+            <span class="n">existing_col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the provided column names match the column names in the data.</span>
+
+<span class="sd">        This method checks if the specified column names can be assigned to</span>
+<span class="sd">        the DataFrame without the risk of altering the data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        existing_col_names : list[str]</span>
+<span class="sd">            The existing column names in the data.</span>
+
+<span class="sd">        col_names : list[str]</span>
+<span class="sd">            The column names to check for.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            - True if the column names match or if only new empty columns will</span>
+<span class="sd">              be added to the existing ones if the specified column names are</span>
+<span class="sd">              assigned.</span>
+
+<span class="sd">            - False otherwise, as assigning the specified column names to the</span>
+<span class="sd">              data would either overwrite existing column names or alter the</span>
+<span class="sd">              data dropping entire columns.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">existing_col_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">col_names</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Column names will be reordered. Current order: </span><span class="si">%s</span><span class="s2">. New &quot;</span>
+                   <span class="s2">&quot;order: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">existing_col_names</span><span class="p">,</span> <span class="n">col_names</span><span class="p">))</span>
+            <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;warning&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">is_subset</span><span class="p">(</span><span class="n">existing_col_names</span><span class="p">,</span> <span class="n">col_names</span><span class="p">):</span>
+            <span class="n">added_column_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">col_names</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">existing_col_names</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;The following empty columns will be added:  </span><span class="si">%s</span><span class="s2">&quot;</span>
+                   <span class="o">%</span> <span class="n">added_column_names</span><span class="p">)</span>
+            <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;warning&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">is_subset</span><span class="p">(</span><span class="n">col_names</span><span class="p">,</span> <span class="n">existing_col_names</span><span class="p">):</span>
+            <span class="n">dropped_column_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">existing_col_names</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">col_names</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;The following existing data columns would be dropped:  </span><span class="si">%s</span><span class="s2">&quot;</span>
+                   <span class="o">%</span> <span class="n">dropped_column_names</span><span class="p">)</span>
+            <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;warning&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">have_intersection</span><span class="p">(</span><span class="n">existing_col_names</span><span class="p">,</span> <span class="n">col_names</span><span class="p">):</span>
+            <span class="n">dropped_column_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">existing_col_names</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">col_names</span><span class="p">)</span>
+            <span class="n">added_column_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">col_names</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">existing_col_names</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;The following existing data columns would be dropped:  </span><span class="si">%s</span><span class="s2"> &quot;</span>
+                   <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> and the following empty columns would be added: </span><span class="si">%s</span><span class="s2">&quot;</span>
+                   <span class="o">%</span> <span class="p">(</span><span class="n">dropped_column_names</span><span class="p">,</span> <span class="n">added_column_names</span><span class="p">))</span>
+            <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;warning&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;All existing data columns would be dropped and replaced by &quot;</span>
+               <span class="s2">&quot;the specified empty columns. Is this the intended purpose?&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;warning&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

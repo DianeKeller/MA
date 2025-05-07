@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.chunk &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.chunk</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.chunk</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">chunk.py</span>
+<span class="sd">--------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+
+<span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_analysis_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SentimentAnalysisConfig</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.serialization.directory_factory</span> <span class="kn">import</span> <span class="n">DirectoryFactory</span>
+<span class="kn">from</span> <span class="nn">src.utils.list_sort_utils</span> <span class="kn">import</span> <span class="n">sort_list_with_int_behind_last_underscore</span>
+<span class="kn">from</span> <span class="nn">src.utils.list_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">remove_elements_from_list</span><span class="p">,</span>
+    <span class="n">get_elements_by_substring</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+
+
+<div class="viewcode-block" id="Chunk">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk.Chunk">[docs]</a>
+<span class="k">class</span> <span class="nc">Chunk</span><span class="p">(</span><span class="n">MyDataFrame</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A specialized class for managing chunks of data.</span>
+
+<span class="sd">    Inherits from MyDataFrame and adds methods specific to chunk operations.</span>
+
+<span class="sd">    A Chunk is a MyDataFrame whose DataFrame contains a special data</span>
+<span class="sd">    structure: It has non-query columns like &#39;sentence_normalized&#39;, &#39;mention&#39;</span>
+<span class="sd">    and &#39;polarity&#39;, &#39;query&#39; columns and &#39;answer&#39; columns, all identified by</span>
+<span class="sd">    a query number appended to the column name.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : SentimentAnalysisConfig</span>
+<span class="sd">        The configuration settings for sentiment analysis operations.</span>
+
+<span class="sd">    non_query_cols : List[str]</span>
+<span class="sd">        The list of non-query columns in the data, retrieved from the LLM</span>
+<span class="sd">        specified in the config settings.</span>
+
+<span class="sd">    answer_cols : List[str]</span>
+<span class="sd">        The list of answer columns in the data.</span>
+
+<span class="sd">    query_cols : List[str]</span>
+<span class="sd">        The query columns in the data.</span>
+
+<span class="sd">    version : str</span>
+<span class="sd">        The version retrieved from the _config variable.</span>
+
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    rename_cols(cols_map: &#39;Dict[str, str]&#39;) -&gt; None:</span>
+<span class="sd">        Renames the columns of the DataFrame based on the provided column map.</span>
+
+<span class="sd">    reorder_cols() -&gt; None:</span>
+<span class="sd">        Orders the columns of the current chunk in a standardized way.</span>
+
+<span class="sd">    set_directory() -&gt; None:</span>
+<span class="sd">        Sets the directory for storing chunks.</span>
+
+
+<span class="sd">    Inherited Attributes and Methods</span>
+<span class="sd">    --------------------------------</span>
+<span class="sd">    See the MyDataFrame class.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Chunk.__init__">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk.Chunk.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes a new instance of the Chunk class with a DataFrame</span>
+<span class="sd">        collection of data, an identifying name and an optional source from</span>
+<span class="sd">        which the data can be fetched if is available from an online source.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data: DataFrame | None</span>
+<span class="sd">            The data to populate the DataFrame. Defaults to None.</span>
+
+<span class="sd">        name : str</span>
+<span class="sd">            The name of the DataFrame. Defaults to an empty string.</span>
+
+<span class="sd">        source : str | None</span>
+<span class="sd">            The source (Url) where the data is to be fetched from.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_query_cols</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_answer_cols</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SentimentAnalysisConfig</span><span class="p">()</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The non_query_cols is the list of column names that do not represent </span>
+<span class="sd">        query or answer columns. This depends on the columns a data source </span>
+<span class="sd">        suite produces and therefore, it needs to be fetched from the llm the </span>
+<span class="sd">        suite is attached to at the moment the Chunk instance is initialized.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">non_query_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;llm&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">non_query_cols</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the version from the _config variable.</span>
+
+<span class="sd">        Retrieves the version from the _config variable each time this getter</span>
+<span class="sd">        is called. This ensures that the getter always returns the latest</span>
+<span class="sd">        version.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The version.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">answer_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the list of answer columns associated with this object.</span>
+
+<span class="sd">        This method returns the answer columns stored in the &#39;_answer_cols&#39;</span>
+<span class="sd">        attribute. If &#39;_answer_cols&#39; is None or empty, it initializes the</span>
+<span class="sd">        answer and query columns by invoking the &#39;_set_answer_and_query_cols&#39;</span>
+<span class="sd">        method before returning the updated &#39;_answer_cols&#39; list.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            A list of strings representing the answer column names.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_answer_cols</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_answer_and_query_cols</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_answer_cols</span>
+
+    <span class="nd">@answer_cols</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">answer_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">answer_cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the answer columns for the object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        answer_cols : List[str]</span>
+<span class="sd">            A list of strings representing the column names to store as the</span>
+<span class="sd">            answer columns within the object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_answer_cols</span> <span class="o">=</span> <span class="n">answer_cols</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">query_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the query columns for the instance.</span>
+
+<span class="sd">        The &#39;query_cols&#39; property retrieves the list of query column names</span>
+<span class="sd">        associated with the instance. If the internal &#39;_query_cols&#39;</span>
+<span class="sd">        variable is not set or empty, it invokes the</span>
+<span class="sd">        &#39;_set_answer_and_query_cols&#39; method to populate the necessary</span>
+<span class="sd">        query columns.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            A list of query column names for the instance.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query_cols</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_answer_and_query_cols</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_cols</span>
+
+    <span class="nd">@query_cols</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">query_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query_cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the `query_cols` attribute for the instance.</span>
+
+<span class="sd">        This setter method is used to assign a list of strings to the</span>
+<span class="sd">        &#39;query_cols&#39; property of the instance. It directly updates the</span>
+<span class="sd">        private attribute &#39;_query_cols&#39; with a provided value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        query_cols : List[str]</span>
+<span class="sd">            A list of column names represented as strings to be stored</span>
+<span class="sd">            in the `query_cols` attribute.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_query_cols</span> <span class="o">=</span> <span class="n">query_cols</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+<div class="viewcode-block" id="Chunk.rename_cols">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk.Chunk.rename_cols">[docs]</a>
+    <span class="k">def</span> <span class="nf">rename_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Renames the columns of the DataFrame based on the provided column map.</span>
+
+<span class="sd">        This method updates the current DataFrame&#39;s column names according to</span>
+<span class="sd">        the mapping provided in the `cols_map` parameter. The renaming is done</span>
+<span class="sd">        in place and modifies the original DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cols_map : Dict[str, str]</span>
+<span class="sd">            A dictionary mapping the original column names (keys) to their</span>
+<span class="sd">            new names (values). Keys represent the existing column names,</span>
+<span class="sd">            and values define the corresponding new names to be assigned.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">cols_map</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Chunk.reorder_cols">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk.Chunk.reorder_cols">[docs]</a>
+    <span class="k">def</span> <span class="nf">reorder_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Orders the columns of the current chunk in a standardized way.</span>
+
+<span class="sd">        Puts the non-query columns first, then displays the query columns in</span>
+<span class="sd">        alphabetically ascending orden, then the answer columns in the same</span>
+<span class="sd">        order.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">new_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_query_cols</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_cols</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">answer_cols</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_cols</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_order</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;Reordering of columns failed! Original number of &quot;</span>
+                <span class="s2">&quot;columns: </span><span class="si">%d</span><span class="s2"> vs. reordered number of columns: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">n_cols</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_order</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">new_order</span><span class="p">]</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_cols</span><span class="si">}</span><span class="s2"> chunk columns reordered: &quot;</span>
+               <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  - old:&quot;</span>
+               <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">col_names</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">  - &quot;</span>
+               <span class="sa">f</span><span class="s2">&quot;new: &quot;</span>
+               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">new_order</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Chunk.set_directory">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk.Chunk.set_directory">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the directory for storing chunks.</span>
+
+<span class="sd">        This method ensures that the appropriate directory path is set for</span>
+<span class="sd">        storing chunks, based on the file&#39;s extension and the provided</span>
+<span class="sd">        version. If the directory path does not already match the specified</span>
+<span class="sd">        version, a new directory is created using the DirectoryFactory. The</span>
+<span class="sd">        path of the directory is then updated, and an informational log</span>
+<span class="sd">        message is generated for the operation.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        FileNotFoundError</span>
+<span class="sd">            If the directory cannot be created by the DirectoryFactory.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method does not return any value.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">):</span>
+            <span class="n">dir_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;chunks_v_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">directory</span> <span class="o">=</span> <span class="n">DirectoryFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">extension</span><span class="p">,</span>
+                    <span class="n">dir_name</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                <span class="n">directory</span> <span class="o">=</span> <span class="n">DirectoryFactory</span><span class="o">.</span><span class="n">make</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">extension</span><span class="p">,</span>
+                    <span class="n">dir_name</span>
+                <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">directory</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Chunk directory for </span><span class="si">%s</span><span class="s2"> set to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">path</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="Chunk._set_answer_and_query_cols">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.sentiment_analysis.html#SentimentAnalysis.src.sentiment_analysis.chunk.Chunk._set_answer_and_query_cols">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_answer_and_query_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the query and answer columns based on the column names.</span>
+
+<span class="sd">        This method determines which columns correspond to query and answer</span>
+<span class="sd">        data by removing non-query columns from the available column names</span>
+<span class="sd">        and identifying columns that contain either the substring &#39;query&#39; or</span>
+<span class="sd">        &#39;answer&#39;. It sorts these columns based on integer values that appear</span>
+<span class="sd">        behind the last underscore in their names and assigns them to</span>
+<span class="sd">        respective attributes for later use.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method modifies the &#39;query_cols&#39; and &#39;answer_cols&#39; properties in</span>
+<span class="sd">            place and does not return any values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">remove_elements_from_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">col_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_query_cols</span><span class="p">)</span>
+        <span class="n">query_cols</span> <span class="o">=</span> <span class="n">get_elements_by_substring</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="s2">&quot;query&quot;</span><span class="p">)</span>
+        <span class="n">answer_cols</span> <span class="o">=</span> <span class="n">get_elements_by_substring</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="s2">&quot;answer&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query_cols</span> <span class="o">=</span> <span class="n">sort_list_with_int_behind_last_underscore</span><span class="p">(</span><span class="n">query_cols</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">answer_cols</span> <span class="o">=</span> <span class="n">sort_list_with_int_behind_last_underscore</span><span class="p">(</span>
+            <span class="n">answer_cols</span>
+        <span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

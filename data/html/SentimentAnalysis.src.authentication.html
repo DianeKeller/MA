@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.authentication package &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9bcbadda"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SentimentAnalysis.src.data_sources package" href="SentimentAnalysis.src.data_sources.html" />
+    <link rel="prev" title="SentimentAnalysis.src package" href="SentimentAnalysis.src.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">SentimentAnalysis</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="SentimentAnalysis.html">SentimentAnalysis package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="SentimentAnalysis.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="SentimentAnalysis.src.html">SentimentAnalysis.src package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#sentimentanalysis-action-module">SentimentAnalysis.action module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#sentimentanalysis-constants-module">SentimentAnalysis.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#sentimentanalysis-logger-module">SentimentAnalysis.logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.main">SentimentAnalysis.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.settings">SentimentAnalysis.settings module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.setup">SentimentAnalysis.setup module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.type_aliases">SentimentAnalysis.type_aliases module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SentimentAnalysis.html#module-SentimentAnalysis.view_log">SentimentAnalysis.view_log module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">SentimentAnalysis</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.html">SentimentAnalysis package</a></li>
+          <li class="breadcrumb-item"><a href="SentimentAnalysis.src.html">SentimentAnalysis.src package</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.authentication package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/SentimentAnalysis.src.authentication.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sentimentanalysis-src-authentication-package">
+<h1>SentimentAnalysis.src.authentication package<a class="headerlink" href="#sentimentanalysis-src-authentication-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="sentimentanalysis-src-authentication-authentication-strategy-module">
+<h2>SentimentAnalysis.src.authentication.authentication_strategy module<a class="headerlink" href="#sentimentanalysis-src-authentication-authentication-strategy-module" title="Link to this heading"></a></h2>
+<section id="authentication-strategy-py">
+<h3>authentication_strategy.py<a class="headerlink" href="#authentication-strategy-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-01</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.authentication.authentication_strategy.</span></span><span class="sig-name descname"><span class="pre">AuthenticationStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/authentication_strategy.html#AuthenticationStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">LoggingMixin</span></code></p>
+<p>AuthenticationStrategy class.</p>
+<p>Abstract base class for all authentication strategies.</p>
+<p>This class serves as an interface that declares common operations
+for all authentication strategies. Specifically, it defines the essential
+operations for authenticating the user and fetching data, which concrete
+strategies must implement. Within the framework of a strategy pattern,
+this design enables a dynamic change of authentication strategies
+according to the varying requirements of different data sources.</p>
+<div class="graphviz"><img src="_images/inheritance-269d404cf2b53501bd42c5d51795aa4b11fa526d.png" alt="Inheritance diagram of SentimentAnalysis.src.authentication.authentication_strategy.AuthenticationStrategy" class="inheritance graphviz" /></div>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/authentication_strategy.html#AuthenticationStrategy.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Constructor.</p>
+<p>Initializes a new instance of the AuthenticationStrategy class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>source</strong> (<em>str</em>) – The path of the source from where the data is to be fetched.
+Defaults to an empty string. If not provided,
+the concrete strategy implementations must ensure that a source is
+provided before attempting any authentication or data fetching.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_authenticate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/authentication_strategy.html#AuthenticationStrategy._authenticate"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Actual authentication logic, to be implemented by subclasses.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/authentication_strategy.html#AuthenticationStrategy._fetch"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Actual fetching logic, to be implemented by subclasses.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">authenticate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/authentication_strategy.html#AuthenticationStrategy.authenticate"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Authenticates the user using the concrete strategy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/authentication_strategy.html#AuthenticationStrategy.fetch"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Fetches data from the source using the concrete strategy.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em></dt>
+<dd><p>Gets the source path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The source path string.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>As the source might not have been provided at the moment of the
+initialization of the class, it might have defaulted to an empty
+string. Therefore, this method might return an empty string.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.authentication.authenticator">
+<span id="sentimentanalysis-src-authentication-authenticator-module"></span><h2>SentimentAnalysis.src.authentication.authenticator module<a class="headerlink" href="#module-SentimentAnalysis.src.authentication.authenticator" title="Link to this heading"></a></h2>
+<section id="authenticator-py">
+<h3>authenticator.py<a class="headerlink" href="#authenticator-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-11-10</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.authenticator.Authenticator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.authentication.authenticator.</span></span><span class="sig-name descname"><span class="pre">Authenticator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AuthenticationStrategy</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/authenticator.html#Authenticator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.authenticator.Authenticator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LoggingMixin</span></code></p>
+<p>This class serves as the context in a strategy pattern, which allows you to
+dynamically choose an authentication strategy at runtime.</p>
+<p>The class works with any of the authentication strategies that implement
+the AuthenticationStrategy interface. It gives access to authentication
+methods such as authenticating the user and fetching data from an
+external or local source.</p>
+<div class="graphviz"><img src="_images/inheritance-6f06a880d929a0b616cbc341a5a5ec84825dce74.png" alt="Inheritance diagram of SentimentAnalysis.src.authentication.authenticator.Authenticator" usemap="#inheritancea45b5443bd" class="inheritance graphviz" /></div>
+<map id="inheritancea45b5443bd" name="inheritancea45b5443bd">
+<area shape="rect" id="node1" href="#SentimentAnalysis.src.authentication.authenticator.Authenticator" target="_top" title="This class serves as the context in a strategy pattern, which allows you to" alt="" coords="157,5,267,31"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.authenticator.Authenticator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AuthenticationStrategy</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/authenticator.html#Authenticator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.authenticator.Authenticator.__init__" title="Link to this definition"></a></dt>
+<dd><p>Constructor.</p>
+<p>Sets the authentication strategy which is supposed to be used for
+accessing data. If no strategy is specified when the
+serializer is called, a default authentication strategy is used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>my_strategy</strong> (<em>AuthenticationStrategy</em><em> | </em><em>None</em>) – The authentication strategy to be used. Default value: None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.authenticator.Authenticator.authenticate">
+<span class="sig-name descname"><span class="pre">authenticate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/authenticator.html#Authenticator.authenticate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.authenticator.Authenticator.authenticate" title="Link to this definition"></a></dt>
+<dd><p>Delegate authentication to the strategy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.authenticator.Authenticator.default_strategy">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">default_strategy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AuthenticationStrategy</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/authenticator.html#Authenticator.default_strategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.authenticator.Authenticator.default_strategy" title="Link to this definition"></a></dt>
+<dd><p>Returns the default authentication strategy.</p>
+<p>As default, the local strategy is used. Data will be fetched from a
+local source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The default authentication strategy.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>AuthenticationStrategy</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This method is used instead of a class constant to ensure lazy
+instantiation. This approach avoids the overhead of creating a default
+strategy object until it is actually needed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.authenticator.Authenticator.fetch">
+<span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/authenticator.html#Authenticator.fetch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.authenticator.Authenticator.fetch" title="Link to this definition"></a></dt>
+<dd><p>Delegate fetching to the strategy.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.authenticator.Authenticator.source">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#SentimentAnalysis.src.authentication.authenticator.Authenticator.source" title="Link to this definition"></a></dt>
+<dd><p>Gets the source path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>source</strong> – the source path of the data in string format.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>As the source might not have been provided at the moment of
+the initialization of the strategy, it might have defaulted to an
+empty string. Therefore, this method might return an empty string.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.authenticator.Authenticator.strategy">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">strategy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">AuthenticationStrategy</span></em><a class="headerlink" href="#SentimentAnalysis.src.authentication.authenticator.Authenticator.strategy" title="Link to this definition"></a></dt>
+<dd><p>Gets the current authentication strategy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The authentication strategy currently in use.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>AuthenticationStrategy</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.authentication.hugging_face_strategy">
+<span id="sentimentanalysis-src-authentication-hugging-face-strategy-module"></span><h2>SentimentAnalysis.src.authentication.hugging_face_strategy module<a class="headerlink" href="#module-SentimentAnalysis.src.authentication.hugging_face_strategy" title="Link to this heading"></a></h2>
+<section id="hugging-face-strategy-py">
+<h3>hugging_face_strategy.py<a class="headerlink" href="#hugging-face-strategy-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-15</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.hugging_face_strategy.HuggingFaceStrategy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.authentication.hugging_face_strategy.</span></span><span class="sig-name descname"><span class="pre">HuggingFaceStrategy</span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/hugging_face_strategy.html#HuggingFaceStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.hugging_face_strategy.HuggingFaceStrategy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AuthenticationStrategy</span></code></p>
+<p>This class provides authentication and data fetching methods for
+HuggingFace.</p>
+<p>It is a concrete implementation of the AuthenticationStrategy
+interface.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.hugging_face_strategy.HuggingFaceStrategy.authenticate">
+<span class="sig-name descname"><span class="pre">authenticate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SentimentAnalysis.src.authentication.hugging_face_strategy.HuggingFaceStrategy.authenticate" title="Link to this definition"></a></dt>
+<dd><p>Login to HuggingFace.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.hugging_face_strategy.HuggingFaceStrategy.fetch">
+<span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SentimentAnalysis.src.authentication.hugging_face_strategy.HuggingFaceStrategy.fetch" title="Link to this definition"></a></dt>
+<dd><p>Fetch data from HuggingFace.</p>
+</dd></dl>
+
+<div class="graphviz"><img src="_images/inheritance-b356b912b05deafa2969c9dd217ad3f5126370e9.png" alt="Inheritance diagram of SentimentAnalysis.src.authentication.hugging_face_strategy.HuggingFaceStrategy" usemap="#inheritance4927e1df2c" class="inheritance graphviz" /></div>
+<map id="inheritance4927e1df2c" name="inheritance4927e1df2c">
+<area shape="rect" id="node4" href="#SentimentAnalysis.src.authentication.hugging_face_strategy.HuggingFaceStrategy" target="_top" title="This class provides authentication and data fetching methods for" alt="" coords="376,31,536,56"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.hugging_face_strategy.HuggingFaceStrategy._authenticate">
+<span class="sig-name descname"><span class="pre">_authenticate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/hugging_face_strategy.html#HuggingFaceStrategy._authenticate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.hugging_face_strategy.HuggingFaceStrategy._authenticate" title="Link to this definition"></a></dt>
+<dd><p>Login to HuggingFaceStrategy.</p>
+<p>Uses local environment variable ‘HUGGING_FACE_AUTH_TOKEN’ to
+authenticate the user for login to HuggingFaceStrategy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException" title="SentimentAnalysis.src.sentiment_analysis.retrieval.custom_exceptions.CriticalException"><strong>CriticalException</strong></a> – If the environment variable is not set or not found or is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.hugging_face_strategy.HuggingFaceStrategy.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/hugging_face_strategy.html#HuggingFaceStrategy.query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.hugging_face_strategy.HuggingFaceStrategy.query" title="Link to this definition"></a></dt>
+<dd><p>Sends a query to a Hugging Face and returns the response JSON.</p>
+<p>Sends a query to a Hugging Face inference API and returns the
+response JSON data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Dict[str, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.authentication.local_strategy">
+<span id="sentimentanalysis-src-authentication-local-strategy-module"></span><h2>SentimentAnalysis.src.authentication.local_strategy module<a class="headerlink" href="#module-SentimentAnalysis.src.authentication.local_strategy" title="Link to this heading"></a></h2>
+<section id="local-strategy-py">
+<h3>local_strategy.py<a class="headerlink" href="#local-strategy-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-01</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.local_strategy.LocalStrategy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.authentication.local_strategy.</span></span><span class="sig-name descname"><span class="pre">LocalStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'xls'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/local_strategy.html#LocalStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.local_strategy.LocalStrategy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AuthenticationStrategy</span></code></p>
+<p>This class provides data fetching methods for locally stored files.</p>
+<p>It is a concrete implementation of the AuthenticationStrategy
+interface.</p>
+<div class="graphviz"><img src="_images/inheritance-1844f661c951e21bc06db94cdf05a95c1af1861a.png" alt="Inheritance diagram of SentimentAnalysis.src.authentication.local_strategy.LocalStrategy" usemap="#inheritance6afe8cb244" class="inheritance graphviz" /></div>
+<map id="inheritance6afe8cb244" name="inheritance6afe8cb244">
+<area shape="rect" id="node4" href="#SentimentAnalysis.src.authentication.local_strategy.LocalStrategy" target="_top" title="This class provides data fetching methods for locally stored files." alt="" coords="376,31,487,56"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.local_strategy.LocalStrategy.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'xls'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/local_strategy.html#LocalStrategy.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.local_strategy.LocalStrategy.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initializes a new instance of the LocalStrategy class with a file type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_type</strong> (<em>str</em>) – The file type of the local file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.local_strategy.LocalStrategy._authenticate">
+<span class="sig-name descname"><span class="pre">_authenticate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/local_strategy.html#LocalStrategy._authenticate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.local_strategy.LocalStrategy._authenticate" title="Link to this definition"></a></dt>
+<dd><p>This method implements the abstract method of the
+AuthenticationStrategy interface.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.local_strategy.LocalStrategy._fetch">
+<span class="sig-name descname"><span class="pre">_fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/local_strategy.html#LocalStrategy._fetch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.local_strategy.LocalStrategy._fetch" title="Link to this definition"></a></dt>
+<dd><p>This method implements the abstract method of the
+AuthenticationStrategy interface.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.local_strategy.LocalStrategy.serializer">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">serializer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.serializer.Serializer" title="SentimentAnalysis.src.serialization.serializer.Serializer"><span class="pre">Serializer</span></a></em><a class="headerlink" href="#SentimentAnalysis.src.authentication.local_strategy.LocalStrategy.serializer" title="Link to this definition"></a></dt>
+<dd><p>Returns the serializer that must be set in this strategy to load the
+data from the local file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The serializer for loading the data from the local file.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="SentimentAnalysis.src.serialization.html#SentimentAnalysis.src.serialization.serializer.Serializer" title="SentimentAnalysis.src.serialization.serializer.Serializer">Serializer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.authentication.no_authentication_strategy">
+<span id="sentimentanalysis-src-authentication-no-authentication-strategy-module"></span><h2>SentimentAnalysis.src.authentication.no_authentication_strategy module<a class="headerlink" href="#module-SentimentAnalysis.src.authentication.no_authentication_strategy" title="Link to this heading"></a></h2>
+<section id="no-authentication-strategy-py">
+<h3>no_authentication_strategy.py<a class="headerlink" href="#no-authentication-strategy-py" title="Link to this heading"></a></h3>
+<p>Version 1.0, updated on 2024-12-17</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.no_authentication_strategy.NoAuthenticationStrategy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SentimentAnalysis.src.authentication.no_authentication_strategy.</span></span><span class="sig-name descname"><span class="pre">NoAuthenticationStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/no_authentication_strategy.html#NoAuthenticationStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.no_authentication_strategy.NoAuthenticationStrategy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AuthenticationStrategy</span></code></p>
+<p>NoAuthenticationStrategy class.</p>
+<p>This class is a concrete implementation of the AuthenticationStrategy
+interface. It is used for fetching data from an external source when no
+authentication is required.</p>
+<div class="graphviz"><img src="_images/inheritance-4416b75a424eda43180cc8c301ddf0dfa3f57738.png" alt="Inheritance diagram of SentimentAnalysis.src.authentication.no_authentication_strategy.NoAuthenticationStrategy" usemap="#inheritance04b21f22e4" class="inheritance graphviz" /></div>
+<map id="inheritance04b21f22e4" name="inheritance04b21f22e4">
+<area shape="rect" id="node4" href="#SentimentAnalysis.src.authentication.no_authentication_strategy.NoAuthenticationStrategy" target="_top" title="NoAuthenticationStrategy class." alt="" coords="376,31,564,56"/>
+</map><dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.no_authentication_strategy.NoAuthenticationStrategy.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/no_authentication_strategy.html#NoAuthenticationStrategy.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.no_authentication_strategy.NoAuthenticationStrategy.__init__" title="Link to this definition"></a></dt>
+<dd><p>Constructor.</p>
+<p>Initializes the NoAuthenticationStrategy class with the source path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>source</strong> (<em>str</em>) – The path of the source from where the data is to be fetched.
+Defaults to an empty string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.no_authentication_strategy.NoAuthenticationStrategy._authenticate">
+<span class="sig-name descname"><span class="pre">_authenticate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/no_authentication_strategy.html#NoAuthenticationStrategy._authenticate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.no_authentication_strategy.NoAuthenticationStrategy._authenticate" title="Link to this definition"></a></dt>
+<dd><p>No authentication needed for this strategy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SentimentAnalysis.src.authentication.no_authentication_strategy.NoAuthenticationStrategy._fetch">
+<span class="sig-name descname"><span class="pre">_fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/SentimentAnalysis/src/authentication/no_authentication_strategy.html#NoAuthenticationStrategy._fetch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SentimentAnalysis.src.authentication.no_authentication_strategy.NoAuthenticationStrategy._fetch" title="Link to this definition"></a></dt>
+<dd><p>Fetch data without authentication.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-SentimentAnalysis.src.authentication">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-SentimentAnalysis.src.authentication" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="SentimentAnalysis.src.html" class="btn btn-neutral float-left" title="SentimentAnalysis.src package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SentimentAnalysis.src.data_sources.html" class="btn btn-neutral float-right" title="SentimentAnalysis.src.data_sources package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

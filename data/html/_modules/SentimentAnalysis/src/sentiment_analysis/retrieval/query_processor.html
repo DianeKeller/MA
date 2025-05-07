@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">query_processor.py</span>
+<span class="sd">------------------</span>
+<span class="sd">Version 1.0, updated on 2024-12-15</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">no_type_check</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">from</span> <span class="nn">logger</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">src.authentication.hugging_face_strategy</span> <span class="kn">import</span> <span class="n">HuggingFaceStrategy</span>
+<span class="kn">from</span> <span class="nn">src.decorators.data_check_decorators</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">requires_property</span><span class="p">,</span>
+    <span class="n">output_not_none</span><span class="p">,</span>
+    <span class="n">parameters_not_empty</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.decorators.communication_error_handling_decorators</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">query_error_handling</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.decorators.type_check_decorators</span> <span class="kn">import</span> <span class="n">enforce_input_types</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.nlp.tokenization.tokenization_mixin</span> <span class="kn">import</span> <span class="n">TokenizationMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_analysis_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SentimentAnalysisConfig</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+
+
+<div class="viewcode-block" id="QueryProcessor">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor.QueryProcessor">[docs]</a>
+<span class="k">class</span> <span class="nc">QueryProcessor</span><span class="p">(</span><span class="n">LoggingMixin</span><span class="p">,</span> <span class="n">TokenizationMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    QueryProcessor class.</span>
+
+<span class="sd">    This class is responsible for processing queries sent to a Hugging Face</span>
+<span class="sd">    LLM API. It manages query payloads, handles API responses, extracts</span>
+<span class="sd">    relevant results, and tracks failed queries for further analysis.</span>
+
+<span class="sd">    Features:</span>
+<span class="sd">    ---------</span>
+<span class="sd">    - Validates and sends query payloads to the LLM API.</span>
+<span class="sd">    - Processes API responses to extract sentiment predictions.</span>
+<span class="sd">    - Implements error-handling mechanisms for API interactions.</span>
+<span class="sd">    - Provides utilities for managing failed queries.</span>
+<span class="sd">    - Includes configurable tokenization for response processing.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    HF : HuggingFaceStrategy</span>
+<span class="sd">        An instance of the HuggingFaceStrategy class for interacting with the</span>
+<span class="sd">        LLM API</span>
+
+<span class="sd">    failed_answers : List[Any]</span>
+<span class="sd">        A class-level attribute to track failed answers across instances</span>
+
+<span class="sd">    api : str</span>
+<span class="sd">        The API endpoint to which queries are sent.</span>
+
+<span class="sd">    payload : Dict[str, str]</span>
+<span class="sd">        The query payload containing input data for the LLM.</span>
+
+<span class="sd">    prompt_is_invalid : bool</span>
+<span class="sd">        Tracks the validity of the prompt.</span>
+
+
+<span class="sd">    Inherited Attributes</span>
+<span class="sd">    --------------------</span>
+<span class="sd">    DEFAULT_SENTENCE_STRATEGY : str</span>
+<span class="sd">        The name of the default sentence strategy.</span>
+
+<span class="sd">    DEFAULT_WORD_STRATEGY : str</span>
+<span class="sd">        The name of the default word strategy.</span>
+
+<span class="sd">    sentence_tokenizer : SentenceTokenizer</span>
+<span class="sd">        The sentence tokenizer.</span>
+
+<span class="sd">    word_tokenizer : WordTokenizer</span>
+<span class="sd">        The word tokenizer.</span>
+
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    process_query() -&gt; str:</span>
+<span class="sd">        Processes the query by sending it to the LLM API and handling the</span>
+<span class="sd">        response.</span>
+
+<span class="sd">    send_query() -&gt; Dict[str, Any]:</span>
+<span class="sd">        Sends the query with the payload to the LLM&#39;s API.</span>
+
+
+<span class="sd">    Inherited Methods</span>
+<span class="sd">    -----------------</span>
+<span class="sd">    set_sentence_tokenizer(tokenization_strategy_name: str = &#39;&#39;) -&gt; None:</span>
+<span class="sd">        Sets the sentence tokenizer using the specified strategy.</span>
+
+<span class="sd">    set_word_tokenizer(tokenization_strategy_name: str = &#39;&#39;) -&gt; None:</span>
+<span class="sd">        Sets the word tokenizer using the specified strategy.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">HF</span> <span class="o">=</span> <span class="n">HuggingFaceStrategy</span><span class="p">()</span>
+
+    <span class="c1"># Sentiment polarity values</span>
+    <span class="n">POSITIVE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;positive&quot;</span>
+    <span class="n">NEGATIVE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;negative&quot;</span>
+    <span class="n">NEUTRAL</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;neutral&quot;</span>
+    <span class="n">POSSIBLE_RESULTS</span> <span class="o">=</span> <span class="p">[</span><span class="n">NEGATIVE</span><span class="p">,</span> <span class="n">POSITIVE</span><span class="p">,</span> <span class="n">NEUTRAL</span><span class="p">]</span>
+
+    <span class="c1"># Class variable to store the failed answers across all instances of the</span>
+    <span class="c1"># class</span>
+    <span class="n">failed_answers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nd">@parameters_not_empty</span><span class="p">()</span>
+    <span class="nd">@enforce_input_types</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">payload</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="c1"># Override the default logger of the &#39;LoggingMixin&#39; class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">payload</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">payload</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_is_invalid</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SentimentAnalysisConfig</span><span class="p">()</span>
+
+        <span class="n">api</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;api&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">api</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;No API given. Cannot send queries!&quot;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">api</span>
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="QueryProcessor.process_query">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor.QueryProcessor.process_query">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_query</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes the query by sending it to the LLM API.</span>
+
+<span class="sd">        Extracts the predicted sentiment from the response.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The predicted sentiment or an empty string if no valid sentiment</span>
+<span class="sd">            is found.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_query</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QueryProcessor.send_query">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor.QueryProcessor.send_query">[docs]</a>
+    <span class="nd">@requires_property</span><span class="p">(</span><span class="s1">&#39;api&#39;</span><span class="p">,</span> <span class="s1">&#39;payload&#39;</span><span class="p">)</span>
+    <span class="nd">@query_error_handling</span>
+    <span class="nd">@no_type_check</span>
+    <span class="k">def</span> <span class="nf">send_query</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends the query with the payload to the LLM&#39;s API.</span>
+
+<span class="sd">        Sends the query with the payload defined in this class to the LLM&#39;s</span>
+<span class="sd">        API.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, Any]</span>
+<span class="sd">            The response returned by the API.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        Exception</span>
+<span class="sd">            Unexpected exception of unknown type that could not be caught by</span>
+<span class="sd">            the error handling decorator function.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - The query_error_handling decorator of this method catches various</span>
+<span class="sd">          exceptions regarding the connection and the kind of response</span>
+<span class="sd">          received.</span>
+
+<span class="sd">          - ConnectionError</span>
+<span class="sd">            If there is a problem with the connection to the API,</span>
+<span class="sd">            the program waits 5 minutes before retrying to send the query.</span>
+
+<span class="sd">          - KeyError</span>
+<span class="sd">            This exception is raised when the Hugging Face rate limit is</span>
+<span class="sd">            reached. In this case, the program needs to wait 1 hour for the</span>
+<span class="sd">            rate limit to expire.</span>
+
+<span class="sd">        - The query originally returns a List[Dict[str, Any]]. This is</span>
+<span class="sd">          checked by the query_error_handling decorator, that in turn</span>
+<span class="sd">          only returns the first element of the response list (response[0]) as</span>
+<span class="sd">          the return value of this method. This change of data type may not be</span>
+<span class="sd">          recognized by static type checkers, which may make them complain</span>
+<span class="sd">          about the return type.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">HF</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">response</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QueryProcessor.get_failed_answers">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor.QueryProcessor.get_failed_answers">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_failed_answers</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the list of failed answers.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[Any]</span>
+<span class="sd">            The list of failed answers that could not be processed correctly.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">failed_answers</span></div>
+
+
+<div class="viewcode-block" id="QueryProcessor.flush_failed_answers">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor.QueryProcessor.flush_failed_answers">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">flush_failed_answers</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the list of failed answers and resets the list.</span>
+
+<span class="sd">        Returns the list of failed answers and resets the list to an empty</span>
+<span class="sd">        list.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[Any]</span>
+<span class="sd">            The list of failed answers before it is reset.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">failed_answers</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">failed_answers</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">failed_answers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">failed_answers</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+<div class="viewcode-block" id="QueryProcessor._process_response">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor.QueryProcessor._process_response">[docs]</a>
+    <span class="k">def</span> <span class="nf">_process_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts the predicted sentiment from the response provided by the LLM.</span>
+
+<span class="sd">        The method performs the following steps:</span>
+
+<span class="sd">        - Remove the input string from the output data.</span>
+<span class="sd">        - Split the remaining string at punctuation marks.</span>
+<span class="sd">        - Choose only the first element, which is the requested sentiment.</span>
+<span class="sd">        - Remove leading and trailing whitespace</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        response : Dict[str, str]</span>
+<span class="sd">            The response from the LLM.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">           The predicted sentiment. An empty string if the result could</span>
+<span class="sd">           not be matched with one of the expected results.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">answer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_input_data_from_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+        <span class="n">predicted_sentiment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_sentiment_from_answer</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">predicted_sentiment</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">failed_answers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">predicted_sentiment</span></div>
+
+
+<div class="viewcode-block" id="QueryProcessor._extract_sentiment_from_answer">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor.QueryProcessor._extract_sentiment_from_answer">[docs]</a>
+    <span class="k">def</span> <span class="nf">_extract_sentiment_from_answer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">answer</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts the sentiment from the answer.</span>
+
+<span class="sd">        Splits the answer into words and returns the first word if this</span>
+<span class="sd">        equals one of the sentiment polarities.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        answer : str</span>
+<span class="sd">            The answer returned from the API, minus the payload text of the</span>
+<span class="sd">            query.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The extracted sentiment. An empty string if the first word is not</span>
+<span class="sd">            one of the expected sentiment polarities.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_word_tokenizer</span><span class="p">(</span><span class="s1">&#39;NoPunctuation&#39;</span><span class="p">)</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_tokenizer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="n">words</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="n">predicted_sentiment</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">predicted_sentiment</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;negative&#39;</span><span class="p">,</span> <span class="s1">&#39;positive&#39;</span><span class="p">,</span> <span class="s1">&#39;neutral&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="n">predicted_sentiment</span></div>
+
+
+<div class="viewcode-block" id="QueryProcessor._remove_input_data_from_response">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor.QueryProcessor._remove_input_data_from_response">[docs]</a>
+    <span class="k">def</span> <span class="nf">_remove_input_data_from_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes the input data from the response text.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        response : Dict[str, Any]</span>
+<span class="sd">            The raw API response containing the generated text.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Any</span>
+<span class="sd">            The response text with input data removed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">generated_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_generated_text</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="n">input_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_input_data_from_payload</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
+
+        <span class="n">answer</span> <span class="o">=</span> <span class="n">generated_text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">answer</span></div>
+
+
+<div class="viewcode-block" id="QueryProcessor._get_input_data_from_payload">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor.QueryProcessor._get_input_data_from_payload">[docs]</a>
+    <span class="nd">@output_not_none</span><span class="p">(</span><span class="s1">&#39;input data&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_get_input_data_from_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the input data from the query payload.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        payload : Dict[str, str]</span>
+<span class="sd">            The query payload.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The input data string extracted from the payload.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QueryProcessor._get_generated_text">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.retrieval.html#SentimentAnalysis.src.sentiment_analysis.retrieval.query_processor.QueryProcessor._get_generated_text">[docs]</a>
+    <span class="nd">@output_not_none</span><span class="p">(</span><span class="s1">&#39;generated text&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_get_generated_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the generated text from the API response.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Dict[str, Any]</span>
+<span class="sd">           The raw API response.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">           The generated text contained in the response.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;generated_text&#39;</span><span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

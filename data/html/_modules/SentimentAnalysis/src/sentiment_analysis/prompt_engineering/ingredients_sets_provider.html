@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.prompt_engineering.ingredients_sets_provider &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.prompt_engineering.ingredients_sets_provider</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.prompt_engineering.ingredients_sets_provider</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">ingredients_sets_provider.py</span>
+<span class="sd">----------------------------</span>
+<span class="sd">Version 1.0, updated on 2025-02-07</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">src.data_structures.history</span> <span class="kn">import</span> <span class="n">History</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.prompt_engineering</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">prompts_and_ingredients_provider</span> <span class="k">as</span> <span class="n">provider</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.prompt_engineering.prompts</span> <span class="kn">import</span> <span class="n">Prompts</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">src.utils.dict_utils</span> <span class="kn">import</span> <span class="n">filter_dict_by_keys</span>
+<span class="kn">from</span> <span class="nn">src.utils.list_utils</span> <span class="kn">import</span> <span class="n">to_strings</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">PromptsDictType</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">src.sentiment_analysis.prompt_engineering</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">prompts_and_ingredients_manager</span> <span class="k">as</span> <span class="n">manager</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="IngredientsSetsProvider">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.ingredients_sets_provider.IngredientsSetsProvider">[docs]</a>
+<span class="k">class</span> <span class="nc">IngredientsSetsProvider</span><span class="p">(</span><span class="n">provider</span><span class="o">.</span><span class="n">PromptsAndIngredientsProvider</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    IngredientsSetsProvider class.</span>
+
+<span class="sd">    This class manages and provides ingredients sets.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    def get_prompts(validity: str = &#39;&#39;)</span>
+<span class="sd">            -&gt; Prompts:</span>
+<span class="sd">        Retrieves and returns the ingredients sets filtered by the specified</span>
+<span class="sd">        validity.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="IngredientsSetsProvider.__init__">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.ingredients_sets_provider.IngredientsSetsProvider.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">prompts_manager</span><span class="p">:</span> <span class="s2">&quot;manager.PromptsAndIngredientsManager&quot;</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes a new ValidPromptsProvider instance with a</span>
+<span class="sd">        PromptsManager instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prompts_manager : PromptsAndIngredientsManager</span>
+<span class="sd">            The PromptsAndIngredientsManager instance that called the</span>
+<span class="sd">            IngredientsSetsProvider to delegate the retrieval of ingredients</span>
+<span class="sd">            sets.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prompts_manager</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid_ingredients_sets</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_ingredients_sets</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients_sets</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">all_ingredients_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">PromptsDictType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns all normalized prompt ingredients sets.</span>
+
+<span class="sd">        If the property is not set yet, this method calls the</span>
+<span class="sd">        _normalze_ingredients_sets method to retrieve the ingredients sets</span>
+<span class="sd">        and normalize them.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        PromptsDictType</span>
+<span class="sd">            The normalized prompt ingredients sets.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The normalized ingredients sets have the same data type as the</span>
+<span class="sd">        all_prompts collection, their keys also being aligned to the</span>
+<span class="sd">        all_prompts collection.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients_sets</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_all_ingredients_sets</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients_sets</span>
+
+    <span class="nd">@all_ingredients_sets</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">all_ingredients_sets</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">ingredients_sets</span><span class="p">:</span> <span class="n">PromptsDictType</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the normalized ingredients sets.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ingredients_sets : PromptsDictType</span>
+<span class="sd">            The normalized ingredients sets to be assigned to the property.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_ingredients_sets</span> <span class="o">=</span> <span class="n">ingredients_sets</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">valid_ingredients_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Prompts</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the valid prompt ingredients sets.</span>
+
+<span class="sd">        If the &#39;_valid_prompt_ingredients&#39; are not set, the</span>
+<span class="sd">        &#39;_set_valid_and_invalid_ingredients_sets&#39; method is called to</span>
+<span class="sd">        populate both valid and invalid prompt ingredients sets.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Prompts</span>
+<span class="sd">            The valid prompt ingredients sets.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Prompt ingredients sets are stored as Prompt data types even though</span>
+<span class="sd">        they are no prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_valid_ingredients_sets</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_valid_and_invalid_ingredients_sets</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_valid_ingredients_sets</span>
+
+    <span class="nd">@valid_ingredients_sets</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">valid_ingredients_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ingredients_sets</span><span class="p">:</span> <span class="n">Prompts</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the valid ingredients_sets.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ingredients_sets : Prompts</span>
+<span class="sd">            The valid ingredients sets to be assigned to the property.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid_ingredients_sets</span> <span class="o">=</span> <span class="n">ingredients_sets</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">invalid_ingredients_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Prompts</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the invalid prompt ingredients sets.</span>
+
+<span class="sd">        If the &#39;_invalid_prompt_ingredients&#39; are not set, the</span>
+<span class="sd">        &#39;_set_valid_and_invalid_ingredients_sets&#39; method is called to</span>
+<span class="sd">        populate both valid and invalid prompt ingredients sets.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Prompts</span>
+<span class="sd">            The invalid prompt ingredients sets.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Prompt ingredients sets are stored as Prompt data types even though</span>
+<span class="sd">        they are no prompts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_invalid_ingredients_sets</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_valid_and_invalid_ingredients_sets</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_ingredients_sets</span>
+
+    <span class="nd">@invalid_ingredients_sets</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">invalid_ingredients_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ingredients_sets</span><span class="p">:</span> <span class="n">Prompts</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the invalid ingredients_sets.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ingredients_sets : Prompts</span>
+<span class="sd">            The invalid prompts to be assigned to the property.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_ingredients_sets</span> <span class="o">=</span> <span class="n">ingredients_sets</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="IngredientsSetsProvider.get_prompts">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.ingredients_sets_provider.IngredientsSetsProvider.get_prompts">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_prompts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validity</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Prompts</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the ingredients sets filtered by the specified validity.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        validity : str</span>
+<span class="sd">            The validity (&#39;valid&#39; or &#39;invalid&#39;) to filter by. Default is an</span>
+<span class="sd">            empty string, which retrieves all ingredients sets without</span>
+<span class="sd">            filtering.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Prompts:</span>
+<span class="sd">            The filtered ingredients sets.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">match</span> <span class="n">validity</span><span class="p">:</span>
+            <span class="k">case</span> <span class="s1">&#39;valid&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_ingredients_sets</span>
+            <span class="k">case</span> <span class="s1">&#39;invalid&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">invalid_ingredients_sets</span>
+            <span class="k">case</span><span class="w"> </span><span class="s1">&#39;all&#39;</span> <span class="o">|</span> <span class="k">_</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Prompts</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">all_ingredients_sets</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">ALL_INGREDIENTS_SETS_NAME</span>
+                <span class="p">)</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+    <span class="k">def</span> <span class="nf">_get_ingredients_sets_by_nrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nrs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Prompts</span><span class="p">:</span>
+
+        <span class="k">return</span> <span class="n">Prompts</span><span class="p">(</span>
+            <span class="n">filter_dict_by_keys</span><span class="p">(</span>
+                <span class="n">to_strings</span><span class="p">(</span><span class="n">nrs</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">all_ingredients_sets</span>
+            <span class="p">),</span>
+            <span class="n">name</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="IngredientsSetsProvider._set_all_ingredients_sets">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.ingredients_sets_provider.IngredientsSetsProvider._set_all_ingredients_sets">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_all_ingredients_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the all_ingredients_sets property.</span>
+
+<span class="sd">        Retrieves all prompt ingredients sets from the PromptEngineer and</span>
+<span class="sd">        sets the all_ingredients_sets property.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">engineer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_engineer</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_ingredients_sets</span> <span class="o">=</span> <span class="n">engineer</span><span class="o">.</span><span class="n">get_prompt_ingredients_sets</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="IngredientsSetsProvider._set_valid_and_invalid_ingredients_sets">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.prompt_engineering.html#SentimentAnalysis.src.sentiment_analysis.prompt_engineering.ingredients_sets_provider.IngredientsSetsProvider._set_valid_and_invalid_ingredients_sets">[docs]</a>
+    <span class="k">def</span> <span class="nf">_set_valid_and_invalid_ingredients_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the valid and the invalid ingredients sets.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">valid_ingredients_sets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_ingredients_sets_by_nrs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valid_prompt_nrs</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">VALID_INGREDIENTS_SETS_NAME</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">invalid_ingredients_sets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_ingredients_sets_by_nrs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">invalid_prompt_nrs</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompts_manager</span><span class="o">.</span><span class="n">INVALID_INGREDIENTS_SETS_NAME</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_get_original_ingredients_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">History</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_engineer</span><span class="o">.</span><span class="n">get_prompt_ingredients_sets</span><span class="p">()</span></div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

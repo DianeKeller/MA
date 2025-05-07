@@ -1,0 +1,6 @@
+<map id="inheritance6afe8cb244" name="inheritance6afe8cb244">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="21,5,93,31"/>
+<area shape="rect" id="node2" title="AuthenticationStrategy class." alt="" coords="157,31,328,56"/>
+<area shape="rect" id="node4" href="#SentimentAnalysis.src.authentication.local_strategy.LocalStrategy" target="_top" title="This class provides data fetching methods for locally stored files." alt="" coords="376,31,487,56"/>
+<area shape="rect" id="node3" title="LoggingMixin class." alt="" coords="5,55,109,80"/>
+</map>

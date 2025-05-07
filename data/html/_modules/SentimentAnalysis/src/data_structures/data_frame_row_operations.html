@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.data_structures.data_frame_row_operations &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.data_structures.data_frame_row_operations</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.data_structures.data_frame_row_operations</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">data_frame_row_operations.py</span>
+<span class="sd">----------------------------</span>
+<span class="sd">Version 1.0, updated on 2024-12-28</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">Index</span>
+
+<span class="kn">from</span> <span class="nn">src.data_structures.data_frame_factory</span> <span class="kn">import</span> <span class="n">DataFrameFactory</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.data_frame_operations</span> <span class="kn">import</span> <span class="n">DataFrameOperations</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.utils.late_imports</span> <span class="kn">import</span> <span class="n">LateImports</span>
+<span class="kn">from</span> <span class="nn">src.utils.list_utils</span> <span class="kn">import</span> <span class="n">is_flat</span><span class="p">,</span> <span class="n">are_all_elements_included</span><span class="p">,</span> <span class="n">is_subset</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">DictOfLists</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations">[docs]</a>
+<span class="k">class</span> <span class="nc">DataFrameRowOperations</span><span class="p">(</span><span class="n">DataFrameOperations</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    DataFrameRowOperations class.</span>
+
+<span class="sd">    Provides row-specific operations for a MyDataFrame instance.</span>
+
+<span class="sd">    This class extends DataFrameOperations to include methods that perform</span>
+<span class="sd">    operations specifically on the rows of a MyDataFrame object. It</span>
+<span class="sd">    allows for adding, extracting, removing and shuffling rows in the</span>
+<span class="sd">    contained DataFrame.</span>
+
+<span class="sd">    Inherited Parameters</span>
+<span class="sd">    --------------------</span>
+<span class="sd">    my_df : MyDataFrame</span>
+<span class="sd">        An instance of MyDataFrame on which row operations will be</span>
+<span class="sd">        performed. This parameter is inherited from the DataFrameOperations</span>
+<span class="sd">        base class.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    add_empty_row() -&gt; None:</span>
+<span class="sd">        Adds an empty row to the DataFrame.</span>
+
+<span class="sd">    add_rows(data: MyDataFrame | DataFrame | DictOfLists |</span>
+<span class="sd">            List[List[int | float | str]] | List[Dict[str, int | float | str]]</span>
+<span class="sd">            | List[int | float | str] | None = None,</span>
+<span class="sd">            ignore_index: bool = True) -&gt; None:</span>
+<span class="sd">        Adds one or more rows with the given data to the DataFrame.</span>
+
+<span class="sd">    check_indices(other: DataFrame) -&gt; bool:</span>
+<span class="sd">        Checks if the indices of the two DataFrames are compatible.</span>
+
+<span class="sd">    drop_row_by_row_name(row_name: str) -&gt; None:</span>
+<span class="sd">        Drops a row from the DataFrame based on its row name.</span>
+
+<span class="sd">    extract_rows_by_col_value(col_name: str, col_value: Any,</span>
+<span class="sd">            op: Callable[[Any, Any], bool] = operator.eq -&gt; DataFrame:</span>
+<span class="sd">        Extracts rows where the specified column value fulfills a condition.</span>
+
+<span class="sd">    extract_rows_by_other_indices(other: MyDataFrame) -&gt; DataFrame:</span>
+<span class="sd">        Extracts rows using the indices of another MyDataFrame.</span>
+
+<span class="sd">    get_additional_row_indices(self, other: DataFrame) -&gt; Index:</span>
+<span class="sd">        Returns the additional row indices of the other DataFrame.</span>
+
+<span class="sd">    get_missing_indices(self, other: DataFrame) -&gt; Index:</span>
+<span class="sd">        Returns the row indices that are missing in the other DataFrame.</span>
+
+<span class="sd">    get_row_df_by_name(row_name: str) -&gt; DataFrame:</span>
+<span class="sd">        Gets a single row from the DataFrame based on its index name. The</span>
+<span class="sd">        row is returned as a pandas DataFrame.</span>
+
+<span class="sd">    get_row_df_by_index(row_index: int) -&gt; DataFrame:</span>
+<span class="sd">        Gets a single row from the DataFrame based on its integer index. The</span>
+<span class="sd">        row is returned as a pandas DataFrame.</span>
+
+<span class="sd">    get_row_series_by_name(row_name: str) -&gt; Series:</span>
+<span class="sd">        Gets a single row from the DataFrame based on its index name. The</span>
+<span class="sd">        row is returned as a pandas Series.</span>
+
+<span class="sd">    get_row_series_by_index(row_index: int) -&gt; Series:</span>
+<span class="sd">        Gets a single row from the DataFrame based on its integer index. The</span>
+<span class="sd">        row is returned as a pandas Series.</span>
+
+<span class="sd">    get_row_id_by_row_name(row_name: str) -&gt; int | None:</span>
+<span class="sd">        Searches the index of the row with the given name in the index column.</span>
+
+<span class="sd">    get_row_name_by_row_id(id: int) -&gt; str:</span>
+<span class="sd">        Gets the row name corresponding to a given integer row index.</span>
+
+<span class="sd">    has_rows_intersection_with(other: DataFrame) -&gt; bool:</span>
+<span class="sd">        Checks if the current DataFrame has an intersection with the other</span>
+<span class="sd">        DataFrame.</span>
+
+<span class="sd">    join(my_df_lst: List[MyDataFrame]) -&gt; MyDataFrame:</span>
+<span class="sd">        Joins the rows of several MyDataFrames in one MyDataFrame.</span>
+
+<span class="sd">    reduce_n_rows(max_n_rows: int) -&gt; DataFrame:</span>
+<span class="sd">        Reduces the number of rows to the given maximimum number of rows.</span>
+
+<span class="sd">    row_index_is_subset_of(self, other: DataFrame) -&gt; bool:</span>
+<span class="sd">        Checks if the current DataFrame is a subset of the other DataFrame.</span>
+
+<span class="sd">    row_index_is_superset_of(self, other: DataFrame) -&gt; bool:</span>
+<span class="sd">        Checks if the current DataFrame is a superset of the other DataFrame.</span>
+
+<span class="sd">    shuffle() -&gt; DataFrame:</span>
+<span class="sd">        Shuffles the rows of the DataFrame.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="DataFrameRowOperations.shuffle">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.shuffle">[docs]</a>
+    <span class="k">def</span> <span class="nf">shuffle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shuffles the rows of the DataFrame.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            The DataFrame with the rows in a new random order.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.reduce_n_rows">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.reduce_n_rows">[docs]</a>
+    <span class="k">def</span> <span class="nf">reduce_n_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_n_rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reduces the number of rows to the given maximimum number of rows.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        max_n_rows : int</span>
+<span class="sd">           Maximum number of rows to return.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            The DataFrame with reduced number of rows.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[:</span><span class="n">max_n_rows</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.drop_row_by_row_name">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.drop_row_by_row_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">drop_row_by_row_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Drops a row from the DataFrame based on its row name.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">       row_name : str</span>
+<span class="sd">            The name of the row to drop.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">row_name</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.get_row_df_by_name">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.get_row_df_by_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_row_df_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a single row from the DataFrame based on its index name.</span>
+
+<span class="sd">        This method can be used for DataFrames where the index consists of</span>
+<span class="sd">        meaningful labels rather than row numbers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        row_name : str</span>
+<span class="sd">           The index name of the row to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">           A pandas DataFrame containing the requested row. Note that the</span>
+<span class="sd">           returned object is a DataFrame with a single row, not a Series,</span>
+<span class="sd">           preserving the original DataFrame&#39;s column structure.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            If the DataFrame wrapped in this class does not contain the</span>
+<span class="sd">            given row name.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        The following example gets the row labeled &quot;example_row&quot; from the</span>
+<span class="sd">        DataFrame, my_df being an instance of the MyDataFrame class:</span>
+
+<span class="sd">        &gt;&gt;&gt; single_row_df = my_df.do_with_row(</span>
+<span class="sd">        ...     &#39;get_row_df_by_name&#39;,</span>
+<span class="sd">        ...     row_name=&#39;example_row&#39;</span>
+<span class="sd">        ... )</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Row names are case-sensitive. Make sure the row name you provide is</span>
+<span class="sd">        written exactly the same as the row name you are looking for in the</span>
+<span class="sd">        DataFrame.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="n">row_name</span><span class="p">]]</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.get_row_series_by_name">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.get_row_series_by_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_row_series_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a single row from the DataFrame based on its index name.</span>
+
+<span class="sd">        This method can be used for DataFrames where the index consists of</span>
+<span class="sd">        meaningful labels rather than row numbers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        row_name : str</span>
+<span class="sd">           The index name of the row to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Series</span>
+<span class="sd">           A pandas Series containing the requested row.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            If the DataFrame wrapped in this class does not contain the</span>
+<span class="sd">            given row name.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        The following example gets the row labeled &quot;example_row&quot; from the</span>
+<span class="sd">        DataFrame, my_df being an instance of the MyDataFrame class:</span>
+
+<span class="sd">        &gt;&gt;&gt; single_row_df = my_df.do_with_row(</span>
+<span class="sd">        ...     &#39;get_row_series_by_name&#39;,</span>
+<span class="sd">        ...     row_name=&quot;example_row&quot;</span>
+<span class="sd">        ... )</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Row names are case-sensitive. Make sure the row name you provide is</span>
+<span class="sd">        written exactly the same as the row name you are looking for in the</span>
+<span class="sd">        DataFrame.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row_name</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.get_row_df_by_index">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.get_row_df_by_index">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_row_df_by_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a single row from the DataFrame based on its integer index.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        row_index : int</span>
+<span class="sd">            The integer index of the row to retrieve. Indexing starts at 0.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            A pandas DataFrame containing the requested row. Note that the</span>
+<span class="sd">            returned object is a DataFrame with a single row, not a Series,</span>
+<span class="sd">            preserving the original DataFrame&#39;s column structure.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        IndexError</span>
+<span class="sd">            If &#39;row_index&#39; is out of bounds for the DataFrame.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        The following example gets the second row of the DataFrame,</span>
+<span class="sd">        my_df being an instance of the MyDataFrame class:</span>
+
+<span class="sd">        &gt;&gt;&gt; single_row_df = my_df.do_with_row(</span>
+<span class="sd">        ...     &#39;get_row_df_by_index&#39;, row_index=1</span>
+<span class="sd">        ... )</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">row_index</span><span class="p">]]</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.get_row_series_by_index">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.get_row_series_by_index">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_row_series_by_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a single row from the DataFrame based on its integer index.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        row_index : int</span>
+<span class="sd">            The integer index of the row to retrieve. Indexing starts at 0.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Series</span>
+<span class="sd">            A pandas Series containing the requested row.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        IndexError</span>
+<span class="sd">            If &#39;row_index&#39; is out of bounds for the DataFrame.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        The following example gets the second row of the DataFrame,</span>
+<span class="sd">        my_df being an instance of the MyDataFrame class:</span>
+
+<span class="sd">        &gt;&gt;&gt; single_row_df = my_df.do_with_row(</span>
+<span class="sd">        ...     &#39;get_row_series_by_index&#39;,</span>
+<span class="sd">        ...     row_index=1</span>
+<span class="sd">        ... )</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">row_index</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.extract_rows_by_col_value">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.extract_rows_by_col_value">[docs]</a>
+    <span class="k">def</span> <span class="nf">extract_rows_by_col_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">col_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+            <span class="n">op</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">eq</span>
+
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts rows where the specified column value fulfills a condition.</span>
+
+<span class="sd">        Extracts rows from the DataFrame based on a condition concerning the</span>
+<span class="sd">        value of a column.</span>
+
+<span class="sd">        This method can be used to extract all rows in the DataFrame that</span>
+<span class="sd">        fulfill the specified condition for the value in the given column.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the column to filter on.</span>
+
+<span class="sd">        col_value : Any</span>
+<span class="sd">            The value with which to compare the values on in the given column.</span>
+
+<span class="sd">        op : Callable[[Any, Any], bool]</span>
+<span class="sd">            The comparison operator to use for the filter ,  e.g.:</span>
+<span class="sd">            - operator.lt for &lt;,</span>
+<span class="sd">            - operator.gt for &gt;,</span>
+<span class="sd">            - operator.le for &lt;=,</span>
+<span class="sd">            - operator.ne for !=,</span>
+<span class="sd">            - operator.eq for ==,</span>
+<span class="sd">            - operator.ge for &gt;=.</span>
+
+<span class="sd">            Defaults to operator.eq</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            A pandas DataFrame containing the rows that fulfill the given</span>
+<span class="sd">            condition in the given column.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">condition</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">],</span> <span class="n">col_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">condition</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.extract_rows_by_other_indices">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.extract_rows_by_other_indices">[docs]</a>
+    <span class="k">def</span> <span class="nf">extract_rows_by_other_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">MyDataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts rows using the indices of another MyDataFrame.</span>
+
+<span class="sd">        This method selects rows from the DataFrame based on the index values</span>
+<span class="sd">        present in another MyDataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : MyDataFrame</span>
+<span class="sd">            The MyDataFrame object whose index values are used to filter the</span>
+<span class="sd">            rows in the current DataFrame.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataFrame</span>
+<span class="sd">            A pandas DataFrame containing the rows whose indices match those</span>
+<span class="sd">            in the other MyDataFrame.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">other</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.add_empty_row">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.add_empty_row">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_empty_row</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds an empty row to the dataframe.</span>
+
+<span class="sd">        Assigns NaN values to each field of the new row.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method uses the &#39;loc&#39; indexer to assign np.nan values to all</span>
+<span class="sd">        fields of the new row, using pandas&#39;s ability to propagate a single</span>
+<span class="sd">        value across multiple columns as an efficient way to add an</span>
+<span class="sd">        empty row to the dataframe.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.add_rows">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.add_rows">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_rows</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">MyDataFrame</span> <span class="o">|</span>
+                  <span class="n">DataFrame</span> <span class="o">|</span>
+                  <span class="n">DictOfLists</span> <span class="o">|</span>
+                  <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span>
+                  <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span>
+                  <span class="n">List</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span>
+                  <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">ignore_index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds one or more rows to the dataframe.</span>
+
+<span class="sd">        If data is None, an empty row is directly added to the dataframe.</span>
+
+<span class="sd">        Otherwise, before appending, the data undergoes validation checks for</span>
+<span class="sd">        data types, column count, and column names to ensure compatibility</span>
+<span class="sd">        with the existing dataframe structure. Upon passing these checks, the</span>
+<span class="sd">        data is converted into a pandas DataFrame and appended.</span>
+
+<span class="sd">        The supported data types for this method align with those with</span>
+<span class="sd">        which the class&#39;s data can be initialized.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data :  MyDataFrame |</span>
+<span class="sd">                DataFrame |</span>
+<span class="sd">                DictOfLists |</span>
+<span class="sd">                List[List[int | float | str]] |</span>
+<span class="sd">                List[Dict[str, int | float | str]] |</span>
+<span class="sd">                List[int | float | str] |</span>
+<span class="sd">                None</span>
+
+<span class="sd">            The data of the rows to be added to the dataframe. The supported</span>
+<span class="sd">            structures are as follows:</span>
+
+<span class="sd">            - MyDataFrame: Should wrap a DataFrame with a compatible, if not</span>
+<span class="sd">              the same, structure as the class&#39;s dataframe.</span>
+
+<span class="sd">            - DataFrame: Should have a compatible, if not the same, structure</span>
+<span class="sd">              as the class&#39;s dataframe.</span>
+
+<span class="sd">            - Dict: Maps column names (str) to lists of column values (int |</span>
+<span class="sd">              float | str), representing one or more rows.</span>
+
+<span class="sd">            - List[List[int | float | str]]: Each inner list represents a</span>
+<span class="sd">              single row&#39;s values.</span>
+
+<span class="sd">            - List[Dict[str, int | float | str]]: Each dictionary</span>
+<span class="sd">              contained represents one or more rows, with keys as column names</span>
+<span class="sd">              and values as lists of column values.</span>
+
+<span class="sd">            - List[int | float | str]: Represents a single row&#39;s values</span>
+<span class="sd">              across columns.</span>
+
+<span class="sd">            - Non-flat lists or tuples can contain</span>
+<span class="sd">                - either flat lists</span>
+<span class="sd">                    representing the values of single rows,</span>
+<span class="sd">                - or dictionaries</span>
+<span class="sd">                    organized the way described above and representing the</span>
+<span class="sd">                    data of one or more rows.</span>
+
+<span class="sd">            Defaults to None.</span>
+
+<span class="sd">        ignore_index : bool</span>
+<span class="sd">            - Should be set to True if the row index is supposed to be</span>
+<span class="sd">              reindexed so that the rows receive consecutive numbers.</span>
+<span class="sd">            - Should be set to False if the different rows contain</span>
+<span class="sd">              meaningful indices that should be preserved.</span>
+<span class="sd">            - Defaults to True.</span>
+
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            Raised if the data fails validation checks, indicating that the</span>
+<span class="sd">            columns of the row are incompatible with the target dataframe&#39;s</span>
+<span class="sd">            structure.</span>
+
+<span class="sd">            May occur in the following cases:</span>
+
+<span class="sd">            - If the row contains columns that are not present in the target</span>
+<span class="sd">              dataframe.</span>
+
+<span class="sd">            - If the row&#39;s column names do not match the names in the target</span>
+<span class="sd">              dataframe.</span>
+
+<span class="sd">            - If the row&#39;s column data types do not match those of the target</span>
+<span class="sd">              dataframe.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_empty_row</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_new_row_data</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+
+            <span class="n">my_data_frame_cls</span> <span class="o">=</span> <span class="n">LateImports</span><span class="o">.</span><span class="n">get_my_dataframe_class</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">my_data_frame_cls</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_append_rows</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="n">ignore_index</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_append_rows</span><span class="p">(</span>
+                    <span class="n">DataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                        <span class="n">data</span><span class="p">,</span>
+                        <span class="n">col_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">col_names</span>
+                    <span class="p">),</span>
+                    <span class="n">ignore_index</span><span class="o">=</span><span class="n">ignore_index</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;The data contains columns that do not match the &quot;</span>
+                <span class="s2">&quot;dataframe&#39;s columns. Cannot add the rows.&quot;</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.join">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.join">[docs]</a>
+    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">my_df_lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">MyDataFrame</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Joins the rows of several MyDataFrames in one MyDataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        my_df_lst : List[MyDataFrame]</span>
+<span class="sd">            The list of MyDataFrame objects to join.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            The resulting MyDataFrame with the joined rows.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">my_df</span> <span class="ow">in</span> <span class="n">my_df_lst</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_rows</span><span class="p">(</span><span class="n">my_df</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.get_row_id_by_row_name">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.get_row_id_by_row_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_row_id_by_row_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Searches the index of the row with the given name in the index column.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        row_name : str</span>
+<span class="sd">            The value to search for in the index column.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int | None</span>
+<span class="sd">            The index number of the row, or None if not found.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">row_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;Index column not set. Cannot search for row name.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">row_name</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.get_row_name_by_row_id">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.get_row_name_by_row_id">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_row_name_by_row_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the row name corresponding to a given integer row index.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        row_id : int</span>
+<span class="sd">            The integer index of the row.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str | int</span>
+<span class="sd">            The row name corresponding to the index.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        IndexError</span>
+<span class="sd">            If the row index is out of bounds.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">row_id</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Row index </span><span class="si">{</span><span class="n">row_id</span><span class="si">}</span><span class="s2"> is out of bounds. Valid range: 0 to &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">row_id</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.check_indices">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.check_indices">[docs]</a>
+    <span class="k">def</span> <span class="nf">check_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the indices of the two DataFrames are compatible.</span>
+
+<span class="sd">        Checks if the two DataFrames have the same indices or if they are</span>
+<span class="sd">        safe to be merged.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : DataFrame</span>
+<span class="sd">            The other DataFrame to compare with.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the two DataFrames have the same index, False otherwise.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the two DataFrames have incompatible indices:</span>
+
+<span class="sd">            - same number of indices but different names</span>
+<span class="sd">            - different number of indices but no intersection of indices.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;The two DataFrames have different indices. Cannot merge them.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_index_is_subset_of</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+                <span class="n">additional_ix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_additional_row_indices</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The new column has additional row(s) </span><span class="si">{</span><span class="n">additional_ix</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;The additional rows will be added to the original &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;DataFrame...&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_index_is_superset_of</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+                <span class="n">missing_ix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_missing_indices</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The new column has missing row(s) </span><span class="si">{</span><span class="n">missing_ix</span><span class="si">}</span><span class="s2">. &quot;</span>
+                       <span class="sa">f</span><span class="s2">&quot;The missing rows will be added to the column...&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_rows_intersection_with</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;The new column has an intersection with the &quot;</span>
+                       <span class="s2">&quot;original DataFrame. The DataFrame will be extended &quot;</span>
+                       <span class="s2">&quot;by the additional rows of the new column...&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.has_rows_intersection_with">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.has_rows_intersection_with">[docs]</a>
+    <span class="k">def</span> <span class="nf">has_rows_intersection_with</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the DataFrame has an intersection with the other DataFrame.</span>
+
+<span class="sd">        Checks if the current DataFrame has an intersection with the other</span>
+<span class="sd">        DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : DataFrame</span>
+<span class="sd">            The other DataFrame to compare with.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the two DataFrames have common rows, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">missing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_missing_indices</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="n">additional</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_additional_row_indices</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">missing</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">additional</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.get_missing_indices">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.get_missing_indices">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_missing_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the row indices that are missing in the other DataFrame.</span>
+
+<span class="sd">        Returns the row indices in the current DataFrame that are not</span>
+<span class="sd">        present in the other DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : DataFrame</span>
+<span class="sd">            The other DataFrame to compare with.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Index</span>
+<span class="sd">            The row indices in the current DataFrame that are not present in</span>
+<span class="sd">            the other DataFrame.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.get_additional_row_indices">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.get_additional_row_indices">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_additional_row_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Index</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the additional row indices of the other DataFrame.</span>
+
+<span class="sd">        Returns the row indices in the other DataFrame that are not present in</span>
+<span class="sd">        the current DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : DataFrame</span>
+<span class="sd">            The other DataFrame to compare with.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Index</span>
+<span class="sd">            The row indices in the other DataFrame that are not present in the</span>
+<span class="sd">            current DataFrame.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.row_index_is_subset_of">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.row_index_is_subset_of">[docs]</a>
+    <span class="k">def</span> <span class="nf">row_index_is_subset_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the current DataFrame is a subset of the other DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+
+<span class="sd">        ----------</span>
+<span class="sd">        other : DataFrame</span>
+<span class="sd">            The other DataFrame to compare with.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the current DataFrame is a subset of the other DataFrame,</span>
+<span class="sd">            False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations.row_index_is_superset_of">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations.row_index_is_superset_of">[docs]</a>
+    <span class="k">def</span> <span class="nf">row_index_is_superset_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the current DataFrame is a superset of the other DataFrame.</span>
+
+<span class="sd">        In other words, checks if the other DataFrame is a subset of the</span>
+<span class="sd">        current DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : DataFrame</span>
+<span class="sd">            The other DataFrame to compare with.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the other DataFrame is a subset of the current DataFrame,</span>
+<span class="sd">            False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+<div class="viewcode-block" id="DataFrameRowOperations._append_rows">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations._append_rows">[docs]</a>
+    <span class="k">def</span> <span class="nf">_append_rows</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">other</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">MyDataFrame</span><span class="p">,</span>
+            <span class="n">ignore_index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Appends the rows of a DataFrame to the end of the DataFrame that is</span>
+<span class="sd">        wrapped in this class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : DataFrame | MyDataFrame</span>
+<span class="sd">            The DataFrame to append to the DataFrame object of this class.</span>
+
+<span class="sd">        ignore_index : bool</span>
+<span class="sd">            - Should be set to True if the row index is supposed to be</span>
+<span class="sd">              reindexed so that the rows receive consecutive numbers.</span>
+<span class="sd">            - Should be set to False if the different rows contain</span>
+<span class="sd">              meaningful indices that should be preserved.</span>
+<span class="sd">            - Defaults to True.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - Ensures compatibility between the DataFrame to be appended (`other`)</span>
+<span class="sd">          and the DataFrame wrapped by this class in terms of column names,</span>
+<span class="sd">          column order, and data types to prevent issues such as misaligned</span>
+<span class="sd">          cols or data type mismatches.</span>
+
+<span class="sd">        - The original index of &#39;other&#39; will be ignored in favour of the target</span>
+<span class="sd">          dataframe&#39;s index.</span>
+
+<span class="sd">        - This method is resource-intensive when used frequently and/or with</span>
+<span class="sd">          big DataFrames.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># If a MyDataFrame object was provided, use the DataFrame wrapped in</span>
+        <span class="c1"># the object:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
+
+            <span class="c1"># Prevent circular imports</span>
+            <span class="n">my_data_frame_cls</span> <span class="o">=</span> <span class="n">LateImports</span><span class="o">.</span><span class="n">get_my_dataframe_class</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">my_data_frame_cls</span><span class="p">):</span>
+                <span class="n">other</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">my_data_frame_cls</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="n">df</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Expected DataFrame or MyDataFrame. Got </span><span class="si">%s</span><span class="s2"> instead&quot;</span> <span class="o">%</span>
+                       <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Copy the column names to ensure the column names of the two</span>
+        <span class="c1"># dataframes match for the intended concat function to work smoothly,</span>
+        <span class="c1"># since dataframes originating from lists or tuples do not contain</span>
+        <span class="c1"># column names.</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">,</span> <span class="n">other</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="n">ignore_index</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations._validate_new_row_data">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations._validate_new_row_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">_validate_new_row_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">MyDataFrame</span> <span class="o">|</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span>
+            <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validates the data against the DataFrame&#39;s schema.</span>
+
+<span class="sd">        This includes checking for matching column names (keys) and compatible</span>
+<span class="sd">        data types. Flat lists and tuples are directly checked for data types,</span>
+<span class="sd">        while non-flat lists and tuples are assumed to represent multiple rows</span>
+<span class="sd">        or complex structures that requires conversion to a DataFrame for</span>
+<span class="sd">        comprehensive validation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : MyDataFrame | DataFrame | dict | list | tuple | None</span>
+<span class="sd">            The data to be validated. Defaults to None.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the data passes the validation checks, False otherwise.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            If an unsupported data type is provided.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Non-flat lists and tuples are more efficiently handled by the</span>
+<span class="sd">        validation checks if previously converted to dataframes,</span>
+<span class="sd">        allowing for leveraging pandas&#39; sophisticated data handling</span>
+<span class="sd">        approaches.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Prevent circular imports</span>
+        <span class="n">my_data_frame_cls</span> <span class="o">=</span> <span class="n">LateImports</span><span class="o">.</span><span class="n">get_my_dataframe_class</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">my_data_frame_cls</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_check_keys</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="n">my_data_frame_cls</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">df</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_check_data_types</span><span class="p">(</span>
+                        <span class="n">cast</span><span class="p">(</span><span class="n">my_data_frame_cls</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">df</span>
+                    <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_keys</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_data_types</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">is_flat</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="c1"># For flat lists/tuples, only type checking is relevant</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_data_types</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+            <span class="c1"># For non-flat lists and tuples, convert to DataFrame and</span>
+            <span class="c1"># only check the number of cols and the data types,</span>
+            <span class="c1"># because lists and tuples do not contain column names.</span>
+            <span class="n">data_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_check_n_cols</span><span class="p">(</span><span class="n">data_df</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_check_data_types</span><span class="p">(</span><span class="n">data_df</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Cover the None case for completeness.</span>
+            <span class="c1"># Trying to add new data without passing any data will</span>
+            <span class="c1"># ultimately result in the creation of a new row in the class&#39;s</span>
+            <span class="c1"># dataframe.</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Unsupported data type: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations._check_data_types">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations._check_data_types">[docs]</a>
+    <span class="k">def</span> <span class="nf">_check_data_types</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks whether the data types of the data match the data types of</span>
+<span class="sd">        the existing cols in the dataframe wrapped in this class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data: DataFrame | dict | list | tuple</span>
+<span class="sd">            Data to be checked.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">           - &#39;True&#39; if all datatypes match.</span>
+<span class="sd">           - &#39;False&#39; if there is a mismatch or if column names do not match</span>
+<span class="sd">             those of the dataframe.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method logs an error message and returns &#39;False&#39; if any of the</span>
+<span class="sd">        column names in the data do not match the cols in the dataframe.</span>
+<span class="sd">        Ensure that column names in the data match those in the dataframe to</span>
+<span class="sd">        avoid mismatches and unnecessarily executing the method&#39;s code,</span>
+<span class="sd">        e.g. by using the _check_keys method beforehand.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
+                <span class="c1"># By only checking cols which are common to both dataframes,</span>
+                <span class="c1"># different column orders or missing cols in one of the</span>
+                <span class="c1"># dataframes do not matter.</span>
+                <span class="n">common_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">all</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span>
+                    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">common_columns</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+                        <span class="s1">&#39;get_col_type&#39;</span><span class="p">,</span> <span class="n">col_name</span><span class="o">=</span><span class="n">key</span>
+                    <span class="p">)</span> <span class="o">!=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span>
+                            <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span>
+                    <span class="p">):</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Column names do not match! (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">err</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations._check_n_cols">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations._check_n_cols">[docs]</a>
+    <span class="k">def</span> <span class="nf">_check_n_cols</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks whether the given dataframe contains the same number of</span>
+<span class="sd">        cols as the dataframe wrapped in this class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : DataFrame</span>
+<span class="sd">            The dataframe to check.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">           - &#39;True&#39; if the column numbers match.</span>
+<span class="sd">           - &#39;False&#39; if the column numbers do not match.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">n_cols</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations._check_keys">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations._check_keys">[docs]</a>
+    <span class="k">def</span> <span class="nf">_check_keys</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">list</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks whether all keys of the given data are contained in the</span>
+<span class="sd">        DataFrame wrapped in this class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data: DataFrame | dict | list</span>
+<span class="sd">            Data to be checked.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">           - &#39;True&#39; if all keys of the data are found in the DataFrame.</span>
+<span class="sd">           - &#39;False&#39; if there are keys in the data that are not found</span>
+<span class="sd">             in the DataFrame.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">are_all_elements_included</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">are_all_elements_included</span><span class="p">(</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+
+            <span class="c1"># Check if it&#39;s a list of dictionaries</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_keys_of_list_of_dicts</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+            <span class="c1"># Check if it&#39;s a list of lists</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_shapes_of_list_of_lists</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+            <span class="c1"># Unsupported list formats</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations._check_keys_of_list_of_dicts">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations._check_keys_of_list_of_dicts">[docs]</a>
+    <span class="k">def</span> <span class="nf">_check_keys_of_list_of_dicts</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks compatibility of the data structure with the current DataFrame.</span>
+
+<span class="sd">        Checks whether all keys of the given list of dicts correspond to</span>
+<span class="sd">        column names in the DataFrame wrapped in this class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : List[Dict[str, int | float | str]]</span>
+<span class="sd">            List of dictionaries whose string keys are to be matched with</span>
+<span class="sd">            the column names of the current MyDataFrame object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            - True if the data structure is compatible with the current</span>
+<span class="sd">              MyDataFrame.</span>
+<span class="sd">            - False if the structure is incompatible.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If the data is None, it is assumed to be compatible, so that this</span>
+<span class="sd">        method will return True.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">is_subset</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
+                   <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataFrameRowOperations._check_shapes_of_list_of_lists">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_frame_row_operations.DataFrameRowOperations._check_shapes_of_list_of_lists">[docs]</a>
+    <span class="k">def</span> <span class="nf">_check_shapes_of_list_of_lists</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks compatibility of the data structure with the current DataFrame.</span>
+
+<span class="sd">        Checks whether the number of elements in the inner list of the given</span>
+<span class="sd">        list of lists corresponds to the number of columns in the</span>
+<span class="sd">        DataFrame wrapped in this class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : List[List[int | float | str]]</span>
+<span class="sd">            List of list whose number is to be matched with the number</span>
+<span class="sd">            of columns of the current MyDataFrame object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            - True if the number of elements matches the number of columns.</span>
+<span class="sd">            - False if the numbers are not equal.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If the data is None, it is assumed to be compatible, so that this</span>
+<span class="sd">        method will return True.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inner_list</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_df</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+                   <span class="k">for</span> <span class="n">inner_list</span> <span class="ow">in</span> <span class="n">data</span><span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,5 @@
+<map id="inheritance4085fdcd86" name="inheritance4085fdcd86">
+<area shape="rect" id="node1" title="Create a collection of name/value pairs." alt="" coords="21,55,93,80"/>
+<area shape="rect" id="node2" href="#SentimentAnalysis.settings.SettingCategories" target="_top" title="Enumerates categories to organize the different settings for this project." alt="" coords="157,55,295,80"/>
+<area shape="rect" id="node3" href="#SentimentAnalysis.settings.SettingValue" target="_top" title="Explicitly set the types of the setting values to ensure type safety." alt="" coords="5,5,109,31"/>
+</map>

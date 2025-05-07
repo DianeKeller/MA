@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.constants &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.constants</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.constants</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">constants.py</span>
+<span class="sd">------------</span>
+<span class="sd">Version 1.0, updated on 2024-10-31</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">StrEnum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">cast</span>
+
+<span class="kn">from</span> <span class="nn">settings</span> <span class="kn">import</span> <span class="n">get_setting</span><span class="p">,</span> <span class="n">SettingCategories</span>
+
+<span class="n">FIRST_ID</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">get_setting</span><span class="p">(</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">NUM</span><span class="p">,</span> <span class="s1">&#39;FIRST_ID&#39;</span>
+<span class="p">))</span>
+<span class="n">MAX_ITEMS</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">get_setting</span><span class="p">(</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">NUM</span><span class="p">,</span> <span class="s1">&#39;MAX_ITEMS&#39;</span>
+<span class="p">))</span>
+<span class="n">MAX_STRING_LENGTH</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">get_setting</span><span class="p">(</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">NUM</span><span class="p">,</span>
+    <span class="s1">&#39;MAX_STRING_LENGTH&#39;</span>
+<span class="p">))</span>
+<span class="n">INFINITY</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">get_setting</span><span class="p">(</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">NUM</span><span class="p">,</span> <span class="s1">&#39;INFINITY&#39;</span>
+<span class="p">))</span>
+<span class="n">DEFAULT_LENGTH</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">get_setting</span><span class="p">(</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">NUM</span><span class="p">,</span>
+    <span class="s1">&#39;DEFAULT_LENGTH&#39;</span>
+<span class="p">))</span>
+<span class="n">BPE_MERGES</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">get_setting</span><span class="p">(</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">NUM</span><span class="p">,</span> <span class="s1">&#39;BPE_MERGES&#39;</span>
+<span class="p">))</span>
+<span class="n">BIG_DATA_THRESHOLD</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">get_setting</span><span class="p">(</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">NUM</span><span class="p">,</span>
+    <span class="s1">&#39;BIG_DATA_THRESHOLD&#39;</span>
+<span class="p">))</span>
+<span class="n">INT_NONE</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">get_setting</span><span class="p">(</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">NUM</span><span class="p">,</span> <span class="s1">&#39;INT_NONE&#39;</span>
+<span class="p">))</span>
+
+<span class="c1"># Data types</span>
+<span class="n">INT</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">get_setting</span><span class="p">(</span><span class="n">SettingCategories</span><span class="o">.</span><span class="n">DTYPE</span><span class="p">,</span> <span class="s1">&#39;INT&#39;</span><span class="p">))</span>
+<span class="n">FLOAT</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">get_setting</span><span class="p">(</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">DTYPE</span><span class="p">,</span> <span class="s1">&#39;FLOAT&#39;</span>
+<span class="p">))</span>
+
+<span class="c1"># Default language</span>
+<span class="n">DEFAULT_LANGUAGE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">get_setting</span><span class="p">(</span>
+    <span class="n">SettingCategories</span><span class="o">.</span><span class="n">STR</span><span class="p">,</span> <span class="s1">&#39;DEFAULT_LANGUAGE&#39;</span>
+<span class="p">))</span>
+
+
+<div class="viewcode-block" id="Language">
+<a class="viewcode-back" href="../../SentimentAnalysis.html#SentimentAnalysis.constants.Language">[docs]</a>
+<span class="k">class</span> <span class="nc">Language</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Language class.</span>
+
+<span class="sd">    This class provides string constants (str) for language codes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">DE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;de&#39;</span>
+    <span class="n">EN</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;en&#39;</span>
+    <span class="n">ES</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;es&#39;</span>
+    <span class="n">FR</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;fr&#39;</span>
+    <span class="n">IT</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;it&#39;</span>
+    <span class="n">NL</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;nl&#39;</span>
+    <span class="n">PT</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;pt&#39;</span>
+    <span class="n">RO</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ro&#39;</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

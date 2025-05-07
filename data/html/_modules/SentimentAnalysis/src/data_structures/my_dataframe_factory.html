@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.data_structures.my_dataframe_factory &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.data_structures.my_dataframe_factory</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.data_structures.my_dataframe_factory</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">my_dataframe_factory.py</span>
+<span class="sd">-----------------------</span>
+<span class="sd">Version 1.0, updated on 2024-09-10</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span> <span class="nn">src.data_structures.data_frame_factory</span> <span class="kn">import</span> <span class="n">DataFrameFactory</span>
+<span class="kn">from</span> <span class="nn">src.data_structures.my_data_frame</span> <span class="kn">import</span> <span class="n">MyDataFrame</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.chunk</span> <span class="kn">import</span> <span class="n">Chunk</span>
+
+
+<div class="viewcode-block" id="MyDataFrameFactory">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_dataframe_factory.MyDataFrameFactory">[docs]</a>
+<span class="k">class</span> <span class="nc">MyDataFrameFactory</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    MyDataFrameFactory class.</span>
+
+<span class="sd">    This class provides factory methods to create MyDataFrame instances and</span>
+<span class="sd">    instances of MyDataFrame child classes like Chunk.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    create(</span>
+<span class="sd">            data: Any | None,</span>
+<span class="sd">            col_names: list[str] | None=None,</span>
+<span class="sd">            index_column: str = &#39;&#39;,</span>
+<span class="sd">            name: str | None = None</span>
+<span class="sd">    ) -&gt; MyDataFrame:</span>
+<span class="sd">        Factory method to create a MyDataFrame instance.</span>
+
+<span class="sd">    create_chunk(</span>
+<span class="sd">            data: Any | None,</span>
+<span class="sd">            col_names: list[str] | None=None,</span>
+<span class="sd">            index_column: str = &#39;&#39;,</span>
+<span class="sd">            name: str | None = None</span>
+<span class="sd">    ) -&gt; Chunk:</span>
+<span class="sd">        Factory method to create a Chunk instance.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MyDataFrameFactory.create">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_dataframe_factory.MyDataFrameFactory.create">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">row_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">index_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MyDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Factory method to create a MyDataFrame instance.</span>
+
+<span class="sd">        This method calls the DataFrameFactory to create the DataFrame</span>
+<span class="sd">        instance which is wrapped in the MyDataFrame class instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Any | None</span>
+<span class="sd">            The data to populate the DataFrame. The specific type of this</span>
+<span class="sd">            argument determines which implementation of the create_dataframe</span>
+<span class="sd">            function is called.</span>
+
+<span class="sd">        col_names : list[str] | None</span>
+<span class="sd">            A list of column names for the DataFrame. If provided, it</span>
+<span class="sd">            overrides the column names in the given data. Default is None.</span>
+
+<span class="sd">        row_names : list[str] | None</span>
+<span class="sd">            A list of row names for the DataFrame. Default is None.</span>
+
+<span class="sd">        index_column : str | None</span>
+<span class="sd">            The name of the column to set as the index of the DataFrame.</span>
+<span class="sd">            Default is None.</span>
+
+<span class="sd">        name : str</span>
+<span class="sd">            The name for the DataFrame, used primarily for serialization</span>
+<span class="sd">            purposes. Default is None.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MyDataFrame</span>
+<span class="sd">            An instance of MyDataFrame populated with the provided data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">col_names</span><span class="p">,</span> <span class="n">row_names</span><span class="p">,</span> <span class="n">index_column</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">MyDataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MyDataFrameFactory.create_chunk">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.my_dataframe_factory.MyDataFrameFactory.create_chunk">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_chunk</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">col_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">row_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">index_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Chunk</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Factory method to create a Chunk instance.</span>
+
+<span class="sd">        This method calls the DataFrameFactory to create the DataFrame</span>
+<span class="sd">        instance which is wrapped in the Chunk class instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Any | None</span>
+<span class="sd">            The data to populate the DataFrame. The specific type of this</span>
+<span class="sd">            argument determines which implementation of the create_dataframe</span>
+<span class="sd">            function is called.</span>
+
+<span class="sd">        col_names : list[str] | None</span>
+<span class="sd">            A list of column names for the DataFrame. If provided, it</span>
+<span class="sd">            overrides the column names in the given data. Default is None.</span>
+
+<span class="sd">        row_names : list[str] | None</span>
+<span class="sd">            A list of row names for the DataFrame. Default is None.</span>
+
+<span class="sd">        index_column : str | None</span>
+<span class="sd">            The name of the column to set as the index of the DataFrame.</span>
+<span class="sd">            Default is None.</span>
+
+<span class="sd">        name : str</span>
+<span class="sd">            The name for the DataFrame, used primarily for serialization</span>
+<span class="sd">            purposes. Default is None.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Chunk</span>
+<span class="sd">            An instance of Chunk populated with the provided data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrameFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">col_names</span><span class="p">,</span> <span class="n">row_names</span><span class="p">,</span> <span class="n">index_column</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Chunk</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

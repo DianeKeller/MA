@@ -1,7 +1,7 @@
 """
 prompt_generating_strategy_2.py
 -------------------------------
-Version 1.0, updated on 2025-05-01
+Version 1.0, updated on 2025-05-07
 
 """
 
@@ -336,7 +336,7 @@ class PromptGeneratingStrategy2(PromptGeneratingStrategy):
     def generate_prompt(self) \
             -> Dict[str, str]:
         """
-        Assembles an returns the prompt parts of a single prompt.
+        Assembles and returns the prompt parts of a single prompt.
 
         This method implements the corresponding abstract method of the
         PromptGenerationStrategy interface.

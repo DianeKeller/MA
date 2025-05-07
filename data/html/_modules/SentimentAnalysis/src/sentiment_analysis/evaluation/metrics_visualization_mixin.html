@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.sentiment_analysis.evaluation.metrics_visualization_mixin &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.sentiment_analysis.evaluation.metrics_visualization_mixin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.sentiment_analysis.evaluation.metrics_visualization_mixin</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">metrics_visualization_mixin.py</span>
+<span class="sd">------------------------------</span>
+<span class="sd">Version 1.0, updated on 2025-01-02</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">no_type_check</span>
+
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">Series</span><span class="p">,</span> <span class="n">DataFrame</span>
+
+<span class="kn">from</span> <span class="nn">src.decorators.ensure_implements_decorator</span> <span class="kn">import</span> <span class="n">ensure_implements</span>
+<span class="kn">from</span> <span class="nn">src.loggable</span> <span class="kn">import</span> <span class="n">Loggable</span>
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.retrieval.custom_exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CriticalException</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.sentiment_analysis.sentiment_analysis_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SentimentAnalysisConfig</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">src.stats.visualization.command_line_strategy</span> <span class="kn">import</span> <span class="n">CommandLineStrategy</span>
+<span class="kn">from</span> <span class="nn">src.stats.visualization.diagram</span> <span class="kn">import</span> <span class="n">Diagram</span>
+<span class="kn">from</span> <span class="nn">src.stats.visualization.plotter</span> <span class="kn">import</span> <span class="n">Plotter</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">src.utils.print_utils</span> <span class="kn">import</span> <span class="n">print_in_box</span>
+<span class="kn">from</span> <span class="nn">type_aliases</span> <span class="kn">import</span> <span class="n">ThresholdsType</span>
+
+
+<div class="viewcode-block" id="MetricsVisualizationMixin">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.metrics_visualization_mixin.MetricsVisualizationMixin">[docs]</a>
+<span class="k">class</span> <span class="nc">MetricsVisualizationMixin</span><span class="p">(</span><span class="n">LoggingMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">SentimentAnalysisConfig</span><span class="p">()</span>
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">diagram</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">Diagram</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets an instance of the Diagram class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_diagram&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_diagram</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_diagram&#39;</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="nd">@diagram</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">diagram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diagram</span><span class="p">:</span> <span class="n">Diagram</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_diagram&#39;</span><span class="p">,</span> <span class="n">diagram</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">submetrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the list of available submetrics.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_submetrics&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_submetrics</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_submetrics&#39;</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="nd">@submetrics</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">submetrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">submetrics</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the list of available submetrics.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_submetrics&#39;</span><span class="p">,</span> <span class="n">submetrics</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">thresholds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">ThresholdsType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the thresholds for the different metrics.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_thresholds&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_thresholds</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_thresholds&#39;</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="nd">@thresholds</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">thresholds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">:</span> <span class="n">ThresholdsType</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the thresholds for the different metrics.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_thresholds&#39;</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">)</span>
+
+    <span class="c1"># endregion --- Properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="MetricsVisualizationMixin.show_partial_metric">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.metrics_visualization_mixin.MetricsVisualizationMixin.show_partial_metric">[docs]</a>
+    <span class="nd">@no_type_check</span>
+    <span class="nd">@ensure_implements</span><span class="p">(</span><span class="n">Loggable</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">show_partial_metric</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;macro&#39;</span><span class="p">,</span>
+            <span class="n">show_best</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">show_worst</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shows a diagram for the specified group of metrics.</span>
+
+<span class="sd">        The possible groups are defined by the submetrics property of this</span>
+<span class="sd">        class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        metric : str</span>
+<span class="sd">            The group of metrics to show corresponding to one of the</span>
+<span class="sd">            submetrics defined in the list returned by the submetrics</span>
+<span class="sd">            property of this class.</span>
+
+<span class="sd">        show_best : bool</span>
+<span class="sd">            Whether to show the best queries. Defaults to False.</span>
+
+<span class="sd">        show_worst : bool</span>
+<span class="sd">            Whether to show the worst queries. Defaults to False.</span>
+
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        CriticalException</span>
+<span class="sd">            If the given metric is not contained in the submetrics list.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">submetrics</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CriticalException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="s2">&quot;Unknown submetric </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">metric</span>
+            <span class="p">)</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_partial_metrics</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span><span class="o">.</span><span class="n">df</span>
+
+        <span class="k">if</span> <span class="n">show_best</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">n_prompts</span><span class="p">]</span>
+            <span class="n">best_or_worst</span> <span class="o">=</span> <span class="s2">&quot;- Best Prompts&quot;</span>
+        <span class="k">elif</span> <span class="n">show_worst</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">n_prompts</span><span class="p">:]</span>
+            <span class="n">best_or_worst</span> <span class="o">=</span> <span class="s2">&quot;- Worst Prompts&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Use df as it is</span>
+            <span class="n">best_or_worst</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">language</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;sub_dir&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="s1">&#39; (v_</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">version</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="s1">&#39;(Samples </span><span class="si">%s</span><span class="s1"> (v_</span><span class="si">%s</span><span class="s1">))&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sub_dir</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+
+        <span class="n">title</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">language</span><span class="si">}</span><span class="s2">: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">metric</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2"> Metrics for Different Prompts &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">best_or_worst</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">samples</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">print_in_box</span><span class="p">(</span>
+            <span class="n">title</span><span class="p">,</span>
+            <span class="n">df</span>
+        <span class="p">)</span>
+        <span class="n">y_label</span> <span class="o">=</span> <span class="s1">&#39;Value&#39;</span>
+        <span class="n">x_label</span> <span class="o">=</span> <span class="s1">&#39;Metric&#39;</span>
+
+        <span class="n">thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span>
+
+        <span class="k">if</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">thresholds</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diagram</span><span class="o">.</span><span class="n">line_plot</span><span class="p">(</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+                <span class="n">title</span><span class="p">,</span>
+                <span class="n">y_label</span><span class="p">,</span>
+                <span class="n">x_label</span><span class="p">,</span>
+                <span class="n">thresholds</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span>
+            <span class="p">)</span>
+
+            <span class="n">x_label</span> <span class="o">=</span> <span class="s1">&#39;Prompt&#39;</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">diagram</span><span class="o">.</span><span class="n">line_plot</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">,</span>
+                <span class="n">title</span><span class="p">,</span>
+                <span class="n">y_label</span><span class="p">,</span>
+                <span class="n">x_label</span><span class="p">,</span>
+                <span class="n">thresholds</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diagram</span><span class="o">.</span><span class="n">line_plot</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">y_label</span><span class="p">,</span> <span class="n">x_label</span><span class="p">)</span>
+
+            <span class="n">x_label</span> <span class="o">=</span> <span class="s1">&#39;Prompt&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diagram</span><span class="o">.</span><span class="n">line_plot</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">y_label</span><span class="p">,</span> <span class="n">x_label</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MetricsVisualizationMixin.show_best">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.metrics_visualization_mixin.MetricsVisualizationMixin.show_best">[docs]</a>
+    <span class="k">def</span> <span class="nf">show_best</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays a DataFrame containing the best queries.</span>
+
+<span class="sd">        Prints the DataFrame in a formatted box in the console.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_best</span><span class="p">()</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Best </span><span class="si">%d</span><span class="s2"> queries&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_prompts</span>
+        <span class="n">print_in_box</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MetricsVisualizationMixin.get_best">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.metrics_visualization_mixin.MetricsVisualizationMixin.get_best">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_best</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">best</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+            <span class="s1">&#39;extract_columns&#39;</span><span class="p">,</span> <span class="n">col_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;rank&#39;</span><span class="p">,</span> <span class="s1">&#39;query&#39;</span><span class="p">]</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MetricsVisualizationMixin.show_worst">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.metrics_visualization_mixin.MetricsVisualizationMixin.show_worst">[docs]</a>
+    <span class="k">def</span> <span class="nf">show_worst</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays a DataFrame containing the worst queries.</span>
+
+<span class="sd">        Prints the DataFrame in a formatted box in the console.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">worst</span><span class="o">.</span><span class="n">do_with_column</span><span class="p">(</span>
+            <span class="s1">&#39;extract_columns&#39;</span><span class="p">,</span> <span class="n">col_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;rank&#39;</span><span class="p">,</span> <span class="s1">&#39;query&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Worst </span><span class="si">%d</span><span class="s2"> queries&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_prompts</span>
+        <span class="n">print_in_box</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MetricsVisualizationMixin.show_correlation_heatmap">
+<a class="viewcode-back" href="../../../../../SentimentAnalysis.src.sentiment_analysis.evaluation.html#SentimentAnalysis.src.sentiment_analysis.evaluation.metrics_visualization_mixin.MetricsVisualizationMixin.show_correlation_heatmap">[docs]</a>
+    <span class="k">def</span> <span class="nf">show_correlation_heatmap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">correlation_data</span><span class="p">:</span> <span class="n">Series</span> <span class="o">|</span> <span class="n">DataFrame</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Displays a correlation heatmap using the provided correlation data.</span>
+
+<span class="sd">        This method generates a heatmap based on the input data to visually</span>
+<span class="sd">        represent correlation values between variables. It supports both</span>
+<span class="sd">        pandas Series and pandas DataFrame objects. If a Series is provided,</span>
+<span class="sd">        it uses a single dimension to plot the heatmap. If a DataFrame is</span>
+<span class="sd">        given, it processes the data to construct a multi-dimensional heatmap.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        correlation_data : Series or DataFrame</span>
+<span class="sd">            The data containing correlation values. Accepts either a pandas</span>
+<span class="sd">            Series, which represents one-dimensional data, or a pandas</span>
+<span class="sd">            DataFrame for multi-dimensional correlation values.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method does not return any values. The methods it calls directly</span>
+<span class="sd">        display the generated heatmap.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Prevent that correlation_data is modified globally:</span>
+        <span class="n">corr_data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">correlation_data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">corr_data</span><span class="p">,</span> <span class="n">Series</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diagram</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">corr_data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diagram</span><span class="o">.</span><span class="n">heatmap_from_df</span><span class="p">(</span><span class="n">corr_data</span><span class="p">)</span></div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+
+    <span class="c1"># region --- Protected Methods</span>
+
+    <span class="k">def</span> <span class="nf">_set_thresholds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Thresholds for the different metrics to show in the diagrams:</span>
+        <span class="n">standard_thresholds</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;Poor&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;Fair&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="s1">&#39;Good&#39;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
+            <span class="s1">&#39;Very good&#39;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
+            <span class="s1">&#39;Excellent&#39;</span><span class="p">:</span> <span class="mf">0.8</span>
+        <span class="p">}</span>
+        <span class="c1"># Slightly higher thresholds for the accuracy compared to the other</span>
+        <span class="c1"># metrics because class imbalance might lead to a misleadingly high</span>
+        <span class="c1"># accuracy if only the most frequent class is mostly classified</span>
+        <span class="c1"># correctly.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;acc&#39;</span><span class="p">:</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;Poor&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="s1">&#39;Fair&#39;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
+                    <span class="s1">&#39;Good&#39;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
+                    <span class="s1">&#39;Very good&#39;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+                    <span class="s1">&#39;Excellent&#39;</span><span class="p">:</span> <span class="mf">0.9</span>
+                <span class="p">},</span>
+            <span class="s1">&#39;macro&#39;</span><span class="p">:</span>
+                <span class="n">standard_thresholds</span><span class="p">,</span>
+            <span class="s1">&#39;f1&#39;</span><span class="p">:</span>
+                <span class="n">standard_thresholds</span><span class="p">,</span>
+            <span class="s1">&#39;precision&#39;</span><span class="p">:</span>
+                <span class="n">standard_thresholds</span><span class="p">,</span>
+            <span class="s1">&#39;recall&#39;</span><span class="p">:</span>
+                <span class="n">standard_thresholds</span><span class="p">,</span>
+            <span class="s1">&#39;positive&#39;</span><span class="p">:</span>
+                <span class="n">standard_thresholds</span><span class="p">,</span>
+            <span class="s1">&#39;negative&#39;</span><span class="p">:</span>
+                <span class="n">standard_thresholds</span><span class="p">,</span>
+            <span class="s1">&#39;neutral&#39;</span><span class="p">:</span>
+                <span class="n">standard_thresholds</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_set_submetrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="c1"># Metrics groups to visualize:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submetrics</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;macro&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;f1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;precision&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;recall&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;positive&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;negative&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;neutral&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_set_diagram</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">diagram</span> <span class="o">=</span> <span class="n">Diagram</span><span class="p">(</span><span class="n">Plotter</span><span class="p">(</span><span class="n">CommandLineStrategy</span><span class="p">()))</span></div>
+
+
+    <span class="c1"># endregion --- Protected Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

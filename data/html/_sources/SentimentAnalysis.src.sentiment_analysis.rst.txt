@@ -1,0 +1,127 @@
+SentimentAnalysis.src.sentiment\_analysis package
+=================================================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   SentimentAnalysis.src.sentiment_analysis.evaluation
+   SentimentAnalysis.src.sentiment_analysis.prompt_engineering
+   SentimentAnalysis.src.sentiment_analysis.retrieval
+   SentimentAnalysis.src.sentiment_analysis.samples
+
+Submodules
+----------
+
+SentimentAnalysis.src.sentiment\_analysis.bloom\_fact\_sheet\_mixin module
+--------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.bloom_fact_sheet_mixin
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.chunk module
+------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.chunk
+   :no-index:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.chunk\_loader module
+--------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.chunk_loader
+   :no-index:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.file\_loader module
+-------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.file_loader
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.llm module
+----------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.llm
+   :no-index:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.query module
+------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.query
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.sentiment\_analysis\_config module
+----------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_config
+   :no-index:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.sentiment\_analysis\_workflow module
+------------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.sentiment_analysis_workflow
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.sentiment\_stats module
+-----------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.sentiment_stats
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.serverless\_bloom module
+------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.serverless_bloom
+   :no-index:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.serverless\_bloom\_prompt\_validation\_mixin module
+---------------------------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.serverless_bloom_prompt_validation_mixin
+   :no-index:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SentimentAnalysis.src.sentiment\_analysis.serverless\_bloom\_workflow module
+----------------------------------------------------------------------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis.serverless_bloom_workflow
+   :no-index:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: SentimentAnalysis.src.sentiment_analysis
+   :members:
+   :undoc-members:
+   :show-inheritance:

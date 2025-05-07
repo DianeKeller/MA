@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentimentAnalysis.src.data_structures.data_collection &mdash; SentimentAnalysis 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SentimentAnalysis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">SentimentAnalysis</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SentimentAnalysis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">SentimentAnalysis.src.data_structures.data_collection</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for SentimentAnalysis.src.data_structures.data_collection</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">data_collection.py</span>
+<span class="sd">------------------</span>
+<span class="sd">Version 1.0, updated on 2025-05-01</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">from</span> <span class="nn">src.logging_mixin</span> <span class="kn">import</span> <span class="n">LoggingMixin</span>
+<span class="kn">from</span> <span class="nn">src.utils.data_utils</span> <span class="kn">import</span> <span class="n">is_none_or_empty</span>
+<span class="kn">from</span> <span class="nn">src.utils.print_utils</span> <span class="kn">import</span> <span class="n">SUBSEPARATOR</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DataCollection">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_collection.DataCollection">[docs]</a>
+<span class="k">class</span> <span class="nc">DataCollection</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">LoggingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract base class for different data collection structures. It defines</span>
+<span class="sd">    functionalities like filtering and extracting data subsets by the</span>
+<span class="sd">    content of given columns, and automatically eliminating columns with no</span>
+<span class="sd">    informational value.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data T | None:</span>
+<span class="sd">        The data, which can be stored in different types of data structures,</span>
+<span class="sd">        e.g. a pandas dataframe or a HuggingFace DatasetDict.        .</span>
+
+<span class="sd">    name : str</span>
+<span class="sd">        An optional name for the data, providing a human-readable</span>
+<span class="sd">        identifier for data saving, logging and tracking purposes.</span>
+
+<span class="sd">    single_value_cols : dict[str, Any]</span>
+<span class="sd">        A dictionary where the keys are column names and the values are the</span>
+<span class="sd">        single unique value found in that column, if applicable. This is used</span>
+<span class="sd">        to track columns that may not be informative.</span>
+
+<span class="sd">    n_single_value_cols : int</span>
+<span class="sd">        The number of columns that have been identified as containing no</span>
+<span class="sd">        values or only a single unique value.</span>
+
+<span class="sd">    Abstract Attributes</span>
+<span class="sd">    -------------------</span>
+<span class="sd">    n_rows : int</span>
+<span class="sd">        The number of rows in the data. </span>
+
+<span class="sd">    n_cols : int</span>
+<span class="sd">        The number of columns in the data. </span>
+
+<span class="sd">    col_names : List[str]</span>
+<span class="sd">        A list of the column names in the data. Must be implemented by</span>
+<span class="sd">        subclasses.</span>
+
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    has_data() -&gt; bool:</span>
+<span class="sd">        Checks if the data is set and is not None or empty. Returns True if</span>
+<span class="sd">        the data exists, False otherwise.</span>
+<span class="sd">        </span>
+<span class="sd">    to_string() -&gt; str:</span>
+<span class="sd">        Returns a string representation of the data, including basic metadata</span>
+<span class="sd">        such as the number of rows and columns, column names, and any</span>
+<span class="sd">        single-value columns identified and removed.</span>
+<span class="sd">        </span>
+<span class="sd">    Abstract Methods</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    filter_rows_by_col_value(col_name: str, col_value: Any) -&gt; T:</span>
+<span class="sd">        Extracts all rows from the data where the value in the given column</span>
+<span class="sd">        matches the specified column value and returns them in the same type</span>
+<span class="sd">        of data structure as the original data. Must be implemented by </span>
+<span class="sd">        subclasses.</span>
+
+<span class="sd">    drop_single_value_cols() -&gt; None:</span>
+<span class="sd">        Removes identified single-value columns from the data to streamline</span>
+<span class="sd">        the data set. </span>
+
+<span class="sd">    find_single_value_cols() -&gt; None:</span>
+<span class="sd">        Identifies columns in the data that contain no values or only a single</span>
+<span class="sd">        value, marking them for potential removal. This method sets the</span>
+<span class="sd">        &#39;single_value_cols&#39; property. </span>
+
+<span class="sd">    has_no_data(verbose: bool = True) -&gt; bool:</span>
+<span class="sd">        Checks if the data is None or empty. If the &#39;verbose&#39; parameter is set</span>
+<span class="sd">        to True, a warning message is logged in case the data is None or empty.</span>
+<span class="sd">        </span>
+
+<span class="sd">    min_filter(col_name: str, min_value: Any) -&gt; T:</span>
+<span class="sd">        Extracts all rows from the data where the value in the given column</span>
+<span class="sd">        is greater than or equal to the specified minimum value. Must be </span>
+<span class="sd">        implemented by subclasses.</span>
+
+<span class="sd">    max_filter(col_name: str, max_value: Any) -&gt; T:</span>
+<span class="sd">        Extracts all rows from the data where the value in the given column</span>
+<span class="sd">        is smaller than or equal to the specified maximum value. Must be </span>
+<span class="sd">        implemented by subclasses.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DataCollection.__init__">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_collection.DataCollection.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">T</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor.</span>
+
+<span class="sd">        Initializes a new instance of this base class with any type of data</span>
+<span class="sd">        collection and an identifying name.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : T | None</span>
+<span class="sd">            The data wrapped in this class.</span>
+
+<span class="sd">        name: str</span>
+<span class="sd">            A name identifying the data, used for naming files when saving</span>
+<span class="sd">            the data or information related to it.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span> <span class="n">T</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_single_value_cols</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+
+    <span class="c1"># region --- Properties</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the name of the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the name of the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">T</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
+
+    <span class="nd">@data</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">single_value_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the single value columns from the data.</span>
+
+<span class="sd">        If they are not set, the find_single_value_cols method will be</span>
+<span class="sd">        called, which will set the single_value_cols so that they can be</span>
+<span class="sd">        returned.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_none_or_empty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;There is no data! Cannot search for single value columns!&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_single_value_cols</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">find_single_value_cols</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_single_value_cols</span>
+
+    <span class="nd">@single_value_cols</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">single_value_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the single value columns.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_single_value_cols</span> <span class="o">=</span> <span class="n">cols</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_single_value_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the number of single-value columns.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">single_value_cols</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">n_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the number of rows in the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">n_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the number of columns in the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">col_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the column names of the data object.</span>
+
+<span class="sd">        The way how the list of column names is provided by the data object of</span>
+<span class="sd">        the different subclasses depends on the data type of the data object.</span>
+<span class="sd">        Therefore, this property is abstract and must be implemented by the</span>
+<span class="sd">        subclasses.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="c1"># endregion --- properties</span>
+
+    <span class="c1"># region --- Public Methods</span>
+
+<div class="viewcode-block" id="DataCollection.filter_rows_by_col_value">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_collection.DataCollection.filter_rows_by_col_value">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">filter_rows_by_col_value</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">col_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts all rows from the data where the value in a given column</span>
+<span class="sd">        matches the specified column value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the column in which to seek for the specified value.</span>
+
+<span class="sd">        col_value : Any</span>
+<span class="sd">            The value for which to seek in the specified column</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        T</span>
+<span class="sd">            A new MyDataFrame containing the extracted rows.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="DataCollection.min_filter">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_collection.DataCollection.min_filter">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">min_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">min_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts all rows from the data where the value in a given column</span>
+<span class="sd">        is greater than or equal to the specified minimum value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the column in which to seek for the specified value.</span>
+
+<span class="sd">        min_value : Any</span>
+<span class="sd">            The minimum value with which to compare the values in the</span>
+<span class="sd">            specified column</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        T</span>
+<span class="sd">            A new MyDataFrame containing the extracted rows.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="DataCollection.max_filter">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_collection.DataCollection.max_filter">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">max_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts all rows from the data where the value in a given column</span>
+<span class="sd">        is smaller than or equal to the specified minimum value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        col_name : str</span>
+<span class="sd">            The name of the column in which to seek for the specified value.</span>
+
+<span class="sd">        max_value : Any</span>
+<span class="sd">            The maximum value with which to compare the values in the</span>
+<span class="sd">            specified column</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        T</span>
+<span class="sd">            A new MyDataFrame containing the extracted rows.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="DataCollection.find_single_value_cols">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_collection.DataCollection.find_single_value_cols">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">find_single_value_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds empty and single-value columns to set the &#39;single_value_cols&#39;</span>
+<span class="sd">        property.</span>
+
+<span class="sd">        Finds columns that have no values or that only have one single</span>
+<span class="sd">        value across the entire dataset. Such columns are considered as</span>
+<span class="sd">        irrelevant, so that they can be dropped from the dataset.</span>
+<span class="sd">        Nevertheless, their names and values are kept in a dictionary</span>
+<span class="sd">        so that the information about which columns and values have been</span>
+<span class="sd">        removed can be retrieved even after the columns have been dropped.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The result of this method is a dictionary containing the names and the</span>
+<span class="sd">        single value (if any) of columns identified as having no or a single</span>
+<span class="sd">        unique value (format: {col_name: col_value}). The resulting</span>
+<span class="sd">        dictionary is not returned, but used to set the &#39;single_value_cols&#39;</span>
+<span class="sd">        property.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="DataCollection.drop_single_value_cols">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_collection.DataCollection.drop_single_value_cols">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">drop_single_value_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes all columns from the DatasetDict that have no informational</span>
+<span class="sd">        value.</span>
+
+<span class="sd">        Empty columns and columns that only have one single value across the</span>
+<span class="sd">        dataset are dropped.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="DataCollection.has_no_data">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_collection.DataCollection.has_no_data">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">has_no_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the data is None or empty.</span>
+
+<span class="sd">        If the &#39;verbose&#39; parameter is set to True, a warning message is</span>
+<span class="sd">        logged in case the data is None or empty.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the data is None or empty, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="DataCollection.has_data">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_collection.DataCollection.has_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">has_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> \
+            <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the data is set and is not None or empty.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the data exists, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_no_data</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DataCollection.to_string">
+<a class="viewcode-back" href="../../../../SentimentAnalysis.src.data_structures.html#SentimentAnalysis.src.data_structures.data_collection.DataCollection.to_string">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a string representation of the data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A string representation of the data.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The content of this method is not inserted in the __str__ method</span>
+<span class="sd">        because this is executed each time the class is viewed in the</span>
+<span class="sd">        debugger. This is extremely confusing, especially if the string</span>
+<span class="sd">        representation uses computed properties.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SUBSEPARATOR</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SUBSEPARATOR</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Data: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Data type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Rows and columns: </span><span class="si">{</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_rows</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">n_cols</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Columns: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_cols</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">col_names</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Empty or single-value columns dropped:&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">single_value_cols</span><span class="p">)</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">single_value_cols</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">single_value_cols</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># endregion --- Public Methods</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Diane Keller.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
